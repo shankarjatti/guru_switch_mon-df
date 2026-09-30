@@ -286,6 +286,28 @@ class TimeoutTap:
 TIMEOUTS_PER_S_STALLED = 3
 
 
+def _reexec(state, tap, why):
+    """Start this program again as a NEW process on the band last asked for: a
+    HackRF whose USB stream stalled (or that was replugged) does not recover
+    inside the process that had it open (2026-09-30: in-process restarts
+    stalled again within a second, 7046 TIMEOUTs; a fresh process was clean)."""
+    argv = [x for x in sys.argv]
+    if "--freq" in argv:
+        i = argv.index("--freq")
+        del argv[i:i + 2]
+    argv += ["--freq", "%.0f" % state["freq"]]
+    print("[watchdog] %s -- starting the transmitter again as a new process on %.4f GHz"
+          % (why, state["freq"] / 1e9), flush=True)
+    try:
+        state["tb"].stop()
+    except Exception:
+        pass
+    time.sleep(3.0)
+    if tap is not None:
+        tap.close()             # real stdout/stderr back, or the new process writes into a dead pipe
+    os.execv(sys.executable, [sys.executable] + argv)
+
+
 def watchdog(make_tb, state, stop, expected_rate, tap=None):
     """Restart the flowgraph if the transmit stream dies.
 
@@ -339,6 +361,12 @@ def watchdog(make_tb, state, stop, expected_rate, tap=None):
                 why.append("%d TIMEOUT warnings in the last second" % timeouts)
             print("\n[watchdog] transmit stream stalled (%s) -- restarting it"
                   % "; ".join(why))
+            # stalls that keep coming back: an in-process restart does not help
+            now = time.time()
+            stalls = [t for t in state.get("stalls", []) if now - t < 60.0] + [now]
+            state["stalls"] = stalls
+            if len(stalls) >= 3:
+                _reexec(state, tap, "%d stalls within 60 s" % len(stalls))
             try:
                 tb.stop(); tb.wait()
             except Exception as e:
@@ -364,24 +392,7 @@ def watchdog(make_tb, state, stop, expected_rate, tap=None):
                     print("[watchdog] restart attempt %d failed: %s -- NOT TRANSMITTING, "
                           "retrying in 3 s" % (attempt, e))
                     if attempt >= 3:
-                        # A replugged HackRF comes back as a new USB device, but
-                        # this process's libusb/libhackrf state still points at
-                        # the old one: every in-process retry fails "No such
-                        # device" forever (2026-09-30: 1843 attempts). Start the
-                        # program again as a fresh process, on the band last
-                        # asked for; it keeps retrying the same way.
-                        argv = [x for x in sys.argv]
-                        if "--freq" in argv:
-                            i = argv.index("--freq")
-                            del argv[i:i + 2]
-                        argv += ["--freq", "%.0f" % state["freq"]]
-                        print("[watchdog] %d restarts failed in this process -- starting it again "
-                              "as a new process on %.4f GHz" % (attempt, state["freq"] / 1e9), flush=True)
-                        time.sleep(3.0)
-                        if tap is not None:
-                            tap.close()         # real stdout/stderr back, or the new
-                                                # process writes into a dead pipe
-                        os.execv(sys.executable, [sys.executable] + argv)
+                        _reexec(state, tap, "%d restarts failed in this process" % attempt)
                     time.sleep(3.0)
             bad = 0
             time.sleep(8.0)
