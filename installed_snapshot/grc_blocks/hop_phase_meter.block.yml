@@ -1,0 +1,70 @@
+id: hop_phase_meter
+label: Hop Phase Meter
+category: '[DOA]'
+
+parameters:
+- id: num_channels
+  label: Num Channels
+  dtype: int
+  default: '4'
+- id: band_freq
+  label: Band shown (Hz)
+  dtype: real
+  default: '2.4e9'
+- id: samp_rate
+  label: Sample rate
+  dtype: real
+  default: samp_rate
+- id: f_lo
+  label: Tone search low (Hz)
+  dtype: real
+  default: '60e3'
+- id: f_hi
+  label: Tone search high (Hz)
+  dtype: real
+  default: '340e3'
+- id: snr_min_db
+  label: Min tone SNR (dB)
+  dtype: real
+  default: '20'
+- id: avg_windows
+  label: Windows averaged
+  dtype: int
+  default: '10'
+- id: report_s
+  label: Log report every (s)
+  dtype: real
+  default: '5'
+- id: remove_dc
+  label: Remove 0 Hz per window
+  dtype: bool
+  default: 'False'
+- id: dc_guard
+  label: Ignore |f| below (Hz)
+  dtype: real
+  default: '0'
+
+inputs:
+- domain: stream
+  dtype: complex
+  multiplicity: ${num_channels}
+
+outputs:
+- domain: stream
+  dtype: float
+  multiplicity: ${num_channels}
+
+templates:
+  imports: import doa
+  make: doa.hop_phase_meter(${num_channels}, ${band_freq}, ${samp_rate}, ${f_lo}, ${f_hi}, ${snr_min_db}, ${avg_windows}, ${report_s}, ${remove_dc}, ${dc_guard})
+  callbacks:
+  - set_band_freq(${band_freq})
+
+documentation: |-
+  chN - ch0 phase in degrees, measured per dwell window of the chosen band
+  (hop tags on input 0), only when a tone is present on every channel.
+  One output item per window: the circular mean of the last N valid windows,
+  or NaN when the window had no tone. Output 0 is always 0 (ch0 - ch0).
+  Logs per-band window counts, tone counts, mean and spread.
+
+file_format: 1

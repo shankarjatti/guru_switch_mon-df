@@ -1,0 +1,338 @@
+# TwinRX USRP source with built-in centre-frequency hopping.
+# The radio is set up exactly as twinrx_usrp_source does it; this adds a band
+# schedule, per-band gain, and the sample formats the original hard-codes.
+id: twinrx_hopping_source
+label: "TwinRX Hopping\n   USRP Source"
+category: DoA
+
+parameters:
+- id: samp_rate
+  label: Samp Rate
+  dtype: float
+  default: '1000000'
+- id: sources
+  label: Num Channels
+  dtype: int
+  default: '4'
+  hide: part
+- id: addresses
+  label: Device Address
+  dtype: string
+  default: '"type=x300"'
+- id: lo_export_direction
+  label: LO Exported By
+  dtype: enum
+  options: [B, A]
+  option_labels: [Rx B exports (this unit), Rx A exports (upstream)]
+  default: B
+- id: cpu_format
+  label: Host Sample Type
+  dtype: enum
+  options: [fc32, sc16, item32]
+  option_labels: [Complex float32, Complex int16, VITA word32]
+  option_attributes:
+    type: [fc32, sc16, s32]
+  default: fc32
+  hide: part
+- id: otw_format
+  label: Wire Format
+  dtype: enum
+  options: ['', sc16, sc12, sc8]
+  option_labels: [Automatic, Complex int16, Complex int12, Complex int8]
+  default: ''
+  hide: ${ 'none' if otw_format else 'part' }
+- id: num_bands
+  label: Number of Bands
+  dtype: int
+  default: '3'
+- id: settle
+  label: Settle after switch (s)
+  dtype: real
+  default: '2.0'
+- id: hop_enable
+  label: Hopping
+  dtype: enum
+  options: ['True', 'False']
+  option_labels: [Enabled, Disabled]
+  default: 'True'
+- id: tx_control
+  label: Transmitter control (host:port)
+  dtype: string
+  default: '"127.0.0.1:5123"'
+  hide: ${ 'none' if tx_control else 'part' }
+- id: gain_trim
+  label: Per-channel gain trim (dB)
+  dtype: raw
+  default: '(0.0, 0.0, 0.0, 0.0)'
+- id: stream_timeout
+  label: Stream watchdog (s)
+  dtype: float
+  default: '3.0'
+- id: recv_buff_size
+  label: Receive buffer (bytes)
+  dtype: int
+  default: '33554432'
+- id: lo_lock_fallback
+  label: LO lock fallback
+  dtype: enum
+  options: ['False', 'True']
+  option_labels: ['Off - report and leave the band dead', 'On - force low-side LO']
+  default: 'False'
+- id: blank_during_settle
+  label: Blank display while settling
+  dtype: enum
+  options: ['True', 'False']
+  option_labels: [Yes - mute during settle, 'No - show the transition']
+  default: 'True'
+- id: start_delay
+  label: Delay before first hop (s)
+  dtype: real
+  default: '2.0'
+  hide: part
+- id: freq_0
+  label: '  band 0  |  freq (Hz)'
+  dtype: real
+  default: '2400000000'
+  hide: ${ 'none' if num_bands > 0 else 'all' }
+- id: gain_0
+  label: '  band 0  |  RX gain (dB)'
+  dtype: real
+  default: '60'
+  hide: ${ 'none' if num_bands > 0 else 'all' }
+- id: dwell_0
+  label: '  band 0  |  dwell (s)'
+  dtype: real
+  default: '10'
+  hide: ${ 'none' if num_bands > 0 else 'all' }
+- id: freq_1
+  label: '  band 1  |  freq (Hz)'
+  dtype: real
+  default: '5200000000'
+  hide: ${ 'none' if num_bands > 1 else 'all' }
+- id: gain_1
+  label: '  band 1  |  RX gain (dB)'
+  dtype: real
+  default: '60'
+  hide: ${ 'none' if num_bands > 1 else 'all' }
+- id: dwell_1
+  label: '  band 1  |  dwell (s)'
+  dtype: real
+  default: '10'
+  hide: ${ 'none' if num_bands > 1 else 'all' }
+- id: freq_2
+  label: '  band 2  |  freq (Hz)'
+  dtype: real
+  default: '5800000000'
+  hide: ${ 'none' if num_bands > 2 else 'all' }
+- id: gain_2
+  label: '  band 2  |  RX gain (dB)'
+  dtype: real
+  default: '60'
+  hide: ${ 'none' if num_bands > 2 else 'all' }
+- id: dwell_2
+  label: '  band 2  |  dwell (s)'
+  dtype: real
+  default: '10'
+  hide: ${ 'none' if num_bands > 2 else 'all' }
+- id: freq_3
+  label: '  band 3  |  freq (Hz)'
+  dtype: real
+  default: '2400000000'
+  hide: ${ 'none' if num_bands > 3 else 'all' }
+- id: gain_3
+  label: '  band 3  |  RX gain (dB)'
+  dtype: real
+  default: '60'
+  hide: ${ 'none' if num_bands > 3 else 'all' }
+- id: dwell_3
+  label: '  band 3  |  dwell (s)'
+  dtype: real
+  default: '10'
+  hide: ${ 'none' if num_bands > 3 else 'all' }
+- id: freq_4
+  label: '  band 4  |  freq (Hz)'
+  dtype: real
+  default: '2400000000'
+  hide: ${ 'none' if num_bands > 4 else 'all' }
+- id: gain_4
+  label: '  band 4  |  RX gain (dB)'
+  dtype: real
+  default: '60'
+  hide: ${ 'none' if num_bands > 4 else 'all' }
+- id: dwell_4
+  label: '  band 4  |  dwell (s)'
+  dtype: real
+  default: '10'
+  hide: ${ 'none' if num_bands > 4 else 'all' }
+- id: freq_5
+  label: '  band 5  |  freq (Hz)'
+  dtype: real
+  default: '2400000000'
+  hide: ${ 'none' if num_bands > 5 else 'all' }
+- id: gain_5
+  label: '  band 5  |  RX gain (dB)'
+  dtype: real
+  default: '60'
+  hide: ${ 'none' if num_bands > 5 else 'all' }
+- id: dwell_5
+  label: '  band 5  |  dwell (s)'
+  dtype: real
+  default: '10'
+  hide: ${ 'none' if num_bands > 5 else 'all' }
+- id: freq_6
+  label: '  band 6  |  freq (Hz)'
+  dtype: real
+  default: '2400000000'
+  hide: ${ 'none' if num_bands > 6 else 'all' }
+- id: gain_6
+  label: '  band 6  |  RX gain (dB)'
+  dtype: real
+  default: '60'
+  hide: ${ 'none' if num_bands > 6 else 'all' }
+- id: dwell_6
+  label: '  band 6  |  dwell (s)'
+  dtype: real
+  default: '10'
+  hide: ${ 'none' if num_bands > 6 else 'all' }
+- id: freq_7
+  label: '  band 7  |  freq (Hz)'
+  dtype: real
+  default: '2400000000'
+  hide: ${ 'none' if num_bands > 7 else 'all' }
+- id: gain_7
+  label: '  band 7  |  RX gain (dB)'
+  dtype: real
+  default: '60'
+  hide: ${ 'none' if num_bands > 7 else 'all' }
+- id: dwell_7
+  label: '  band 7  |  dwell (s)'
+  dtype: real
+  default: '10'
+  hide: ${ 'none' if num_bands > 7 else 'all' }
+
+asserts:
+- ${ sources > 1 }
+- ${ sources != 3 }
+- ${ sources < 5 }
+- ${ num_bands >= 1 }
+- ${ num_bands <= 8 }
+
+outputs:
+- domain: stream
+  dtype: ${ cpu_format.type }
+  vlen: 1
+  multiplicity: ${ sources }
+
+templates:
+  imports: import doa
+  make: |-
+    doa.twinrx_hopping_source(
+        samp_rate=${samp_rate},
+        sources=${sources},
+        addresses=${addresses},
+        lo_export_direction="${lo_export_direction}",
+        cpu_format="${cpu_format}",
+        otw_format="${otw_format}",
+        bands=[
+    % if int(num_bands) > 0:
+            (${freq_0}, ${gain_0}, ${dwell_0}),
+    % endif
+    % if int(num_bands) > 1:
+            (${freq_1}, ${gain_1}, ${dwell_1}),
+    % endif
+    % if int(num_bands) > 2:
+            (${freq_2}, ${gain_2}, ${dwell_2}),
+    % endif
+    % if int(num_bands) > 3:
+            (${freq_3}, ${gain_3}, ${dwell_3}),
+    % endif
+    % if int(num_bands) > 4:
+            (${freq_4}, ${gain_4}, ${dwell_4}),
+    % endif
+    % if int(num_bands) > 5:
+            (${freq_5}, ${gain_5}, ${dwell_5}),
+    % endif
+    % if int(num_bands) > 6:
+            (${freq_6}, ${gain_6}, ${dwell_6}),
+    % endif
+    % if int(num_bands) > 7:
+            (${freq_7}, ${gain_7}, ${dwell_7}),
+    % endif
+        ],
+        settle=${settle},
+        hop_enable=${hop_enable},
+        tx_control=${tx_control},
+        blank_during_settle=${blank_during_settle},
+        lo_lock_fallback=${lo_lock_fallback},
+        stream_timeout=${stream_timeout},
+        recv_buff_size=${recv_buff_size},
+        gain_trim=${gain_trim},
+        start_delay=${start_delay},
+    )
+  callbacks:
+  - set_settle(${settle})
+  - set_hop_enable(${hop_enable})
+
+documentation: |-
+  TwinRX USRP source that walks through a list of bands on its own.
+
+  The radio is set up exactly as twinrx_usrp_source does it -- same subdev map,
+  antenna selection, LO routing and export, timed double tune, and the
+  low-side LO lock fallback -- so the two blocks cannot drift apart.
+
+  Added here:
+    Number of Bands   how many of the rows below are used (1..8)
+    band i            centre frequency, RX gain and dwell for that band
+    Settle            applied after every switch, before the dwell starts
+    Gain trim         dB added per channel on top of the band gain. The four
+                      RF paths are not equally sensitive -- one channel here
+                      runs about 13 dB hot -- so a single gain either clips
+                      that one or buries the rest. Trimming at the radio keeps
+                      every trace on scale instead of rescaling the picture.
+                      Note it shifts per-channel phase, so a phase calibration
+                      belongs to a given trim as well as a given band.
+
+    Stream watchdog   Seconds of silence from the radio before the stream
+                      is declared dead and restarted. The X310 stops sending
+                      when its FIFO overruns and does not always come back on
+                      its own; when that happens the plot freezes on its last
+                      value, which looks like a stable reading rather than no
+                      reading. The restart is timed so the channels stay
+                      aligned, the display is blanked until it has re-settled,
+                      and every stall is counted and printed. 0 turns it off.
+    Receive buffer    Socket buffer UHD asks the kernel for. Bigger absorbs
+                      host-side hiccups -- a frozen GUI back-pressures the
+                      flowgraph all the way to the radio -- and buys roughly
+                      size / (rate x channels x 4) seconds of slack. It needs
+                      net.core.rmem_max to be at least this large.
+    LO lock fallback  Off by default, so the radio is never reconfigured
+                      behind you. Where UHD picks a high-side LO the
+                      synthesiser will not lock to (5.00-5.14 GHz on this
+                      unit) the band simply reports the failure and stays
+                      dead. Turning it on forces a low-side LO, which works
+                      but inverts the spectrum and re-locks the LO, putting a
+                      180 degree step on the exporting channel every hop.
+
+    Blank while settling  mutes the outputs during that window, so the plot
+                      does not draw the transition -- half-tuned LO, gain
+                      still moving -- as if it were data. Only applies to
+                      Complex float32.
+    Hopping           Disabled keeps it parked on band 0
+    Transmitter       host:port of a calibration source that takes
+                      "freq <hz>" over UDP. It is commanded before each tune,
+                      so the tone is already there when the receiver arrives.
+                      Leave blank if the transmitter is driven some other way
+                      -- but then the receiver hops alone and every band the
+                      transmitter is not on will read as noise.
+    Wire Format       USRP->host format. sc12/sc8 cut Ethernet bandwidth and
+                      do not change the output type. sc8 costs about 24 dB of
+                      dynamic range, so avoid it on weak bands.
+    Host Sample Type  what the flowgraph sees. Leave at Complex float32 unless
+                      writing raw samples to a file -- the complex processing
+                      blocks downstream will not connect to anything else.
+
+  Per-band gain: inter-channel phase offsets shift with RX gain on this
+  hardware, so a phase calibration belongs to a (band, gain) pair rather than
+  to a band alone. Once a band is calibrated, keep its gain fixed.
+
+file_format: 1

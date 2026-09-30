@@ -1,0 +1,527 @@
+commit 8093beca34583c47fba3d66db8094563c267d6db
+Author: Shankar <jattishankar67@gmail.com>
+Date:   Thu Sep 24 18:22:13 2026 +0530
+
+    twinrx: stop reporting success for checks that did not run
+    
+    An audit for silent fallbacks. The pattern throughout was the same: a call
+    wrapped in except/pass, then carrying on as though it had worked.
+    
+    _Lifecycle.stop() swallowed a failed stop_hopping() and returned success. That
+    is the failure that matters most here -- a hop thread still running through
+    teardown keeps issuing timed commands at a device being destroyed, which is
+    what leaves the X310's control plane wedged. It now prints the error and says
+    a power cycle may be needed.
+    
+    set_gain() fell back to setting the gain unclamped when the range query
+    failed, silently. The gain then may not be the one asked for, and phase moves
+    with gain on this hardware, so a calibration measured at the nominal gain
+    would no longer apply. Said once, with that consequence spelled out.
+    
+    Clearing the LO export was silent in twinrx_usrp_source while the hopping
+    subclass already reported it. LO routing decides whether channels 2 and 3
+    receive anything at all, so a silent failure there reads as two dead channels
+    much later.
+    
+    The LO fallback's retry loop had four silent passes. Only the final outcome
+    was printed, so a run could report the fallback failing without any hint of
+    which step failed.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ python/twinrx_hopping_source.py | 24 ++++++++++++++++++++----
+ python/twinrx_usrp_source.py    | 23 +++++++++++++++--------
+ 2 files changed, 35 insertions(+), 12 deletions(-)
+
+commit 8e9a043c21444fb4baaa4fa894b4d241bc083b36
+Author: Shankar <jattishankar67@gmail.com>
+Date:   Thu Sep 24 17:43:58 2026 +0530
+
+    phase_correct_hopping: announce each band switch
+    
+    The block was silent when it worked and loud only when it failed, so no
+
+ python/phase_correct_hopping.py | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+commit a42d340e2d5d3372080c7b9aa2ad377dcfae948e
+Author: Shankar <jattishankar67@gmail.com>
+Date:   Thu Sep 24 16:20:21 2026 +0530
+
+    phase_correct_hopping: per-band phase correction for a hopping receiver
+    
+    phase_correct_hier corrects one set of offsets, read from its file once in
+    __init__. That is right for a receiver parked on one frequency and wrong for
+    one that hops, because the inter-channel offset belongs to the band. Measured
+    on this unit:
+    
+      pair       2.4 GHz    5.8 GHz    error if the 2.4 table is used at 5.8
+      ch1-ch0    +158.4     +67.9                      90 deg
+      ch2-ch0     -89.2    +144.1                     127 deg
+      ch3-ch0    -175.4    +155.3                      29 deg
+    
+    Corrections that wrong are worse than none, because the readout still looks
+    corrected.
+    
+    So this holds a row per band and switches rows with the band. It does the same
+    arithmetic as phase_correct_hier -- channel 0 straight through, channel N
+    multiplied by exp(-j*offset) -- so the two agree on any single band, and
+    phase_correct_hier is not touched.
+    
+    Offsets are entered in DEGREES, which is what the readouts show, and are the
+    measured angle_chN - angle_ch0 rather than a correction to apply; the block
+    negates them, so a correct table drives the residuals to zero. A file may be
+    given instead, in radians, in the format twinrx_hop_test.py --cal-out already
+    writes.
+    
+    The band normally comes from the radio via set_band_freq(), which cannot drift
+    out of step with it. An internal dwell schedule is available for standalone
+    use and is not the default: two clocks beside one radio eventually disagree,
+    and a correction applied to the wrong band reads as a clean, stable, wrong
+    phase.
+    
+    A frequency with no row gets no correction and says so, rather than silently
+    reusing the nearest row.
+    
+    The file reader deliberately does not copy phase_correct_hier's, which runs
+    the parsed values through filter(): 0.0 is falsy, so an offset of exactly zero
+    disappears and the row comes back one short. In phase_correct_hier that then
+    fails the length check and calls sys.exit(1), taking the whole flowgraph with
+    it -- feeding it the existing twinrx_session_zero.cfg, three lines of 0.0,
+    would do exactly that.
+    
+    Verified on the hardware's toolchain: degrees converted, a 158.4 deg offset
+    rotated to -0.00, nothing applied until a band is selected, unknown band
+    refused, file loading, the 2-channel case, and GRC loads the definition.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ grc/CMakeLists.txt                  |   1 +
+ grc/phase_correct_hopping.block.yml | 252 ++++++++++++++++++++++++++++
+ python/CMakeLists.txt               |   1 +
+ python/__init__.py                  |   1 +
+ python/phase_correct_hopping.py     | 320 ++++++++++++++++++++++++++++++++++++
+ 5 files changed, 575 insertions(+)
+
+commit edb59e37cfe143de495c02421d3f9fa6eb27d659
+Author: Shankar <jattishankar67@gmail.com>
+Date:   Thu Sep 24 13:54:23 2026 +0530
+
+    twinrx: keep the DDC out of the timed tune -- this is the stall
+    
+    Root cause of the radio dying after about seventy hops, and of the power
+    cycles.
+    
+    A DDC block subscribes to time/cmd exactly as a radio does
+    (ddc_block_ctrl_impl.cpp:93), so set_command_time applies to it too and its
+    register writes are queued in the FPGA command FIFO to execute when the
+    block's time reaches the stamp. A radio has a timekeeper and its timed
+    commands execute and retire. The DDC's time never advances, so every timed
+    write to it is queued and never executes, and never retires.
+    
+    The FIFO holds CMD_FIFO_SIZE / MAX_CMD_PKT_SIZE = 256/3 = 85 commands.
+    Initialisation uses about thirteen, each hop strands one more, and at
+    eighty-five the block stops answering:
+    
+      [0/DDC_0] sr_write() failed: Block ctrl (CE_03_Port_60) no response packet
+    
+    after which every tune fails for the rest of the run.
+    
+    Measured failure points: 70, 72 and 74 hops over three runs. A count, not a
+    time. It did not move when the host's CPU load was halved, when a Qt
+    threading bug was fixed, or when the command-time margin went from 10 ms to
+    100 ms -- none of which change how many commands are stranded per hop. It is
+    also why only DDC_0 ever fails and never a radio, why a fresh process
+    inherits the fault, and why only a power cycle clears it: the full FIFO is
+    in the FPGA, not in the driver.
+    
+    The fix is to stamp only the RF frontend. POLICY_NONE on dsp_freq leaves the
+    DDC untouched inside the timed window; it is still set, identically on all
+    four channels, by the untimed pass that precedes it. Coherence is unaffected
+    -- the four channels share one LO, and what the timed pass exists for is
+    making the frontends take effect on the same tick.
+    
+    Unverified: the run that demonstrates this needs a power cycle first. What
+    is established is the mechanism, the arithmetic and the 70/72/74
+    reproducibility; what is not is that removing the stranded command removes
+    the failure.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ python/twinrx_usrp_source.py | 43 +++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 39 insertions(+), 4 deletions(-)
+
+commit c6db8e21a7aa6387dfcc05c7c78f3c789951c9bc
+Author: Shankar <jattishankar67@gmail.com>
+Date:   Thu Sep 24 13:26:19 2026 +0530
+
+    twinrx: give the timed tune a 100 ms deadline instead of 10 ms
+    
+    The timed tune stamped its writes 10 ms ahead. That is a deadline, not a
+    delay: the FPGA holds each write in its command FIFO until that time, and a
+    write that arrives after its own timestamp is late and is never
+    acknowledged.
+    
+    One missing acknowledgement is fatal, because of how UHD accounts for them.
+    ctrl_iface allows CMD_FIFO_SIZE / MAX_CMD_PKT_SIZE = 256/3 = 85 commands in
+    flight unacknowledged, then drains one per new command. Past that point a
+    single absent acknowledgement starves the drain: the next write blocks for
+    the full 10 s timeout and throws
+    
+      Block ctrl (CE_03_Port_60) no response packet
+    
+    and every tune on that block fails for the rest of the run. The API offers
+    no way to resynchronise, so the process has to be restarted.
+    
+    The evidence for a per-command accumulation rather than heating or load is
+    the repeatability: 72 hops before the first failure in one run, about 70 in
+    another. A count, not a time. It also survived halving the host's CPU load
+    and fixing a Qt threading bug, which rules out the host-starvation
+    explanation tried before this one.
+    
+    10 ms had to cover a device time round trip plus eight register writes on a
+    host that can be descheduled anywhere in between; one overrun in a few
+    hundred is enough. 100 ms costs nothing -- it only postpones a retune that
+    already sits inside a one second settle window.
+    
+    Configurable, so the margin can be measured rather than argued about.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ python/twinrx_hopping_source.py |  8 +++++++-
+ python/twinrx_usrp_source.py    | 40 +++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 44 insertions(+), 4 deletions(-)
+
+commit 8cd55d9f614a697f225deefde12d0096cc014896
+Author: Shankar <jattishankar67@gmail.com>
+Date:   Thu Sep 24 12:57:55 2026 +0530
+
+    twinrx_hopping_source: detect a dead stream and restart it
+    
+    The X310 can stop sending with nothing in the flowgraph noticing: the plot
+    goes flat and the phase readouts hold their last value, which reads as a
+    measurement rather than as the absence of one. Reproduced at 14m38s into a
+    run, and it does not recover by itself.
+    
+    The signal used is whether the radio is putting packets on the wire, read
+    from the kernel's own counter, not the flowgraph's sample count: when a GUI
+    sink stalls, back-pressure stops the source too, and restarting the stream
+    would then be the wrong answer to the wrong question.
+    
+    The restart is a real STOP_CONTINUOUS then START_CONTINUOUS. For more than
+    one channel the start is timed rather than immediate, because an immediate
+    start lets the four channels begin on different samples, and a constant
+    sample skew between channels is a constant phase error -- it would come
+    back looking healthy and read wrong.
+    
+    If no interface carries the expected rate the watchdog says so and stays
+    off rather than watching a counter that means nothing. stream_is_alive()
+    lets the display say which of the two it is showing.
+    
+    recv_buff_size defaults to 32 MB, which buys about two seconds of slack at
+    4 x 1 Msps. That makes the failure rarer, not impossible.
+    
+    Measured working: 6 stalls in one run, 6 restarts, each on the first
+    attempt, stream back at 15.5 MB/s every time.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ grc/twinrx_hopping_source.block.yml |  23 ++++
+ python/twinrx_hopping_source.py     | 248 +++++++++++++++++++++++++++++++++++-
+ 2 files changed, 264 insertions(+), 7 deletions(-)
+
+commit 65d8bb472f1fc3b021edfaeae2016fde0ee5599c
+Author: Shankar <jattishankar67@gmail.com>
+Date:   Wed Sep 23 19:39:59 2026 +0530
+
+    twinrx_hopping_source: expose the per-channel gain trim in GRC
+    
+    The four RF paths are not equally sensitive -- on this unit one channel
+    runs about 13 dB hot -- so a single band gain either clips that one or
+    buries the other three. The parameter existed in the Python block but had
+    no GRC field, so a flowgraph could only reach it by hand-editing.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ grc/twinrx_hopping_source.block.yml | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+commit d9b6587cc1a1dda34b78883827a89e31b3491735
+Author: Shankar <jattishankar67@gmail.com>
+Date:   Wed Sep 23 18:49:08 2026 +0530
+
+    twinrx_hopping_source: stop the hop thread from inside the flowgraph teardown
+    
+    Putting stop_hopping() in a GRC "main after stop" snippet was too late by
+    construction -- that snippet runs after tb.stop() has already returned, so
+    the thread spent the whole teardown tuning a device being destroyed. That is
+    what left the X310's RFNoC control plane wedged after a shutdown, needing a
+    power cycle to recover.
+    
+    A small sync block inside the hier block now carries the shutdown hook. The
+    scheduler calls stop() on every block during top_block.stop(), which is the
+    only point a hier_block2 gets while the flowgraph is still alive.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ python/twinrx_hopping_source.py | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+
+commit f85537d52301bfab35910cc7901ecf3ba51feadc
+Author: Shankar <jattishankar67@gmail.com>
+Date:   Wed Sep 23 18:26:52 2026 +0530
+
+    Undo the LO fallback's spectrum mirroring in the receiver
+    
+    Where the fallback puts the LO on the side UHD did not plan for, the DDC's
+    correction runs the wrong way and the baseband comes out mirrored: a tone
+    sent at centre +200 kHz arrived at -200 kHz. That was being worked around at
+    the transmitter, by sending that one band an inverted tone -- which made the
+    transmitter behave differently per band for a fault that belongs to the
+    receiver.
+    
+    The receiver now mirrors it back, so every band is plainly centre + the same
+    baseband offset and the transmitter needs no per-band offsets at all.
+    Conjugation cannot be toggled on a conjugate block, so it is done as
+    multiply the Q path by -1, whose constant is a runtime callback; the block
+    sets it only on bands where its own fallback fired.
+    
+    Note this negates the measured phase on those bands. It is applied to all
+    four channels identically so the measurement stays consistent, but a
+    calibration taken before this change is sign-inverted.
+    
+    Measured: 2.4 GHz +203.8 kHz, 5.8 GHz +209.0 kHz, 5.1 GHz +208.0 kHz -- all
+    on the positive side, SNR 71-76 dB.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ python/twinrx_hopping_source.py | 37 +++++++++++++++++++++++++++++++++++--
+ python/twinrx_usrp_source.py    |  5 +++++
+ 2 files changed, 40 insertions(+), 2 deletions(-)
+
+commit 5b0f5bdace3085eeb565b0a781dce354678e9de5
+Author: Shankar <jattishankar67@gmail.com>
+Date:   Wed Sep 23 18:13:12 2026 +0530
+
+    twinrx_hopping_source: stop hopping when tuning starts failing
+    
+    Tuning only fails the way it does here when the device is going away.
+    Carrying on means issuing timed commands at a radio that is being torn
+    down, and that is what leaves the X310's RFNoC control plane wedged --
+    recoverable only by power cycling it. Two consecutive failures now stop the
+    thread instead.
+    
+    This is the block's own guard. The flowgraph should still call
+    stop_hopping() before teardown; this is what happens when it does not.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ python/twinrx_hopping_source.py | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+commit c36fbd30f81dfcbab428e4a3f4dadd20bf3ac0a9
+Author: Shankar <jattishankar67@gmail.com>
+Date:   Wed Sep 23 18:03:35 2026 +0530
+
+    twinrx_hopping_source: put the transmitter on the first band before tuning to it
+    
+    The transmitter does not hop on its own -- it sits wherever it was last
+    commanded and only moves when the receiver tells it to. But the command was
+    only sent from inside the hop loop, not for the initial tune, so the
+    receiver opened on band 0 while the transmitter was still parked wherever
+    the previous run left it. For the first couple of seconds the two were on
+    different frequencies and the band looked empty, until the hop thread's
+    first iteration corrected it.
+    
+    It now commands the transmitter before the opening tune, and starts with
+    _settled False so nothing is displayed until the first settle window has
+    actually completed. The constructor tunes, but the transmitter and the LO
+    both need a moment, and drawing that stretch would be drawing the
+    transition as though it were data.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ python/twinrx_hopping_source.py | 60 ++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 56 insertions(+), 4 deletions(-)
+
+commit d44dbcb6e48caa35cf9b68f90a24d426fdbc2690
+Author: Shankar <jattishankar67@gmail.com>
+Date:   Wed Sep 23 15:48:48 2026 +0530
+
+    Nothing silent: no synthetic samples, no unrequested reconfiguration
+    
+    The bench is only worth having if every number on it came from the radio,
+    so the quiet paths are gone.
+    
+    The LO lock fallback is now opt-in and off by default. It rewrote the LO
+    whenever UHD picked one the synthesiser would not lock to, which recovered
+    5.00-5.14 GHz but inverted the spectrum and re-locked the LO on every
+    arrival -- and that is where the 180 degree step on the exporting channel
+    comes from. Off, the band reports the failure in full and stays dead, which
+    is the truth about this hardware. lo_lock_fallback=True restores it.
+    
+    dry_run is removed from the hopping block: there is no longer any way for it
+    to produce samples without a radio attached.
+    
+    A band is only declared good when the transmitter acknowledged its retune
+    and the LO locked. Otherwise the gate stays shut and it says so, rather than
+    drawing whatever happened to be in the buffer.
+    
+    Swallowed exceptions now report: clearing LO export, reading lo_locked, and
+    set_lo_freq all print instead of passing silently. An unknown cpu_format
+    raises rather than quietly assuming complex float32.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ grc/twinrx_hopping_source.block.yml |  15 ++++++
+ python/twinrx_hopping_source.py     |  59 +++++++++++----------
+ python/twinrx_usrp_source.py        | 102 +++++++++++++++++++++++++++++++++++-
+ 3 files changed, 147 insertions(+), 29 deletions(-)
+
+commit b19c6820a7ae3cba669388db1978fdd5690d4b96
+Author: Shankar <jattishankar67@gmail.com>
+Date:   Wed Sep 23 15:44:36 2026 +0530
+
+    twinrx_hopping_source: make is_settled report the schedule, not the muting
+    
+    It returned True whenever blank_during_settle was off, so a flowgraph gating
+    its own display path on it never saw a settle window at all. The two are
+    separate concerns: callers need to know where they are in the schedule
+    regardless of whether this block is also muting.
+    
+    Also starts settled, since the constructor has already tuned and is
+    streaming a good band before the first hop.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ python/twinrx_hopping_source.py | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+commit fdbfe1e91042f27e45848d633cf6e30682618169
+Author: Shankar <jattishankar67@gmail.com>
+Date:   Wed Sep 23 15:39:38 2026 +0530
+
+    twinrx_hopping_source: mute the outputs while settling
+    
+    The settle time only delayed the next hop, so the display kept drawing the
+    transition -- half-tuned LO, gain still moving -- as though it were data. A
+    gate per channel now holds the outputs at zero from the moment a hop starts
+    until the settle window ends, so the plot goes flat while the radio moves
+    and only shows samples worth looking at.
+    
+    It mutes rather than stopping the stream on purpose: a block that stops
+    producing would stall the flowgraph through back-pressure. Complex float32
+    only, since the other sample formats have nothing to multiply by.
+    
+    is_settled() exposes the state for anything downstream that wants to ignore
+    the blanked stretch rather than average zeros into a result.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ grc/twinrx_hopping_source.block.yml | 11 +++++++++++
+ python/twinrx_hopping_source.py     | 38 +++++++++++++++++++++++++++++++++----
+ 2 files changed, 45 insertions(+), 4 deletions(-)
+
+commit 28d2176099a0b330aca629a4c10a57959df10f48
+Author: Shankar <jattishankar67@gmail.com>
+Date:   Wed Sep 23 15:08:05 2026 +0530
+
+    twinrx_hopping_source: command the transmitter before each tune
+    
+    Moving the hop into the block dropped the UDP command that used to move the
+    calibration source, so the receiver hopped alone and every band the
+    transmitter was not sitting on read as noise. The block now takes a
+    tx_control host:port and sends "freq <hz>" before tuning, which also keeps
+    the ordering right -- the tone is already in place when the receiver arrives.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ grc/twinrx_hopping_source.block.yml | 12 ++++++++++++
+ python/twinrx_hopping_source.py     | 36 ++++++++++++++++++++++++++++++++++--
+ 2 files changed, 46 insertions(+), 2 deletions(-)
+
+commit a66f3e76d4527660b8c79282f851b12a5185d9f4
+Author: Shankar <jattishankar67@gmail.com>
+Date:   Wed Sep 23 13:13:07 2026 +0530
+
+    Add twinrx_hopping_source: a TwinRX source that hops bands by itself
+    
+    twinrx_usrp_source is left exactly as it was. The new block subclasses it so
+    the radio setup cannot drift apart between the two -- subdev map, antenna
+    selection, LO routing and export, the timed double tune and the low-side LO
+    lock fallback are all inherited. Only __init__ is replaced, so the stream
+    arguments can carry cpu_format/otw_format, which the original hard-codes to
+    fc32; the attributes the inherited methods rely on are set explicitly there.
+    
+    Adds a band schedule: each band carries its own centre frequency, RX gain and
+    dwell, with one settling time applied after every switch. In GRC the row for
+    each band appears as "Number of Bands" is raised, up to eight. Gain is applied
+    before the tune so both settle inside the same window, and lo_locked is
+    checked on every hop so a band that stops working is visible rather than
+    silent.
+    
+    A dry_run mode opens no radio, which is how the schedule was verified: with
+    0.5 s settle and dwells of 2/1/3 s the measured intervals were 2.51/1.51/3.51 s.
+    GRC generation was checked at 1, 5 and 8 bands.
+    
+    Per-band gain is a calibration hazard worth remembering: inter-channel phase
+    offsets shift with RX gain on this hardware, so a phase calibration belongs to
+    a (band, gain) pair rather than to a band alone.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ grc/CMakeLists.txt                  |   1 +
+ grc/twinrx_hopping_source.block.yml | 264 +++++++++++++++++++++++++++++++++
+ python/CMakeLists.txt               |   1 +
+ python/__init__.py                  |  21 +--
+ python/twinrx_hopping_source.py     | 284 ++++++++++++++++++++++++++++++++++++
+ 5 files changed, 561 insertions(+), 10 deletions(-)
+
+commit 2b01d91ac578294f382719c855a5ae46a54dc5bf
+Author: Shankar <jattishankar67@gmail.com>
+Date:   Mon Sep 21 19:23:39 2026 +0530
+
+    twinrx_usrp_source: default to Rx B as LO exporter, and select the antenna
+    
+    Two faults on this USRP-2945, both of which made ch2/ch3 look dead.
+    
+    LO direction.  Upstream hard-codes Rx A as the exporter: ch0 internal +
+    export, ch1 companion, ch2/ch3 external.  The A->B MMCX jumpers on this
+    unit pass no LO, so ch2/ch3 were left without an oscillator and read
+    about 70x down -- indistinguishable from a broken RF path.  Measured
+    twice, hours apart: B->A works, A->B does not.
+    
+    Now defaults to Rx B exporting (external, external, internal+export,
+    companion) and takes a lo_export_direction argument, "B" or "A", so the
+    upstream arrangement is still reachable.  Exports are cleared on every
+    channel first, because UHD refuses a state where two channels export.
+    
+    Antenna.  Upstream never calls set_antenna, so every channel stayed on
+    whatever UHD defaults to.  A TwinRX board has RX1 and RX2, and a channel
+    left on the wrong one reads far down.  Now set per channel with the same
+    mapping twinrx_lo_check.py uses: A:0->RX1, A:1->RX2, B:0->RX1, B:1->RX2.
+    
+    Gain and DC-offset calls collapsed into one loop over sources.
+    
+    Verified on hardware after the change:
+    
+      readback   ch0 external / ch1 external / ch2 internal+export / ch3 companion
+      tone       +50.4  +50.5  +49.9  +50.9 dB
+      coherence  PASS, 0.07 deg across retunes
+      guru chain ch2/ch3 rose from 1.3e-4 to 1.35e-2
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ python/twinrx_usrp_source.py | 92 +++++++++++++++++++++++++++++---------------
+ 1 file changed, 61 insertions(+), 31 deletions(-)
+
+commit 7f982b7e2447a7c08112db42e231a94791e88003
+Author: AsriFox <asrifox@yandex.ru>
+Date:   Tue Jul 16 14:40:52 2024 +0300
+
+    Fix errors when unpacking multiple return values from Octave
+
+ python/qa_autocorrelate.py       | 12 ++++++------
+ python/qa_calibrate_lin_array.py | 12 ++++++------
+ python/qa_find_local_max.py      |  6 ++++--
+ 3 files changed, 16 insertions(+), 14 deletions(-)

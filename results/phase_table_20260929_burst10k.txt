@@ -1,0 +1,8 @@
+# Measured (chN - ch0) in DEGREES through guru_fast's own chain:
+# radio-clock hopping 5.0 ms on / 7.0 ms off (burst), gains 46/60/69,
+# gain_trim (0.0, -13.3, 1.5, -1.7), LO exported by board B.
+# 2026-09-29 13:26. Valid for THIS power session only.
+# freq_hz, ch1_deg, ch2_deg, ch3_deg
+2400000000, 172.2018, -145.7001, 130.8652
+5200000000, 104.3154, 119.9913, 83.9029
+5800000000, 83.9943, -160.6644, -141.5616

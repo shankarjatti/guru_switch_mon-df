@@ -1,0 +1,2287 @@
+options:
+  parameters:
+    author: shankar
+    category: '[GRC Hier Blocks]'
+    cmake_opt: ''
+    comment: 'USRP-2945 (X310 + 2x TwinRX) LO configuration and phase-coherence test.
+
+      GNU Radio 3.8 / UHD 3.15.
+
+      All four channels are driven from ONE synthesiser, tuned with timed commands.'
+    copyright: ''
+    description: TwinRX LO sharing / phase coherence test bench
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: qt_gui
+    hier_block_src_path: '.:'
+    id: guru_fast
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    qt_qss_theme: ''
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: prompt
+    sizing_mode: fixed
+    thread_safe_setters: ''
+    title: 'Guru fast: USRP-2945 4-Channel, 10 ms radio-clock hopping'
+    window_size: 1400,900
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 8]
+    rotation: 0
+    state: enabled
+
+blocks:
+- name: avg_len
+  id: variable
+  parameters:
+    comment: 'Coherent averaging length for the phase estimate.
+
+      65536 samples = 65 ms at 1 Msps, comparable to what
+
+      twinrx_lo_check.py integrates. The old 4096 averaged 24x
+
+      less and made the GUI look far noisier than the CLI for
+
+      the same signal.'
+    value: '65536'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [344, 116.0]
+    rotation: 0
+    state: enabled
+- name: center_freq
+  id: variable
+  parameters:
+    comment: 'Reported by the hopping block, not a control any more.
+
+      The band list lives in the TwinRX Hopping USRP Source block.'
+    value: tone_band
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [944, 124.0]
+    rotation: 0
+    state: enabled
+- name: cmd_lead
+  id: variable
+  parameters:
+    comment: 'How far ahead of "now" the timed tune is scheduled.
+
+      Must exceed the host->FPGA latency. 0.1 s is safe.'
+    value: '0.1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [168, 284.0]
+    rotation: 0
+    state: enabled
+- name: disp_bw
+  id: variable
+  parameters:
+    comment: 'Wide enough to keep the tone when the transmitter''s crystal is off
+
+      frequency. The HackRF is ~+/-20 ppm, which is ~116 kHz at 5.8 GHz,
+
+      so the old 20 kHz window would have rejected it entirely.'
+    value: 300e3
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1000, 8]
+    rotation: 0
+    state: enabled
+- name: disp_gain
+  id: variable
+  parameters:
+    comment: 'Fixed display gain for ch2/ch3.
+
+      Replaces the AGC: the tone is already steady to ~0.6%, so no
+
+      automatic gain is needed.  A fixed gain keeps the true relative
+
+      amplitude between channels and has no start-up transient.'
+    value: '25'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1240, 8]
+    rotation: 0
+    state: enabled
+- name: disp_interp_trans
+  id: variable
+  parameters:
+    comment: 'Transition width of the display interpolator''s anti-imaging filter.
+
+
+      time_resamp_N interpolates 1 Msps up to time_srate purely so the time
+
+      plot draws a smooth waveform. The filter only has to reject the images
+
+      of the interpolated stream: the signal reaches disp_bw, the first image
+
+      starts at samp_rate - disp_bw, so everything between the two is
+
+      transition band and nothing is gained by making it narrower.
+
+
+      It was fixed at 50 kHz, eight times tighter than that. Hamming taps go
+
+      as 3.3 * fs / transition, so 50 kHz meant ~1320 taps running at 20 Msps
+
+      on four channels -- 5.3 GMAC/s, measured as 527% CPU and a load average
+
+      of 16 on a 12 core host, for a picture. A starved host is what makes
+
+      the X310''s RFNoC control acks time out, which is what kills the stream.'
+    value: samp_rate - 2 * disp_bw
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1000, 80]
+    rotation: 0
+    state: enabled
+- name: disp_taps_bp
+  id: variable
+  parameters:
+    comment: 'One-sided: the tone always arrives on the positive side.
+
+      Bands whose receive chain inverts the spectrum are pre-compensated at
+
+      the transmitter -- 5.1 GHz is sent a -200 kHz tone so it still lands at
+
+      +200 kHz (see --offset-map). Widening the filter to cover both sides
+
+      would work too, but costs 3 dB of noise bandwidth to paper over
+
+      something better fixed at the source.'
+    value: firdes.complex_band_pass(1.0, samp_rate, tone_offset - disp_bw/2, tone_offset
+      + disp_bw/2, disp_bw/4, firdes.WIN_HAMMING)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1120, 8]
+    rotation: 0
+    state: enabled
+- name: dsp_manual
+  id: variable
+  parameters:
+    comment: 'True  -> force every DDC to 0 Hz so the digital
+
+      down-conversion adds no per-channel phase.
+
+      Set False if you need exact requested centre freq.'
+    value: 'True'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [168, 356.0]
+    rotation: 0
+    state: enabled
+- name: lo_export_chan
+  id: variable
+  parameters:
+    comment: 'Channel whose synthesiser feeds everything else.
+
+      0 = DB-A ch0 exports (cables A->B)  -- NOT WORKING on this unit
+
+      2 = DB-B ch0 exports (cables B->A)  -- verified working'
+    value: '2'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [168, 116.0]
+    rotation: 0
+    state: enabled
+- name: lo_sources
+  id: variable
+  parameters:
+    comment: 'Per-channel LO source, index = UHD channel.
+
+      Master board : exporter = internal (or reimport), partner = companion
+
+      Slave  board : BOTH channels = external
+
+      Valid: internal / companion / external / reimport / disabled
+
+      Rx B exports here, not Rx A. Measured on this unit the jumpers
+
+      carrying A LO-out to B LO-in pass nothing, while B to A works.
+
+      Swap back to [internal, companion, external, external] with
+
+      lo_export_chan 0 if those cables get repaired.'
+    value: '[''external'', ''external'', ''internal'', ''companion'']'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [168, 188.0]
+    rotation: 0
+    state: enabled
+- name: ph_avg
+  id: variable
+  parameters:
+    comment: Averaging length for the displayed phase.
+    value: '16384'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [248, 36.0]
+    rotation: 0
+    state: enabled
+- name: ph_skip
+  id: variable
+  parameters:
+    comment: 'Samples skipped before measuring, so the reading is
+
+      past the start-up transient.'
+    value: 2**13
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 120]
+    rotation: 0
+    state: enabled
+- name: samp_rate
+  id: variable
+  parameters:
+    comment: 'Per-channel rate. 1 Msps x 4ch is easy on 10GbE
+
+      and plenty for a phase-coherence check.'
+    value: '1000000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [16, 116.0]
+    rotation: 0
+    state: enabled
+- name: sched_state
+  id: variable_qtgui_label
+  parameters:
+    comment: ''
+    formatter: None
+    gui_hint: tabs@0:2,0,1,3
+    label: SCHEDULE
+    type: string
+    value: '''starting'''
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [16, 252.0]
+    rotation: 0
+    state: enabled
+- name: stream_state
+  id: variable_qtgui_label
+  parameters:
+    comment: 'Says on screen whether the radio is actually sending.
+
+      When the stream dies the traces hold their last value,
+
+      which looks like a steady reading rather than no reading.
+
+      The snippet below drives this from the block''s watchdog.'
+    formatter: None
+    gui_hint: tabs@0:3,0,1,3
+    label: STREAM
+    type: string
+    value: '''receiving'''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1384, 444.0]
+    rotation: 0
+    state: enabled
+- name: subdev
+  id: variable
+  parameters:
+    comment: 'DB-A = TwinRX #1 (ch0, ch1)
+
+      DB-B = TwinRX #2 (ch2, ch3)'
+    value: '"A:0 A:1 B:0 B:1"'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [16, 180.0]
+    rotation: 0
+    state: enabled
+- name: time_interp
+  id: variable
+  parameters:
+    comment: Interpolation factor for time domain block
+    value: '20'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [500, 116.0]
+    rotation: 0
+    state: enabled
+- name: time_srate
+  id: variable
+  parameters:
+    comment: Sampling rate specifically for time domain block (20 Msps)
+    value: samp_rate * time_interp
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [620, 116.0]
+    rotation: 0
+    state: enabled
+- name: tone_band
+  id: variable_qtgui_chooser
+  parameters:
+    comment: ''
+    gui_hint: tabs@0:1,0,1,3
+    label: LAB TONE (HackRF) BAND
+    label0: 2.4 GHz
+    label1: 5.2 GHz
+    label2: 5.8 GHz
+    label3: ''
+    label4: ''
+    labels: '[]'
+    num_opts: '3'
+    option0: '2400000000.0'
+    option1: '5200000000.0'
+    option2: '5800000000.0'
+    option3: '3'
+    option4: '4'
+    options: '[0, 1, 2]'
+    orient: Qt.QHBoxLayout
+    type: real
+    value: '2400000000.0'
+    widget: combo_box
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [16, 356.0]
+    rotation: 0
+    state: enabled
+- name: tone_bw
+  id: variable
+  parameters:
+    comment: 'Half-width of the band kept around the tone, Hz.
+
+      Narrow enough to reject DC and most of the noise, wide
+
+      enough to tolerate the B210/X310 reference offset, which
+
+      measured ~3.9 kHz at 2.4 GHz. 10 kHz halves the noise
+
+      power the phase estimator sees versus the old 25 kHz.'
+    value: 10e3
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1872, 108.0]
+    rotation: 0
+    state: enabled
+- name: tone_offset
+  id: variable
+  parameters:
+    comment: 'Baseband offset of the calibration tone, Hz.
+
+      MUST match b210_tone_source.py --offset (default +200 kHz).
+
+      Set 0 only if your source really is at the centre frequency,
+
+      which makes it indistinguishable from LO leakage.'
+    value: 200e3
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1544, 212.0]
+    rotation: 0
+    state: enabled
+- name: tone_taps
+  id: variable
+  parameters:
+    comment: Low-pass prototype for the translating filter.
+    value: firdes.low_pass(1.0, samp_rate, tone_bw, tone_bw/2.0, firdes.WIN_HAMMING)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [960, 292.0]
+    rotation: 0
+    state: enabled
+- name: tx_control
+  id: variable
+  parameters:
+    comment: 'hackrf_tone_source.py control socket. The transmitter is told to
+
+      retune first, so it is already there when we arrive.
+
+      Set to '''' to leave the transmitter alone.'
+    value: '''127.0.0.1:5123'''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1128, 252.0]
+    rotation: 0
+    state: enabled
+- name: tx_disp_gain
+  id: variable
+  parameters:
+    comment: 'Display-only gain for the black TX reference trace.
+
+      The B210 TX sink in this flowgraph is DISABLED -- the real
+
+      transmitter is b210_tone_source.py -- so this scales the
+
+      on-screen trace only and cannot change radiated power.'
+    value: '10'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1360, 8]
+    rotation: 0
+    state: enabled
+- name: view_decim
+  id: variable
+  parameters:
+    comment: Decimation before the GUI sinks.
+    value: '2048'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [344, 180.0]
+    rotation: 0
+    state: enabled
+- name: bp_0
+  id: fir_filter_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: Keep only the tone.
+    decim: '1'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samp_delay: '0'
+    taps: disp_taps_bp
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [616, 660.0]
+    rotation: 0
+    state: enabled
+- name: bp_1
+  id: fir_filter_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: Keep only the tone.
+    decim: '1'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samp_delay: '0'
+    taps: disp_taps_bp
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [600, 972.0]
+    rotation: 0
+    state: enabled
+- name: bp_2
+  id: fir_filter_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: Keep only the tone.
+    decim: '1'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samp_delay: '0'
+    taps: disp_taps_bp
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [608, 756.0]
+    rotation: 0
+    state: enabled
+- name: bp_3
+  id: fir_filter_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: Keep only the tone.
+    decim: '1'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samp_delay: '0'
+    taps: disp_taps_bp
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [592, 868.0]
+    rotation: 0
+    state: enabled
+- name: met_0
+  id: hop_phase_meter
+  parameters:
+    affinity: ''
+    alias: ''
+    avg_windows: '10'
+    band_freq: '2400000000.0'
+    comment: chN - ch0 per 2.4 GHz dwell window, NaN when flat
+    f_hi: tone_offset + disp_bw/2 - 10e3
+    f_lo: tone_offset - disp_bw/2 + 10e3
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_channels: '4'
+    report_s: '5'
+    samp_rate: samp_rate
+    snr_min_db: '20'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1224, 1380.0]
+    rotation: 0
+    state: enabled
+- name: met_0_null0
+  id: blocks_null_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    bus_structure_sink: '[[0,],]'
+    comment: ''
+    num_inputs: '1'
+    type: float
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1536, 1520.0]
+    rotation: 0
+    state: enabled
+- name: met_0_null1
+  id: blocks_null_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    bus_structure_sink: '[[0,],]'
+    comment: ''
+    num_inputs: '1'
+    type: float
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1552, 1600.0]
+    rotation: 0
+    state: enabled
+- name: met_0_null2
+  id: blocks_null_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    bus_structure_sink: '[[0,],]'
+    comment: ''
+    num_inputs: '1'
+    type: float
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1568, 1680.0]
+    rotation: 0
+    state: enabled
+- name: met_0_null3
+  id: blocks_null_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    bus_structure_sink: '[[0,],]'
+    comment: ''
+    num_inputs: '1'
+    type: float
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1584, 1816.0]
+    rotation: 0
+    state: enabled
+- name: met_1
+  id: hop_phase_meter
+  parameters:
+    affinity: ''
+    alias: ''
+    avg_windows: '10'
+    band_freq: '5200000000.0'
+    comment: chN - ch0 per 5.2 GHz dwell window, NaN when flat
+    f_hi: tone_offset + disp_bw/2 - 10e3
+    f_lo: tone_offset - disp_bw/2 + 10e3
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_channels: '4'
+    report_s: '5'
+    samp_rate: samp_rate
+    snr_min_db: '20'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [2040, 1252.0]
+    rotation: 0
+    state: enabled
+- name: met_1_null0
+  id: blocks_null_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    bus_structure_sink: '[[0,],]'
+    comment: ''
+    num_inputs: '1'
+    type: float
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [2376, 1216.0]
+    rotation: 0
+    state: enabled
+- name: met_1_null1
+  id: blocks_null_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    bus_structure_sink: '[[0,],]'
+    comment: ''
+    num_inputs: '1'
+    type: float
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [2512, 1248.0]
+    rotation: 0
+    state: enabled
+- name: met_1_null2
+  id: blocks_null_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    bus_structure_sink: '[[0,],]'
+    comment: ''
+    num_inputs: '1'
+    type: float
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [2488, 1296.0]
+    rotation: 0
+    state: enabled
+- name: met_1_null3
+  id: blocks_null_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    bus_structure_sink: '[[0,],]'
+    comment: ''
+    num_inputs: '1'
+    type: float
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [2456, 1392.0]
+    rotation: 0
+    state: enabled
+- name: met_2
+  id: hop_phase_meter
+  parameters:
+    affinity: ''
+    alias: ''
+    avg_windows: '10'
+    band_freq: '5800000000.0'
+    comment: chN - ch0 per 5.8 GHz dwell window, NaN when flat
+    f_hi: tone_offset + disp_bw/2 - 10e3
+    f_lo: tone_offset - disp_bw/2 + 10e3
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_channels: '4'
+    report_s: '5'
+    samp_rate: samp_rate
+    snr_min_db: '20'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [3200, 1200]
+    rotation: 0
+    state: enabled
+- name: met_2_null0
+  id: blocks_null_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    bus_structure_sink: '[[0,],]'
+    comment: ''
+    num_inputs: '1'
+    type: float
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [3500, 1150]
+    rotation: 0
+    state: enabled
+- name: met_2_null1
+  id: blocks_null_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    bus_structure_sink: '[[0,],]'
+    comment: ''
+    num_inputs: '1'
+    type: float
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [3500, 1190]
+    rotation: 0
+    state: enabled
+- name: met_2_null2
+  id: blocks_null_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    bus_structure_sink: '[[0,],]'
+    comment: ''
+    num_inputs: '1'
+    type: float
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [3500, 1230]
+    rotation: 0
+    state: enabled
+- name: met_2_null3
+  id: blocks_null_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    bus_structure_sink: '[[0,],]'
+    comment: ''
+    num_inputs: '1'
+    type: float
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [3500, 1270]
+    rotation: 0
+    state: enabled
+- name: phase_correct_hopping_0
+  id: phase_correct_hopping
+  parameters:
+    affinity: ''
+    alias: ''
+    cal_file: '""'
+    comment: 'Removes the fixed inter-channel offset, per band. Measured 2026-09-24
+      through this same radio configuration -- gains 46/60/69 and gain_trim (0, -13.3,
+      1.5, -1.7) -- because RX gain shifts phase here, so a table measured any other
+      way does not apply. Verified: residuals -0.05..+0.23 deg on all three bands,
+      against a measurement noise floor of 0.2-0.3 deg.
+
+      VALID FOR THIS POWER SESSION ONLY. The LO dividers relock to a new phase every
+      time the X310 is power cycled; re-run phase_table_measure.py after one, or these
+      numbers silently correct to the wrong place.'
+    deg_0: (175.90, -86.62, -168.03)
+    deg_1: (111.43, 71.93, 35.91)
+    deg_2: (82.66, 155.54, 173.74)
+    deg_3: (0.0, 0.0, 0.0)
+    deg_4: (0.0, 0.0, 0.0)
+    deg_5: (0.0, 0.0, 0.0)
+    deg_6: (0.0, 0.0, 0.0)
+    deg_7: (0.0, 0.0, 0.0)
+    dwell_0: '10'
+    dwell_1: '10'
+    dwell_2: '10'
+    dwell_3: '10'
+    dwell_4: '10'
+    dwell_5: '10'
+    dwell_6: '10'
+    dwell_7: '10'
+    follow_source: 'True'
+    follow_tags: 'True'
+    freq_0: '2400000000.0'
+    freq_1: '5200000000.0'
+    freq_2: '5800000000.0'
+    freq_3: '2400000000'
+    freq_4: '2400000000'
+    freq_5: '2400000000'
+    freq_6: '2400000000'
+    freq_7: '2400000000'
+    freq_tol: '1000000'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_bands: '3'
+    num_channels: '4'
+    settle: '1.0'
+    start_delay: '2.0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [856, 716.0]
+    rotation: 0
+    state: enabled
+- name: qtgui_freq_sink_x_0
+  id: qtgui_freq_sink_x
+  parameters:
+    affinity: ''
+    alias: ''
+    alpha1: '1.0'
+    alpha10: '1.0'
+    alpha2: '1.0'
+    alpha3: '1.0'
+    alpha4: '1.0'
+    alpha5: '1.0'
+    alpha6: '1.0'
+    alpha7: '1.0'
+    alpha8: '1.0'
+    alpha9: '1.0'
+    autoscale: 'False'
+    average: '0.2'
+    axislabels: 'True'
+    bw: samp_rate
+    color1: '"blue"'
+    color10: '"blue"'
+    color2: '"red"'
+    color3: '"green"'
+    color4: '"black"'
+    color5: '"blue"'
+    color6: '"blue"'
+    color7: '"blue"'
+    color8: '"blue"'
+    color9: '"blue"'
+    comment: 'Wideband view of what each channel actually receives: the tone,
+
+      any LO leakage left after the DC blocker, and the noise floor.
+
+      Taken before the display band-pass, so it shows the whole
+
+      1 MHz span rather than just the tone.'
+    ctrlpanel: 'False'
+    fc: center_freq
+    fftsize: '4096'
+    freqhalf: 'False'
+    grid: 'True'
+    gui_hint: tabs@1:0,0,1,2
+    label: Relative Gain
+    label1: Ch0 RF A/RX1
+    label10: ''
+    label2: Ch1 RF A/RX2
+    label3: Ch2 RF B/RX1 (LO master)
+    label4: Ch3 RF B/RX2
+    label5: ''
+    label6: ''
+    label7: ''
+    label8: ''
+    label9: ''
+    legend: 'True'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    name: '"Spectrum - all 4 channels (DC removed)"'
+    nconnections: '4'
+    showports: 'False'
+    tr_chan: '0'
+    tr_level: '0.0'
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_tag: '""'
+    type: complex
+    units: dB
+    update_time: '0.10'
+    width1: '2'
+    width10: '2'
+    width2: '2'
+    width3: '2'
+    width4: '2'
+    width5: '2'
+    width6: '2'
+    width7: '2'
+    width8: '2'
+    width9: '2'
+    wintype: firdes.WIN_BLACKMAN_hARRIS
+    ymax: '-20'
+    ymin: '-140'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [776, 1232.0]
+    rotation: 0
+    state: enabled
+- name: snippet_hop
+  id: snippet
+  parameters:
+    alias: ''
+    code: "# Radio-clock hopping: the band changes every 20 ms on the radio's own\
+      \ clock,\n# far faster than a GUI can follow, so nothing here touches the band.\
+      \ The\n# correction, the plot and the readouts all switch on the hop marks the\n\
+      # source puts on the exact samples. This only reports status, twice a second.\n\
+      from PyQt5 import QtCore\n\nself._hop_run = True\nself._fast_state = {}\n\n\
+      def _poll():\n    st = self._fast_state\n    src = self.twinrx_radio_source_0\n\
+      \    try:\n        s = src.get_schedule_stats()\n        alive = src.stream_is_alive()\n\
+      \        stalls = src.get_stream_stalls()\n    except Exception as e:\n    \
+      \    s, alive, stalls = None, None, 0\n        if not st.get('err'):\n     \
+      \       st['err'] = True\n            print('[follow] cannot read the source:\
+      \ %s: %s' % (type(e).__name__, e))\n    if s is not None:\n        txt = ('slots\
+      \ %d | used %d | late %d | unlocked %d | skipped %d | too slow %d | '\n    \
+      \           'send: typical %.1f ms, worst %.1f ms (limit 13 ms)'\n         \
+      \      % (s['slots'], s['valid'], s['late'], s['unlocked'], s['skipped'],\n\
+      \                  s['unknown_in_time'], s.get('avg_send_ms', 0.0), s['max_send_ms']))\n\
+      \        if s['timing_lost']:\n            txt = 'TIMING LOST - restart. ' +\
+      \ txt\n        if txt != st.get('sched'):\n            st['sched'] = txt\n \
+      \           self.set_sched_state(txt)\n    state = ('receiving' if alive else\n\
+      \             'UNKNOWN - cannot read the stream state' if alive is None else\n\
+      \             'STOPPED - the radio is not sending, nothing below is a reading')\n\
+      \    if stalls:\n        state += '   (recovered %d time(s) this run)' % stalls\n\
+      \    if state != st.get('stream'):\n        st['stream'] = state\n        self.set_stream_state(state)\n\
+      \n# CALIBRATE: re-measure the table on the live chain (lab tone), see\n# doa/hop_calibrator.py.\
+      \ Result is applied only if every band passes.\nimport os\nimport doa\nfrom\
+      \ PyQt5 import Qt as _Qt\nself._cal = doa.hop_calibrator(\n    self.twinrx_radio_source_0,\
+      \ self.phase_correct_hopping_0, {2400000000.0: self.met_0, 5200000000.0: self.met_1,\
+      \ 5800000000.0: self.met_2},\n    [2400000000.0, 5200000000.0, 5800000000.0],\
+      \ secs=4.0,\n    out_file=os.path.join(os.path.dirname(os.path.abspath(__file__)),\
+      \ 'phase_table_live_deg.txt'))\nself._cal_btn = _Qt.QPushButton('CALIBRATE \
+      \ (lab tone on each band, ~15 s)')\nself._cal_lbl = _Qt.QLabel('CAL: startup\
+      \ table from the flowgraph (not re-measured this session)')\ndef _cal_click():\n\
+      \    if self._cal.start(restore_freq=self.tone_band):\n        self._cal_btn.setEnabled(False)\n\
+      self._cal_btn.clicked.connect(_cal_click)\nself.tabs_grid_layout_0.addWidget(self._cal_btn,\
+      \ 0, 0, 1, 1)\nself.tabs_grid_layout_0.addWidget(self._cal_lbl, 0, 1, 1, 2)\n\
+      \n# one status line per band: SIGNAL or FLAT, from that band's own dwells\n\
+      self._band_lbl = []\nfor _i, (_f, _m) in enumerate([(2400000000.0, self.met_0),\
+      \ (5200000000.0, self.met_1), (5800000000.0, self.met_2)]):\n    _l = _Qt.QLabel('%g\
+      \ GHz: waiting for dwells' % (_f / 1e9))\n    _l.setStyleSheet('font-family:\
+      \ monospace; font-size: 13pt;')\n    self.tabs_grid_layout_0.addWidget(_l, 6\
+      \ + _i, 0, 1, 3)\n    self._band_lbl.append((_f, _m, _l, {'w': 0, 't': 0}))\n\
+      \nself._now_lbl = _Qt.QLabel('RECEIVING NOW: starting')\nself._now_lbl.setStyleSheet('font-size:\
+      \ 15pt; font-weight: bold;')\nself.tabs_grid_layout_0.addWidget(self._now_lbl,\
+      \ 4, 0, 1, 3)\ndef _now_poll():\n    st, f = self.twinrx_radio_source_0.get_current()\n\
+      \    if f:\n        self._now_lbl.setText('RECEIVING NOW:  %g GHz  (%s)' % (f\
+      \ / 1e9, st))\nself._now_timer = QtCore.QTimer(self)\nself._now_timer.timeout.connect(_now_poll)\n\
+      self._now_timer.start(40)\n\ndef _band_poll():\n    for _f, _m, _l, _last in\
+      \ self._band_lbl:\n        _s = _m.get_stats()\n        _row = [v for k, v in\
+      \ _s.items() if abs(k - _f) <= 1e6]\n        _w = _row[0]['windows'] if _row\
+      \ else 0\n        _t = _row[0]['tone'] if _row else 0\n        dw, dt = _w -\
+      \ _last['w'], _t - _last['t']\n        _last['w'], _last['t'] = _w, _t\n   \
+      \     _ph = _m.recent(10)\n        _num = ('  '.join('ch%d-ch0 %+7.2f deg' %\
+      \ (c + 1, v) for c, v in enumerate(_ph))\n                if _ph is not None\
+      \ and dt > 0 else '  '.join('ch%d-ch0     nan    ' % (c + 1) for c in range(3)))\n\
+      \        if dw <= 0:\n            _state = 'NO DWELLS ARRIVING   '\n       \
+      \ elif dt == dw:\n            _state = 'SIGNAL (%2d/%2d dwells)' % (dt, dw)\n\
+      \        elif dt == 0:\n            _state = 'FLAT   ( 0/%2d dwells)' % dw\n\
+      \        else:\n            _state = 'PARTLY (%2d/%2d dwells)' % (dt, dw)\n\
+      \        _l.setText('%-8s  %s   %s' % ('%g GHz' % (_f / 1e9), _state, _num))\n\
+      \ndef _cal_poll():\n    if self._cal.status != self._fast_state.get('cal'):\n\
+      \        self._fast_state['cal'] = self._cal.status\n        if self._cal.status\
+      \ != 'not run':\n            self._cal_lbl.setText('CAL: ' + self._cal.status)\n\
+      \    self._cal_btn.setEnabled(not self._cal.busy)\n\nself._follow_timer = QtCore.QTimer(self)\n\
+      self._follow_timer.timeout.connect(_poll)\nself._follow_timer.timeout.connect(_cal_poll)\n\
+      self._follow_timer.timeout.connect(_band_poll)\nself._follow_timer.start(500)\n"
+    comment: 'Follows the block so the CURRENT BAND label
+
+      tracks; the block does the hopping itself.'
+    priority: '0'
+    section: main_after_start
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1128, 332.0]
+    rotation: 0
+    state: enabled
+- name: snippet_lo_config
+  id: snippet
+  parameters:
+    alias: ''
+    code: '# LO routing and the timed tune happen INSIDE the TwinRX USRP Source
+
+      # block, so nothing LO-related belongs here.
+
+      #
+
+      # The calibration source is a HackRF One, started outside this flowgraph
+
+      # (run_hop.sh, or: hackrf --freq 2.4e9 --vga 16). It cannot be launched
+
+      # from here: the HackRF needs the system GNU Radio 3.10 while this runs
+
+      # under 3.8, and keeping libuhd 4.1 out of the transmitter''s process
+
+      # matters because the X310''s FPGA image is built for UHD 3.15.
+
+      print(''[*] Calibration source: HackRF One (started separately).'')
+
+      '
+    comment: The transmitter runs in its own process; see run_hop.sh.
+    priority: '0'
+    section: main_after_init
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [296, 300.0]
+    rotation: 0
+    state: enabled
+- name: snippet_lo_stop
+  id: snippet
+  parameters:
+    alias: ''
+    code: "# twinrx_radio_source stops its scheduler and the stream inside the\n#\
+      \ flowgraph's own stop, before the device goes away. Only the GUI poll is\n\
+      # left to stop here.\nself._hop_run = False\nfor _t in (\"_follow_timer\", \"\
+      _now_timer\"):\n    try:\n        getattr(self, _t).stop()\n    except Exception:\n\
+      \        pass\nself._twinrx_run = False\n"
+    comment: 'Stops hopping before teardown -- otherwise the thread
+
+      tunes a device that is being destroyed.'
+    priority: '0'
+    section: main_after_stop
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1400, 4.0]
+    rotation: 0
+    state: enabled
+- name: snippet_lo_watch
+  id: snippet
+  parameters:
+    alias: ''
+    code: 'print(''TwinRX USRP Source block owns LO routing and tuning.'')
+
+      '
+    comment: ''
+    priority: '0'
+    section: main_after_start
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [544, 300.0]
+    rotation: 0
+    state: enabled
+- name: spec_sel
+  id: hop_band_select
+  parameters:
+    affinity: ''
+    alias: ''
+    band_freq: tone_band
+    comment: 'Spectrum: dwell samples of the lab tone''s band'
+    frame_offset: '100'
+    frame_tag: ''''''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_channels: '4'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [424, 1288.0]
+    rotation: 0
+    state: enabled
+- name: sw_avg_0
+  id: blocks_moving_average_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: same display gain as the RF waveform plot
+    length: '20'
+    max_iter: '4000'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    scale: disp_gain * 1.0/20
+    type: float
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [2050, 1600]
+    rotation: 0
+    state: enabled
+- name: sw_avg_1
+  id: blocks_moving_average_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: same display gain as the RF waveform plot
+    length: '20'
+    max_iter: '4000'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    scale: disp_gain * 1.0/20
+    type: float
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [2050, 1660]
+    rotation: 0
+    state: enabled
+- name: sw_avg_2
+  id: blocks_moving_average_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: same display gain as the RF waveform plot
+    length: '20'
+    max_iter: '4000'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    scale: disp_gain * 1.0/20
+    type: float
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [2050, 1720]
+    rotation: 0
+    state: enabled
+- name: sw_avg_3
+  id: blocks_moving_average_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: same display gain as the RF waveform plot
+    length: '20'
+    max_iter: '4000'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    scale: disp_gain * 1.0/20
+    type: float
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [2050, 1780]
+    rotation: 0
+    state: enabled
+- name: sw_dec_0
+  id: blocks_keep_one_in_n
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    n: '20'
+    type: float
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [2250, 1600]
+    rotation: 0
+    state: enabled
+- name: sw_dec_1
+  id: blocks_keep_one_in_n
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    n: '20'
+    type: float
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [2250, 1660]
+    rotation: 0
+    state: enabled
+- name: sw_dec_2
+  id: blocks_keep_one_in_n
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    n: '20'
+    type: float
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [2250, 1720]
+    rotation: 0
+    state: enabled
+- name: sw_dec_3
+  id: blocks_keep_one_in_n
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    n: '20'
+    type: float
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [2250, 1780]
+    rotation: 0
+    state: enabled
+- name: sw_mag_0
+  id: blocks_complex_to_mag
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1900, 1600]
+    rotation: 0
+    state: enabled
+- name: sw_mag_1
+  id: blocks_complex_to_mag
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1900, 1660]
+    rotation: 0
+    state: enabled
+- name: sw_mag_2
+  id: blocks_complex_to_mag
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1900, 1720]
+    rotation: 0
+    state: enabled
+- name: sw_mag_3
+  id: blocks_complex_to_mag
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1900, 1780]
+    rotation: 0
+    state: enabled
+- name: sw_sink
+  id: qtgui_time_sink_x
+  parameters:
+    affinity: ''
+    alias: ''
+    alpha1: '1.0'
+    alpha10: '1.0'
+    alpha2: '1.0'
+    alpha3: '1.0'
+    alpha4: '1.0'
+    alpha5: '1.0'
+    alpha6: '1.0'
+    alpha7: '1.0'
+    alpha8: '1.0'
+    alpha9: '1.0'
+    autoscale: 'False'
+    axislabels: 'True'
+    color1: red
+    color10: dark blue
+    color2: blue
+    color3: green
+    color4: magenta
+    color5: black
+    color6: cyan
+    color7: dark red
+    color8: dark green
+    color9: dark blue
+    comment: ''
+    ctrlpanel: 'True'
+    entags: 'False'
+    grid: 'True'
+    gui_hint: tabs@0:5,0,1,3
+    label1: Ch0 RF A/RX2 - LO external
+    label10: Signal10
+    label2: Ch1 RF A/RX1 - LO external
+    label3: Ch2 RF B/RX1 - LO internal (MASTER, exports)
+    label4: Ch3 RF B/RX2 - LO companion
+    label5: TX Signal (B210)
+    label6: Signal6
+    label7: Signal7
+    label8: Signal8
+    label9: Signal9
+    legend: 'True'
+    marker1: '-1'
+    marker10: '-1'
+    marker2: '-1'
+    marker3: '-1'
+    marker4: '-1'
+    marker5: '-1'
+    marker6: '-1'
+    marker7: '-1'
+    marker8: '-1'
+    marker9: '-1'
+    name: '"One cycle:  0-10 ms switch | 10-20 ms 2.4 GHz  |  20-30 ms switch | 30-40
+      ms 5.2 GHz  |  40-50 ms switch | 50-60 ms 5.8 GHz"'
+    nconnections: '4'
+    size: '3000'
+    srate: '50000.0'
+    stemplot: 'False'
+    style1: '1'
+    style10: '1'
+    style2: '1'
+    style3: '1'
+    style4: '1'
+    style5: '1'
+    style6: '1'
+    style7: '1'
+    style8: '1'
+    style9: '1'
+    tr_chan: '0'
+    tr_delay: '0'
+    tr_level: '0.0'
+    tr_mode: qtgui.TRIG_MODE_TAG
+    tr_slope: qtgui.TRIG_SLOPE_POS
+    tr_tag: '''hop_cycle'''
+    type: float
+    update_time: '0.20'
+    width1: '2'
+    width10: '1'
+    width2: '2'
+    width3: '2'
+    width4: '2'
+    width5: '2'
+    width6: '1'
+    width7: '1'
+    width8: '1'
+    width9: '1'
+    ylabel: '|amplitude|'
+    ymax: '0.5'
+    ymin: '-0.05'
+    yunit: '""'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [2464, 1616.0]
+    rotation: 0
+    state: enabled
+- name: tabs
+  id: qtgui_tab_widget
+  parameters:
+    alias: ''
+    comment: ''
+    gui_hint: ''
+    label0: Hopping
+    label1: Spectra
+    label10: Tab 10
+    label11: Tab 11
+    label12: Tab 12
+    label13: Tab 13
+    label14: Tab 14
+    label15: Tab 15
+    label16: Tab 16
+    label17: Tab 17
+    label18: Tab 18
+    label19: Tab 19
+    label2: RF waveforms (lab tone band)
+    label3: ''
+    label4: ''
+    label5: ''
+    label6: ''
+    label7: ''
+    label8: ''
+    label9: ''
+    num_tabs: '3'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [456, 12.0]
+    rotation: 0
+    state: enabled
+- name: twinrx_radio_source_0
+  id: twinrx_radio_source
+  parameters:
+    addresses: '''addr=192.168.10.2'''
+    affinity: ''
+    alias: ''
+    comment: Hops on the X310 clock; hop_off/hop_on marks on the exact samples
+    dwell_0: '0.01'
+    dwell_1: '0.01'
+    dwell_2: '0.01'
+    dwell_3: '0.01'
+    freq_0: '2400000000.0'
+    freq_1: '5200000000.0'
+    freq_2: '5800000000.0'
+    freq_3: 1.0e9
+    gain_0: '46.0'
+    gain_1: '60.0'
+    gain_2: '69.0'
+    gain_3: '46'
+    gain_trim: (0.0, -13.3, 1.5, -1.7)
+    guard_pre: '0.00025'
+    hop_enable: 'True'
+    lock_check: '0.007'
+    maxoutbuf: '0'
+    min_slack: '0.008'
+    minoutbuf: '0'
+    num_bands: '3'
+    park_freq: tone_band
+    recv_buff_size: '33554432'
+    rt_priority: '0'
+    samp_rate: samp_rate
+    settle: '0.01'
+    start_delay: '0.5'
+    tx_control: '"127.0.0.1:5123"'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [128, 508.0]
+    rotation: 0
+    state: enabled
+- name: uhd_usrp_source_0
+  id: uhd_usrp_source
+  parameters:
+    affinity: ''
+    alias: ''
+    ant0: RX1
+    ant1: RX2
+    ant10: RX2
+    ant11: RX2
+    ant12: RX2
+    ant13: RX2
+    ant14: RX2
+    ant15: RX2
+    ant16: RX2
+    ant17: RX2
+    ant18: RX2
+    ant19: RX2
+    ant2: RX1
+    ant20: RX2
+    ant21: RX2
+    ant22: RX2
+    ant23: RX2
+    ant24: RX2
+    ant25: RX2
+    ant26: RX2
+    ant27: RX2
+    ant28: RX2
+    ant29: RX2
+    ant3: RX2
+    ant30: RX2
+    ant31: RX2
+    ant4: RX2
+    ant5: RX2
+    ant6: RX2
+    ant7: RX2
+    ant8: RX2
+    ant9: RX2
+    bw0: '0'
+    bw1: '0'
+    bw10: '0'
+    bw11: '0'
+    bw12: '0'
+    bw13: '0'
+    bw14: '0'
+    bw15: '0'
+    bw16: '0'
+    bw17: '0'
+    bw18: '0'
+    bw19: '0'
+    bw2: '0'
+    bw20: '0'
+    bw21: '0'
+    bw22: '0'
+    bw23: '0'
+    bw24: '0'
+    bw25: '0'
+    bw26: '0'
+    bw27: '0'
+    bw28: '0'
+    bw29: '0'
+    bw3: '0'
+    bw30: '0'
+    bw31: '0'
+    bw4: '0'
+    bw5: '0'
+    bw6: '0'
+    bw7: '0'
+    bw8: '0'
+    bw9: '0'
+    center_freq0: center_freq
+    center_freq1: center_freq
+    center_freq10: '0'
+    center_freq11: '0'
+    center_freq12: '0'
+    center_freq13: '0'
+    center_freq14: '0'
+    center_freq15: '0'
+    center_freq16: '0'
+    center_freq17: '0'
+    center_freq18: '0'
+    center_freq19: '0'
+    center_freq2: center_freq
+    center_freq20: '0'
+    center_freq21: '0'
+    center_freq22: '0'
+    center_freq23: '0'
+    center_freq24: '0'
+    center_freq25: '0'
+    center_freq26: '0'
+    center_freq27: '0'
+    center_freq28: '0'
+    center_freq29: '0'
+    center_freq3: center_freq
+    center_freq30: '0'
+    center_freq31: '0'
+    center_freq4: '0'
+    center_freq5: '0'
+    center_freq6: '0'
+    center_freq7: '0'
+    center_freq8: '0'
+    center_freq9: '0'
+    clock_rate: 200e6
+    clock_source0: internal
+    clock_source1: ''
+    clock_source2: ''
+    clock_source3: ''
+    clock_source4: ''
+    clock_source5: ''
+    clock_source6: ''
+    clock_source7: ''
+    comment: 'TwinRX REQUIRES master_clock_rate = 200 MHz.
+
+      LO controls are deliberately hidden here: GRC would emit
+
+      set_lo_source() AFTER set_center_freq(), which is the wrong
+
+      order.  The Python Snippet does it properly instead.'
+    dc_offs_enb0: ''
+    dc_offs_enb1: ''
+    dc_offs_enb10: ''
+    dc_offs_enb11: ''
+    dc_offs_enb12: ''
+    dc_offs_enb13: ''
+    dc_offs_enb14: ''
+    dc_offs_enb15: ''
+    dc_offs_enb16: ''
+    dc_offs_enb17: ''
+    dc_offs_enb18: ''
+    dc_offs_enb19: ''
+    dc_offs_enb2: ''
+    dc_offs_enb20: ''
+    dc_offs_enb21: ''
+    dc_offs_enb22: ''
+    dc_offs_enb23: ''
+    dc_offs_enb24: ''
+    dc_offs_enb25: ''
+    dc_offs_enb26: ''
+    dc_offs_enb27: ''
+    dc_offs_enb28: ''
+    dc_offs_enb29: ''
+    dc_offs_enb3: ''
+    dc_offs_enb30: ''
+    dc_offs_enb31: ''
+    dc_offs_enb4: ''
+    dc_offs_enb5: ''
+    dc_offs_enb6: ''
+    dc_offs_enb7: ''
+    dc_offs_enb8: ''
+    dc_offs_enb9: ''
+    dev_addr: '"type=x300"'
+    dev_args: '""'
+    gain0: gain
+    gain1: gain
+    gain10: '0'
+    gain11: '0'
+    gain12: '0'
+    gain13: '0'
+    gain14: '0'
+    gain15: '0'
+    gain16: '0'
+    gain17: '0'
+    gain18: '0'
+    gain19: '0'
+    gain2: gain
+    gain20: '0'
+    gain21: '0'
+    gain22: '0'
+    gain23: '0'
+    gain24: '0'
+    gain25: '0'
+    gain26: '0'
+    gain27: '0'
+    gain28: '0'
+    gain29: '0'
+    gain3: gain
+    gain30: '0'
+    gain31: '0'
+    gain4: '0'
+    gain5: '0'
+    gain6: '0'
+    gain7: '0'
+    gain8: '0'
+    gain9: '0'
+    iq_imbal_enb0: ''
+    iq_imbal_enb1: ''
+    iq_imbal_enb10: ''
+    iq_imbal_enb11: ''
+    iq_imbal_enb12: ''
+    iq_imbal_enb13: ''
+    iq_imbal_enb14: ''
+    iq_imbal_enb15: ''
+    iq_imbal_enb16: ''
+    iq_imbal_enb17: ''
+    iq_imbal_enb18: ''
+    iq_imbal_enb19: ''
+    iq_imbal_enb2: ''
+    iq_imbal_enb20: ''
+    iq_imbal_enb21: ''
+    iq_imbal_enb22: ''
+    iq_imbal_enb23: ''
+    iq_imbal_enb24: ''
+    iq_imbal_enb25: ''
+    iq_imbal_enb26: ''
+    iq_imbal_enb27: ''
+    iq_imbal_enb28: ''
+    iq_imbal_enb29: ''
+    iq_imbal_enb3: ''
+    iq_imbal_enb30: ''
+    iq_imbal_enb31: ''
+    iq_imbal_enb4: ''
+    iq_imbal_enb5: ''
+    iq_imbal_enb6: ''
+    iq_imbal_enb7: ''
+    iq_imbal_enb8: ''
+    iq_imbal_enb9: ''
+    lo_export0: 'False'
+    lo_export1: 'False'
+    lo_export10: 'False'
+    lo_export11: 'False'
+    lo_export12: 'False'
+    lo_export13: 'False'
+    lo_export14: 'False'
+    lo_export15: 'False'
+    lo_export16: 'False'
+    lo_export17: 'False'
+    lo_export18: 'False'
+    lo_export19: 'False'
+    lo_export2: 'False'
+    lo_export20: 'False'
+    lo_export21: 'False'
+    lo_export22: 'False'
+    lo_export23: 'False'
+    lo_export24: 'False'
+    lo_export25: 'False'
+    lo_export26: 'False'
+    lo_export27: 'False'
+    lo_export28: 'False'
+    lo_export29: 'False'
+    lo_export3: 'False'
+    lo_export30: 'False'
+    lo_export31: 'False'
+    lo_export4: 'False'
+    lo_export5: 'False'
+    lo_export6: 'False'
+    lo_export7: 'False'
+    lo_export8: 'False'
+    lo_export9: 'False'
+    lo_source0: internal
+    lo_source1: internal
+    lo_source10: internal
+    lo_source11: internal
+    lo_source12: internal
+    lo_source13: internal
+    lo_source14: internal
+    lo_source15: internal
+    lo_source16: internal
+    lo_source17: internal
+    lo_source18: internal
+    lo_source19: internal
+    lo_source2: internal
+    lo_source20: internal
+    lo_source21: internal
+    lo_source22: internal
+    lo_source23: internal
+    lo_source24: internal
+    lo_source25: internal
+    lo_source26: internal
+    lo_source27: internal
+    lo_source28: internal
+    lo_source29: internal
+    lo_source3: internal
+    lo_source30: internal
+    lo_source31: internal
+    lo_source4: internal
+    lo_source5: internal
+    lo_source6: internal
+    lo_source7: internal
+    lo_source8: internal
+    lo_source9: internal
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    nchan: '4'
+    norm_gain0: 'False'
+    norm_gain1: 'False'
+    norm_gain10: 'False'
+    norm_gain11: 'False'
+    norm_gain12: 'False'
+    norm_gain13: 'False'
+    norm_gain14: 'False'
+    norm_gain15: 'False'
+    norm_gain16: 'False'
+    norm_gain17: 'False'
+    norm_gain18: 'False'
+    norm_gain19: 'False'
+    norm_gain2: 'False'
+    norm_gain20: 'False'
+    norm_gain21: 'False'
+    norm_gain22: 'False'
+    norm_gain23: 'False'
+    norm_gain24: 'False'
+    norm_gain25: 'False'
+    norm_gain26: 'False'
+    norm_gain27: 'False'
+    norm_gain28: 'False'
+    norm_gain29: 'False'
+    norm_gain3: 'False'
+    norm_gain30: 'False'
+    norm_gain31: 'False'
+    norm_gain4: 'False'
+    norm_gain5: 'False'
+    norm_gain6: 'False'
+    norm_gain7: 'False'
+    norm_gain8: 'False'
+    norm_gain9: 'False'
+    num_mboards: '1'
+    otw: ''
+    rx_agc0: Default
+    rx_agc1: Default
+    rx_agc10: Default
+    rx_agc11: Default
+    rx_agc12: Default
+    rx_agc13: Default
+    rx_agc14: Default
+    rx_agc15: Default
+    rx_agc16: Default
+    rx_agc17: Default
+    rx_agc18: Default
+    rx_agc19: Default
+    rx_agc2: Default
+    rx_agc20: Default
+    rx_agc21: Default
+    rx_agc22: Default
+    rx_agc23: Default
+    rx_agc24: Default
+    rx_agc25: Default
+    rx_agc26: Default
+    rx_agc27: Default
+    rx_agc28: Default
+    rx_agc29: Default
+    rx_agc3: Default
+    rx_agc30: Default
+    rx_agc31: Default
+    rx_agc4: Default
+    rx_agc5: Default
+    rx_agc6: Default
+    rx_agc7: Default
+    rx_agc8: Default
+    rx_agc9: Default
+    samp_rate: samp_rate
+    sd_spec0: subdev
+    sd_spec1: ''
+    sd_spec2: ''
+    sd_spec3: ''
+    sd_spec4: ''
+    sd_spec5: ''
+    sd_spec6: ''
+    sd_spec7: ''
+    show_lo_controls: 'False'
+    start_time: '-1.0'
+    stream_args: ''
+    stream_chans: '[]'
+    sync: none
+    time_source0: internal
+    time_source1: ''
+    time_source2: ''
+    time_source3: ''
+    time_source4: ''
+    time_source5: ''
+    time_source6: ''
+    time_source7: ''
+    type: fc32
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [3272, 444.0]
+    rotation: 0
+    state: disabled
+- name: wave_c2r_0
+  id: blocks_complex_to_real
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1800, 600]
+    rotation: 0
+    state: enabled
+- name: wave_c2r_1
+  id: blocks_complex_to_real
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1800, 660]
+    rotation: 0
+    state: enabled
+- name: wave_c2r_2
+  id: blocks_complex_to_real
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1800, 720]
+    rotation: 0
+    state: enabled
+- name: wave_c2r_3
+  id: blocks_complex_to_real
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1800, 780]
+    rotation: 0
+    state: enabled
+- name: wave_rs_0
+  id: rational_resampler_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    decim: '1'
+    fbw: '0'
+    interp: time_interp
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    taps: firdes.low_pass(time_interp * disp_gain, time_srate, disp_bw, disp_interp_trans,
+      firdes.WIN_HAMMING)
+    type: ccc
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1600, 600]
+    rotation: 0
+    state: enabled
+- name: wave_rs_1
+  id: rational_resampler_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    decim: '1'
+    fbw: '0'
+    interp: time_interp
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    taps: firdes.low_pass(time_interp * disp_gain, time_srate, disp_bw, disp_interp_trans,
+      firdes.WIN_HAMMING)
+    type: ccc
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1600, 660]
+    rotation: 0
+    state: enabled
+- name: wave_rs_2
+  id: rational_resampler_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    decim: '1'
+    fbw: '0'
+    interp: time_interp
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    taps: firdes.low_pass(time_interp * disp_gain, time_srate, disp_bw, disp_interp_trans,
+      firdes.WIN_HAMMING)
+    type: ccc
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1600, 720]
+    rotation: 0
+    state: enabled
+- name: wave_rs_3
+  id: rational_resampler_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    decim: '1'
+    fbw: '0'
+    interp: time_interp
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    taps: firdes.low_pass(time_interp * disp_gain, time_srate, disp_bw, disp_interp_trans,
+      firdes.WIN_HAMMING)
+    type: ccc
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1600, 780]
+    rotation: 0
+    state: enabled
+- name: wave_sel
+  id: hop_band_select
+  parameters:
+    affinity: ''
+    alias: ''
+    band_freq: tone_band
+    comment: dwell samples of the lab tone's band
+    frame_offset: '100'
+    frame_tag: '''hop_frame'''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_channels: '4'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1400, 600]
+    rotation: 0
+    state: enabled
+- name: wave_sink
+  id: qtgui_time_sink_x
+  parameters:
+    affinity: ''
+    alias: ''
+    alpha1: '1.0'
+    alpha10: '1.0'
+    alpha2: '1.0'
+    alpha3: '1.0'
+    alpha4: '1.0'
+    alpha5: '1.0'
+    alpha6: '1.0'
+    alpha7: '1.0'
+    alpha8: '1.0'
+    alpha9: '1.0'
+    autoscale: 'False'
+    axislabels: 'True'
+    color1: red
+    color10: dark blue
+    color2: blue
+    color3: green
+    color4: magenta
+    color5: black
+    color6: cyan
+    color7: dark red
+    color8: dark green
+    color9: dark blue
+    comment: ''
+    ctrlpanel: 'True'
+    entags: 'False'
+    grid: 'True'
+    gui_hint: tabs@2:0,0,1,1
+    label1: Ch0 RF A/RX2 - LO external
+    label10: Signal10
+    label2: Ch1 RF A/RX1 - LO external
+    label3: Ch2 RF B/RX1 - LO internal (MASTER, exports)
+    label4: Ch3 RF B/RX2 - LO companion
+    label5: TX Signal (B210)
+    label6: Signal6
+    label7: Signal7
+    label8: Signal8
+    label9: Signal9
+    legend: 'True'
+    marker1: '-1'
+    marker10: '-1'
+    marker2: '-1'
+    marker3: '-1'
+    marker4: '-1'
+    marker5: '-1'
+    marker6: '-1'
+    marker7: '-1'
+    marker8: '-1'
+    marker9: '-1'
+    name: '"RF waveforms of the LAB TONE band (its 10 ms dwells only), all 4 channels"'
+    nconnections: '4'
+    size: '1000'
+    srate: time_srate
+    stemplot: 'False'
+    style1: '1'
+    style10: '1'
+    style2: '1'
+    style3: '1'
+    style4: '1'
+    style5: '1'
+    style6: '1'
+    style7: '1'
+    style8: '1'
+    style9: '1'
+    tr_chan: '0'
+    tr_delay: '0'
+    tr_level: '0.0'
+    tr_mode: qtgui.TRIG_MODE_TAG
+    tr_slope: qtgui.TRIG_SLOPE_POS
+    tr_tag: '''hop_frame'''
+    type: float
+    update_time: '0.10'
+    width1: '2'
+    width10: '1'
+    width2: '2'
+    width3: '2'
+    width4: '2'
+    width5: '2'
+    width6: '1'
+    width7: '1'
+    width8: '1'
+    width9: '1'
+    ylabel: Amplitude
+    ymax: '0.6'
+    ymin: '-0.6'
+    yunit: '""'
+  states:
+    alias: ''
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [2000, 700]
+    rotation: 0
+    state: enabled
+
+connections:
+- [bp_0, '0', phase_correct_hopping_0, '0']
+- [bp_1, '0', phase_correct_hopping_0, '3']
+- [bp_2, '0', phase_correct_hopping_0, '1']
+- [bp_3, '0', phase_correct_hopping_0, '2']
+- [met_0, '0', met_0_null0, '0']
+- [met_0, '1', met_0_null1, '0']
+- [met_0, '2', met_0_null2, '0']
+- [met_0, '3', met_0_null3, '0']
+- [met_1, '0', met_1_null0, '0']
+- [met_1, '1', met_1_null1, '0']
+- [met_1, '2', met_1_null2, '0']
+- [met_1, '3', met_1_null3, '0']
+- [met_2, '0', met_2_null0, '0']
+- [met_2, '1', met_2_null1, '0']
+- [met_2, '2', met_2_null2, '0']
+- [met_2, '3', met_2_null3, '0']
+- [phase_correct_hopping_0, '0', met_0, '0']
+- [phase_correct_hopping_0, '0', met_1, '0']
+- [phase_correct_hopping_0, '0', met_2, '0']
+- [phase_correct_hopping_0, '0', sw_mag_0, '0']
+- [phase_correct_hopping_0, '0', wave_sel, '0']
+- [phase_correct_hopping_0, '1', met_0, '1']
+- [phase_correct_hopping_0, '1', met_1, '1']
+- [phase_correct_hopping_0, '1', met_2, '1']
+- [phase_correct_hopping_0, '1', sw_mag_1, '0']
+- [phase_correct_hopping_0, '1', wave_sel, '1']
+- [phase_correct_hopping_0, '2', met_0, '2']
+- [phase_correct_hopping_0, '2', met_1, '2']
+- [phase_correct_hopping_0, '2', met_2, '2']
+- [phase_correct_hopping_0, '2', sw_mag_2, '0']
+- [phase_correct_hopping_0, '2', wave_sel, '2']
+- [phase_correct_hopping_0, '3', met_0, '3']
+- [phase_correct_hopping_0, '3', met_1, '3']
+- [phase_correct_hopping_0, '3', met_2, '3']
+- [phase_correct_hopping_0, '3', sw_mag_3, '0']
+- [phase_correct_hopping_0, '3', wave_sel, '3']
+- [spec_sel, '0', qtgui_freq_sink_x_0, '0']
+- [spec_sel, '1', qtgui_freq_sink_x_0, '1']
+- [spec_sel, '2', qtgui_freq_sink_x_0, '2']
+- [spec_sel, '3', qtgui_freq_sink_x_0, '3']
+- [sw_avg_0, '0', sw_dec_0, '0']
+- [sw_avg_1, '0', sw_dec_1, '0']
+- [sw_avg_2, '0', sw_dec_2, '0']
+- [sw_avg_3, '0', sw_dec_3, '0']
+- [sw_dec_0, '0', sw_sink, '0']
+- [sw_dec_1, '0', sw_sink, '1']
+- [sw_dec_2, '0', sw_sink, '2']
+- [sw_dec_3, '0', sw_sink, '3']
+- [sw_mag_0, '0', sw_avg_0, '0']
+- [sw_mag_1, '0', sw_avg_1, '0']
+- [sw_mag_2, '0', sw_avg_2, '0']
+- [sw_mag_3, '0', sw_avg_3, '0']
+- [twinrx_radio_source_0, '0', bp_0, '0']
+- [twinrx_radio_source_0, '0', spec_sel, '0']
+- [twinrx_radio_source_0, '1', bp_2, '0']
+- [twinrx_radio_source_0, '1', spec_sel, '1']
+- [twinrx_radio_source_0, '2', bp_3, '0']
+- [twinrx_radio_source_0, '2', spec_sel, '2']
+- [twinrx_radio_source_0, '3', bp_1, '0']
+- [twinrx_radio_source_0, '3', spec_sel, '3']
+- [wave_c2r_0, '0', wave_sink, '0']
+- [wave_c2r_1, '0', wave_sink, '1']
+- [wave_c2r_2, '0', wave_sink, '2']
+- [wave_c2r_3, '0', wave_sink, '3']
+- [wave_rs_0, '0', wave_c2r_0, '0']
+- [wave_rs_1, '0', wave_c2r_1, '0']
+- [wave_rs_2, '0', wave_c2r_2, '0']
+- [wave_rs_3, '0', wave_c2r_3, '0']
+- [wave_sel, '0', wave_rs_0, '0']
+- [wave_sel, '1', wave_rs_1, '0']
+- [wave_sel, '2', wave_rs_2, '0']
+- [wave_sel, '3', wave_rs_3, '0']
+
+metadata:
+  file_format: 1

@@ -1,0 +1,198 @@
+id: twinrx_radio_source
+label: "TwinRX Radio-Clock\n   Hopping Source"
+category: '[DOA]'
+
+parameters:
+- id: samp_rate
+  label: Samp Rate
+  dtype: real
+  default: samp_rate
+- id: addresses
+  label: Device Address
+  dtype: string
+  default: addr=192.168.10.2
+- id: num_bands
+  label: Number of Bands
+  dtype: int
+  default: '3'
+- id: settle
+  label: Switching time per slot (s)
+  dtype: real
+  default: '0.01'
+- id: guard_pre
+  label: Part of it before each switch (s)
+  dtype: real
+  default: '0.00025'
+- id: gain_trim
+  label: Per-channel gain trim (dB)
+  dtype: raw
+  default: (0.0, 0.0, 0.0, 0.0)
+- id: hop_enable
+  label: Hopping
+  dtype: bool
+  default: 'True'
+- id: start_delay
+  label: Delay before first hop (s)
+  dtype: real
+  default: '0.5'
+  hide: part
+- id: tx_control
+  label: Lab transmitter control (host:port)
+  dtype: string
+  default: ''
+- id: park_freq
+  label: Park lab tone at (Hz, 0 = off)
+  dtype: real
+  default: '0'
+- id: lock_check
+  label: Lock check after switch (s)
+  dtype: real
+  default: '0.007'
+  hide: part
+- id: min_slack
+  label: Min time to send a change (s)
+  dtype: real
+  default: '0.008'
+  hide: part
+- id: recv_buff_size
+  label: Receive buffer (bytes)
+  dtype: int
+  default: '33554432'
+  hide: part
+- id: rt_priority
+  label: Real-time priority (0 = off)
+  dtype: int
+  default: '0'
+  hide: part
+- id: burst
+  label: Burst mode (no samples while switching)
+  dtype: bool
+  default: 'False'
+- id: preroll
+  label: Burst pre-roll before each dwell (s)
+  dtype: real
+  default: '0.00025'
+  hide: ${ 'part' if burst else 'all' }
+- id: freq_0
+  label: '  band 0  |  freq (Hz)'
+  dtype: real
+  default: '2.4e9'
+- id: gain_0
+  label: '  band 0  |  RX gain (dB)'
+  dtype: real
+  default: '46'
+- id: dwell_0
+  label: '  band 0  |  dwell (s)'
+  dtype: real
+  default: '0.01'
+- id: freq_1
+  label: '  band 1  |  freq (Hz)'
+  dtype: real
+  default: '5.2e9'
+  hide: ${ 'none' if int(num_bands) > 1 else 'all' }
+- id: gain_1
+  label: '  band 1  |  RX gain (dB)'
+  dtype: real
+  default: '60'
+  hide: ${ 'none' if int(num_bands) > 1 else 'all' }
+- id: dwell_1
+  label: '  band 1  |  dwell (s)'
+  dtype: real
+  default: '0.01'
+  hide: ${ 'none' if int(num_bands) > 1 else 'all' }
+- id: freq_2
+  label: '  band 2  |  freq (Hz)'
+  dtype: real
+  default: '5.8e9'
+  hide: ${ 'none' if int(num_bands) > 2 else 'all' }
+- id: gain_2
+  label: '  band 2  |  RX gain (dB)'
+  dtype: real
+  default: '69'
+  hide: ${ 'none' if int(num_bands) > 2 else 'all' }
+- id: dwell_2
+  label: '  band 2  |  dwell (s)'
+  dtype: real
+  default: '0.01'
+  hide: ${ 'none' if int(num_bands) > 2 else 'all' }
+- id: freq_3
+  label: '  band 3  |  freq (Hz)'
+  dtype: real
+  default: '1.0e9'
+  hide: ${ 'none' if int(num_bands) > 3 else 'all' }
+- id: gain_3
+  label: '  band 3  |  RX gain (dB)'
+  dtype: real
+  default: '46'
+  hide: ${ 'none' if int(num_bands) > 3 else 'all' }
+- id: dwell_3
+  label: '  band 3  |  dwell (s)'
+  dtype: real
+  default: '0.01'
+  hide: ${ 'none' if int(num_bands) > 3 else 'all' }
+
+asserts:
+- ${ 1 <= int(num_bands) <= 4 }
+- ${ 0 <= guard_pre < settle }
+
+outputs:
+- domain: stream
+  dtype: complex
+  multiplicity: '4'
+
+templates:
+  imports: import doa
+  make: |-
+    doa.twinrx_radio_source(
+        samp_rate=${samp_rate},
+        addresses=${addresses},
+        bands=[
+    % if int(num_bands) > 0:
+            (${freq_0}, ${gain_0}, ${dwell_0}),
+    % endif
+    % if int(num_bands) > 1:
+            (${freq_1}, ${gain_1}, ${dwell_1}),
+    % endif
+    % if int(num_bands) > 2:
+            (${freq_2}, ${gain_2}, ${dwell_2}),
+    % endif
+    % if int(num_bands) > 3:
+            (${freq_3}, ${gain_3}, ${dwell_3}),
+    % endif
+        ],
+        settle=${settle},
+        guard_pre=${guard_pre},
+        gain_trim=${gain_trim},
+        hop_enable=${hop_enable},
+        start_delay=${start_delay},
+        tx_control=${tx_control},
+        park_freq=${park_freq},
+        lock_check=${lock_check},
+        min_slack=${min_slack},
+        recv_buff_size=${recv_buff_size},
+        rt_priority=${rt_priority},
+        burst=${burst},
+        preroll=${preroll},
+    )
+  callbacks:
+  - set_park_freq(${park_freq})
+
+documentation: |-
+  USRP-2945 (X310 + 2x TwinRX, LO exported by board B), hopping on the radio's
+  own clock. The receive loop and the scheduler run in a C++ engine
+  (libtwinrx_engine.so) that talks to UHD directly -- not through gr-uhd, which
+  leaves ch0 180 deg off on some 5.8 GHz dwells, and not in Python, whose
+  interpreter lock delayed ~1 % of slots with the GUI running.
+  Real-time priority needs an rtprio limit for the user (see README).
+
+  Each slot = switching time + the band's dwell. The band change is one timed
+  batch (gains, staggered RF tunes, second timed pass), sent one slot ahead;
+  the lock is confirmed before every dwell. Output 0 carries hop_off / hop_on
+  tags on the exact samples; late, skipped or unlocked slots get no hop_on.
+  Burst mode: the X310 sends only each dwell (plus the pre-roll, inside the
+  switching time), nothing while the LO relocks; every burst is checked for its
+  exact start sample and length and put back on the continuous timeline.
+  Use with Phase Correct Hopping (Follow = hop marks), Hop Band Select and
+  Hop Phase Meter.
+
+file_format: 1

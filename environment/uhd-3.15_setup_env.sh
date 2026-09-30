@@ -1,0 +1,6 @@
+export UHD_DIR="/home/shankar/uhd-3.15"
+export PATH="$UHD_DIR/bin:$PATH"
+export LD_LIBRARY_PATH="$UHD_DIR/lib:$LD_LIBRARY_PATH"
+export PYTHONPATH="$UHD_DIR/lib/python3.10/site-packages:$PYTHONPATH"
+export PKG_CONFIG_PATH="$UHD_DIR/lib/pkgconfig:$PKG_CONFIG_PATH"
+echo "UHD 3.15 environment loaded successfully!"

@@ -1,0 +1,43 @@
+id: hop_dc_remove
+label: Hop DC Remove
+category: '[DOA]'
+
+parameters:
+- id: num_channels
+  label: Num Channels
+  dtype: int
+  default: '4'
+- id: delay
+  label: Delay (samples, >= longest dwell)
+  dtype: int
+  default: '5000'
+- id: narrow_hz
+  label: Display filter +/- (Hz around the tone, 0 = off)
+  dtype: real
+  default: '0'
+- id: samp_rate
+  label: Sample rate
+  dtype: real
+  default: samp_rate
+
+inputs:
+- domain: stream
+  dtype: complex
+  multiplicity: ${num_channels}
+
+outputs:
+- domain: stream
+  dtype: complex
+  multiplicity: ${num_channels}
+
+templates:
+  imports: import doa
+  make: doa.hop_dc_remove(${num_channels}, ${delay}, ${narrow_hz}, ${samp_rate})
+
+documentation: |-
+  Subtracts each dwell window's measured mean (the receiver's own 0 Hz
+  leakage) on the continuous timeline. The stream is delayed by `delay`
+  samples so each window is complete before its first sample goes out;
+  switching samples pass unchanged, tags keep their samples (delay later).
+
+file_format: 1

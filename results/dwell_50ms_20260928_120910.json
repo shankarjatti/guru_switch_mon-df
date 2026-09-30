@@ -1,0 +1,6930 @@
+{
+ "args": {
+  "addr": "addr=192.168.10.2",
+  "dwell": 0.05,
+  "settle": 0.01,
+  "margin": 0.002,
+  "cycles": 60,
+  "park": "2.4e9,5.2e9,5.8e9"
+ },
+ "tx_replies": {
+  "2400000000.0": "ok 2400000000",
+  "5200000000.0": "ok 5200000000",
+  "5800000000.0": "ok 5800000000"
+ },
+ "stream": {
+  "rate": 500002.6088816768,
+  "seconds": 69.761692,
+  "errors": {},
+  "gaps": 95826
+ },
+ "bands": {
+  "2400000000.0": {
+   "visits": 60,
+   "visits_ok": 0,
+   "window_ms_min": 49.99245400012775,
+   "window_ms_max": 50.20663850014628,
+   "settled_ms_max": null,
+   "phase_mean_deg": [
+    NaN,
+    NaN,
+    NaN
+   ],
+   "repeat_max_dev_deg": [
+    NaN,
+    NaN,
+    NaN
+   ],
+   "vs_guru_table_deg": [
+    NaN,
+    NaN,
+    NaN
+   ],
+   "visits_detail": [
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 2.1700567650000484,
+     "window_ms": 50.09496999980101,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 2.35041850450004,
+     "window_ms": 50.024483999818955,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 2.5305006395000773,
+     "window_ms": 50.02922999982573,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 2.7105851544999546,
+     "window_ms": 50.07501049985707,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 2.890804270999837,
+     "window_ms": 50.071618500264314,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 3.070976196499828,
+     "window_ms": 50.133136000317435,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 3.2512660795000556,
+     "window_ms": 50.021416500030554,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 3.4313530034998703,
+     "window_ms": 50.028400000095004,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 3.6115676055000394,
+     "window_ms": 50.085698500074386,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 3.791923106500101,
+     "window_ms": 50.14673200004971,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 3.9721069440000756,
+     "window_ms": 50.12588999999501,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 4.152272412500012,
+     "window_ms": 50.143701999985524,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 4.332452766999929,
+     "window_ms": 50.15224000007912,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 4.512651519500062,
+     "window_ms": 50.162640499967104,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 4.693006072000007,
+     "window_ms": 50.02751199989319,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 4.87311010749996,
+     "window_ms": 50.02908200019629,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 5.053186491499967,
+     "window_ms": 50.03847099989134,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 5.233354403000035,
+     "window_ms": 50.06505500005698,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 5.413450763000003,
+     "window_ms": 50.02092499991928,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 5.593532838500049,
+     "window_ms": 50.04316749995308,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 5.773613765499906,
+     "window_ms": 50.01654800016819,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 5.9539517609998525,
+     "window_ms": 50.14129800010103,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 6.134274078999928,
+     "window_ms": 50.0374070001115,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 6.314351894999964,
+     "window_ms": 50.022579500021536,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 6.494424662000022,
+     "window_ms": 50.02687450011223,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 6.674514608500134,
+     "window_ms": 50.03197599971365,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 6.854584322000127,
+     "window_ms": 50.02925649974266,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 7.034689514500086,
+     "window_ms": 50.032754499885534,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 7.214784781499981,
+     "window_ms": 50.161528500162866,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 7.395117681499823,
+     "window_ms": 50.01757700028886,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 7.575288413000214,
+     "window_ms": 50.02366749977849,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 7.755380835000028,
+     "window_ms": 50.106630500072136,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 7.9355793469999645,
+     "window_ms": 50.05989750011164,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 8.115796059500013,
+     "window_ms": 50.054585000040674,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 8.295927304499864,
+     "window_ms": 50.03775000008304,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 8.476085320499886,
+     "window_ms": 50.062384000096216,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 8.656189853999813,
+     "window_ms": 49.99245400012775,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 8.836256179499893,
+     "window_ms": 50.02586850008761,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 9.016335257000131,
+     "window_ms": 50.12684149987834,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 9.196558258999943,
+     "window_ms": 50.01436549999028,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 9.376636630500151,
+     "window_ms": 49.99778549974998,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 9.55678714349988,
+     "window_ms": 50.20663850014628,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 9.737042047500049,
+     "window_ms": 50.023134999991115,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 9.91711112349989,
+     "window_ms": 50.16127650020863,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 10.097329578499966,
+     "window_ms": 50.034094999904966,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 10.277409597499938,
+     "window_ms": 50.0245830001802,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 10.457487690499882,
+     "window_ms": 50.01488600014348,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 10.637558578999935,
+     "window_ms": 50.03025100026903,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 10.817656360500049,
+     "window_ms": 50.14663900005445,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 10.997990663500007,
+     "window_ms": 50.04505750005528,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 11.178111059000008,
+     "window_ms": 50.156531499952806,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 11.358413871499941,
+     "window_ms": 50.02046500015567,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 11.538484763999834,
+     "window_ms": 50.028861500120314,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 11.718576919000093,
+     "window_ms": 50.042761999939955,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 11.898794451499827,
+     "window_ms": 50.13987750012383,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 12.079084648499956,
+     "window_ms": 50.033541999876974,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 12.25918559450017,
+     "window_ms": 50.03284849999723,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 12.4392654165001,
+     "window_ms": 50.142726499975865,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 12.61958105749989,
+     "window_ms": 50.14699300030401,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 2400000000.0,
+     "t0_dev": 12.79985296000017,
+     "window_ms": 50.039075999833926,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    }
+   ]
+  },
+  "5200000000.0": {
+   "visits": 60,
+   "visits_ok": 0,
+   "window_ms_min": 49.963788999917824,
+   "window_ms_max": 50.194452999882344,
+   "settled_ms_max": null,
+   "phase_mean_deg": [
+    NaN,
+    NaN,
+    NaN
+   ],
+   "repeat_max_dev_deg": [
+    NaN,
+    NaN,
+    NaN
+   ],
+   "vs_guru_table_deg": [
+    NaN,
+    NaN,
+    NaN
+   ],
+   "visits_detail": [
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 13.590790336000191,
+     "window_ms": 50.154503999884525,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 13.771040527000023,
+     "window_ms": 50.01067899998901,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 13.951182259500001,
+     "window_ms": 50.04834650005385,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 14.131420948000171,
+     "window_ms": 49.99543799980799,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 14.311581727999943,
+     "window_ms": 50.021542000012076,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 14.491900797999987,
+     "window_ms": 50.132707499967566,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 14.672199631499943,
+     "window_ms": 50.11537900014673,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 14.852488523999938,
+     "window_ms": 50.00481899997666,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 15.0326105045001,
+     "window_ms": 50.14734599990689,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 15.213004767500186,
+     "window_ms": 50.0315454997633,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 15.393081521000056,
+     "window_ms": 50.01591450002074,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 15.573336808500008,
+     "window_ms": 50.14985299996866,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 15.753594113999874,
+     "window_ms": 50.04511850017046,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 15.933862050999924,
+     "window_ms": 50.1277189999616,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 16.1140532494999,
+     "window_ms": 50.03785900004232,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 16.294239081000125,
+     "window_ms": 50.0309814998765,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 16.47429509049997,
+     "window_ms": 50.023932500039336,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 16.65438343150013,
+     "window_ms": 50.0362194998516,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 16.834533196999992,
+     "window_ms": 50.01264449983722,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 17.014620258999926,
+     "window_ms": 50.045265999902,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 17.19478463749994,
+     "window_ms": 50.03678450004401,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 17.374895911499987,
+     "window_ms": 50.03350150007435,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 17.555110718499826,
+     "window_ms": 50.016061000047074,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 17.735289407000213,
+     "window_ms": 50.0200604999641,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 17.915357088500013,
+     "window_ms": 50.03158700010957,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 18.095471855500012,
+     "window_ms": 50.05647300001215,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 18.275602153499968,
+     "window_ms": 50.02775800016934,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 18.45583417650004,
+     "window_ms": 50.043618000028545,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 18.635944473999942,
+     "window_ms": 49.963788999917824,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 18.816003559000055,
+     "window_ms": 50.0172779997925,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 18.996091225499992,
+     "window_ms": 50.0391295001279,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 19.17631602650015,
+     "window_ms": 50.05315899980545,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 19.35641975899986,
+     "window_ms": 50.026944500228154,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 19.536510665999888,
+     "window_ms": 50.013012000171386,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 19.71656510399984,
+     "window_ms": 50.04878950008518,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 19.896769584499985,
+     "window_ms": 50.168370000090334,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 20.077133320999955,
+     "window_ms": 50.027933500050636,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 20.257220988500087,
+     "window_ms": 50.010624999750064,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 20.437284903000023,
+     "window_ms": 50.0186450000939,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 20.617333390499827,
+     "window_ms": 50.05909200028569,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 20.797482652000028,
+     "window_ms": 50.027963499903905,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 20.977563393999954,
+     "window_ms": 50.02419850006845,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 21.15780059600005,
+     "window_ms": 50.14138499994658,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 21.338143865999985,
+     "window_ms": 50.047876999908425,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 21.51829782050009,
+     "window_ms": 50.12204249977614,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 21.698557664000017,
+     "window_ms": 50.051151499879154,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 21.878950124999992,
+     "window_ms": 50.00302899999198,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 22.05912233399994,
+     "window_ms": 50.06861350010183,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 22.23940467900001,
+     "window_ms": 50.081730500096455,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 22.419599471000026,
+     "window_ms": 50.194452999882344,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 22.59998503450003,
+     "window_ms": 50.045642000121404,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 22.780088389000007,
+     "window_ms": 49.9877489999605,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 22.960267018500055,
+     "window_ms": 50.01580000009298,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 23.140395652000024,
+     "window_ms": 50.044816000099246,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 23.32049493299981,
+     "window_ms": 50.01954000019637,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 23.500595300000036,
+     "window_ms": 50.04752499991483,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 23.68078681850008,
+     "window_ms": 50.07815949999639,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 23.861053249499815,
+     "window_ms": 50.042967000148764,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 24.041114860499903,
+     "window_ms": 50.0172775000749,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5200000000.0,
+     "t0_dev": 24.221188497000018,
+     "window_ms": 50.02440399987407,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    }
+   ]
+  },
+  "5800000000.0": {
+   "visits": 59,
+   "visits_ok": 0,
+   "window_ms_min": 50.005230499955644,
+   "window_ms_max": 50.16843449998021,
+   "settled_ms_max": null,
+   "phase_mean_deg": [
+    NaN,
+    NaN,
+    NaN
+   ],
+   "repeat_max_dev_deg": [
+    NaN,
+    NaN,
+    NaN
+   ],
+   "vs_guru_table_deg": [
+    NaN,
+    NaN,
+    NaN
+   ],
+   "visits_detail": [
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 25.011960984,
+     "window_ms": 50.02920499995156,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 25.192072687000024,
+     "window_ms": 50.036940499886384,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 25.37217306400008,
+     "window_ms": 50.03710699973851,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 25.552247381500006,
+     "window_ms": 50.01105150000029,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 25.732339631499883,
+     "window_ms": 50.04869150008773,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 25.91246523050004,
+     "window_ms": 50.032507499963685,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 26.09255550350004,
+     "window_ms": 50.033200999870076,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 26.272609541500014,
+     "window_ms": 50.16172349989745,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 26.452891032000192,
+     "window_ms": 50.03819799964759,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 26.633132989500044,
+     "window_ms": 50.008611000066594,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 26.81317926850004,
+     "window_ms": 50.022078000012016,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 26.993249337500032,
+     "window_ms": 50.0294209999268,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 27.173352914500096,
+     "window_ms": 50.03024349990426,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 27.35349782050008,
+     "window_ms": 50.018879499994284,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 27.533638361500167,
+     "window_ms": 50.03732749980827,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 27.71376381750001,
+     "window_ms": 50.01969400017714,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 27.89408833949998,
+     "window_ms": 50.04243549991472,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 28.074301738000003,
+     "window_ms": 50.02135949991171,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 28.254483778000136,
+     "window_ms": 50.032712999865225,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 28.43457182900009,
+     "window_ms": 50.02476799982958,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 28.614783944500005,
+     "window_ms": 50.04702499988056,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 28.79508148000004,
+     "window_ms": 50.14095199993562,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 28.975269181500032,
+     "window_ms": 50.02085450005822,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 29.1553485955,
+     "window_ms": 50.01734450010886,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 29.335462693999837,
+     "window_ms": 50.02801350015318,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 29.515568405499828,
+     "window_ms": 50.02187000021152,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 29.695781366000126,
+     "window_ms": 50.15266049976219,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 29.87613626999997,
+     "window_ms": 50.052433500034965,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 30.056231136000058,
+     "window_ms": 50.04153599972483,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 30.236374973999954,
+     "window_ms": 50.02447600005766,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 30.416466178500034,
+     "window_ms": 50.028044499882185,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 30.59656912450003,
+     "window_ms": 50.0306644999533,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 30.776921153500012,
+     "window_ms": 50.02673450005801,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 30.957135070500158,
+     "window_ms": 50.010376999715334,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 31.137199797999916,
+     "window_ms": 50.02626600004234,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 31.317251043000006,
+     "window_ms": 50.047816000045486,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 31.497389215999927,
+     "window_ms": 50.06693750016211,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 31.677498821500045,
+     "window_ms": 50.081390500043454,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 31.857622470499965,
+     "window_ms": 50.005230499955644,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 32.03782115500012,
+     "window_ms": 50.05700249996892,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 32.217929959999964,
+     "window_ms": 50.14231600016217,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 32.398118822000136,
+     "window_ms": 50.02680799989889,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 32.578182430000034,
+     "window_ms": 50.02986599995296,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 32.75824709550005,
+     "window_ms": 50.0346775001006,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 32.938362450000085,
+     "window_ms": 50.029252999856055,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 33.11844991149983,
+     "window_ms": 50.01223450017278,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 33.29848143650011,
+     "window_ms": 50.032415499998706,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 33.47856362500008,
+     "window_ms": 50.02467199997085,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 33.65869124200012,
+     "window_ms": 50.041900999957534,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 33.838918708999955,
+     "window_ms": 50.16843449998021,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 34.019195657999965,
+     "window_ms": 50.02100399992315,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 34.19938370899998,
+     "window_ms": 50.06098199998377,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 34.37948926100011,
+     "window_ms": 50.03675899987314,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 34.559618450499926,
+     "window_ms": 50.06050449996735,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 34.73975863149995,
+     "window_ms": 50.008528499972726,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 34.92008152299996,
+     "window_ms": 50.010010499867974,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 35.10017140350004,
+     "window_ms": 50.013126499933946,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 35.280238072000046,
+     "window_ms": 50.0113644999729,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    },
+    {
+     "freq": 5800000000.0,
+     "t0_dev": 35.46029074450014,
+     "window_ms": 50.02715499984589,
+     "window_blocks": 0,
+     "ok": false,
+     "why": "no samples in dwell window"
+    }
+   ]
+  }
+ },
+ "verdict": "DWELL 50 ms: NOT ACHIEVED -- 4 hop(s) not locked at end of settle; stream errors/gaps; stream rate 500003; 2.4 GHz: 60 visit(s) not steady; 5.2 GHz: 60 visit(s) not steady; 5.8 GHz: 59 visit(s) not steady",
+ "hops": [
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 2.1700567650000484,
+   "due_dev": 2.17308492,
+   "calls_s": 0.0013591140000244195,
+   "locked": true,
+   "lock_read_s": 0.009850909999840951,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 2.230151734999849,
+   "due_dev": 2.2339688,
+   "calls_s": 0.0020726709999507875,
+   "locked": true,
+   "lock_read_s": 0.009833579999849462,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 2.290279393000012,
+   "due_dev": 2.2940130099999996,
+   "calls_s": 0.002131444000042393,
+   "locked": true,
+   "lock_read_s": 0.00975831100004143,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 2.35041850450004,
+   "due_dev": 2.35486123,
+   "calls_s": 0.002854159999969852,
+   "locked": true,
+   "lock_read_s": 0.009863082000265422,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 2.4104429884998586,
+   "due_dev": 2.41519533,
+   "calls_s": 0.003213993999906961,
+   "locked": true,
+   "lock_read_s": 0.009774909000043408,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 2.470467253500008,
+   "due_dev": 2.4741469499999997,
+   "calls_s": 0.002051264000328956,
+   "locked": true,
+   "lock_read_s": 0.009729273000175453,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 2.5305006395000773,
+   "due_dev": 2.53508772,
+   "calls_s": 0.002969448000385455,
+   "locked": true,
+   "lock_read_s": 0.009673425000073621,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 2.590529869499903,
+   "due_dev": 2.5950241299999997,
+   "calls_s": 0.002742432999639277,
+   "locked": true,
+   "lock_read_s": 0.009817851999741833,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 2.6505482614999756,
+   "due_dev": 2.6541815499999997,
+   "calls_s": 0.0019872019997819734,
+   "locked": true,
+   "lock_read_s": 0.009680618999936996,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 2.7105851544999546,
+   "due_dev": 2.71521197,
+   "calls_s": 0.00287338499992984,
+   "locked": true,
+   "lock_read_s": 0.009708404999855702,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 2.7706601649998115,
+   "due_dev": 2.7750309399999997,
+   "calls_s": 0.0026154629999837198,
+   "locked": true,
+   "lock_read_s": 0.009729384999900503,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 2.830803690499992,
+   "due_dev": 2.83451249,
+   "calls_s": 0.0021000359997742635,
+   "locked": true,
+   "lock_read_s": 0.009801785000036034,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 2.890804270999837,
+   "due_dev": 2.8954092599999997,
+   "calls_s": 0.002964107000025251,
+   "locked": true,
+   "lock_read_s": 0.009699963999992178,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 2.950875889500101,
+   "due_dev": 2.9580164399999997,
+   "calls_s": 0.00596590599980118,
+   "locked": false,
+   "lock_read_s": 0.009805420999782655,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 3.010927060000011,
+   "due_dev": 3.01444994,
+   "calls_s": 0.0019672409998747753,
+   "locked": true,
+   "lock_read_s": 0.009826069999689935,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 3.070976196499828,
+   "due_dev": 3.07568062,
+   "calls_s": 0.00309896699991441,
+   "locked": true,
+   "lock_read_s": 0.009683664000021963,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 3.131109332500145,
+   "due_dev": 3.1356121499999996,
+   "calls_s": 0.002877451000131259,
+   "locked": true,
+   "lock_read_s": 0.00968068200018024,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 3.1911437060000547,
+   "due_dev": 3.1947758299999998,
+   "calls_s": 0.0020072480001545046,
+   "locked": true,
+   "lock_read_s": 0.009684022999863373,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 3.2512660795000556,
+   "due_dev": 3.2558513299999996,
+   "calls_s": 0.002951181000298675,
+   "locked": true,
+   "lock_read_s": 0.009770620000381314,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 3.311287496000086,
+   "due_dev": 3.3162236299999996,
+   "calls_s": 0.003957325000101264,
+   "locked": true,
+   "lock_read_s": 0.009747458999754599,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 3.3713338085000766,
+   "due_dev": 3.37494227,
+   "calls_s": 0.0020125010000811017,
+   "locked": true,
+   "lock_read_s": 0.009682270999746834,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 3.4313530034998703,
+   "due_dev": 3.43579292,
+   "calls_s": 0.002853147999758221,
+   "locked": true,
+   "lock_read_s": 0.009860386999662296,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 3.491381403499965,
+   "due_dev": 3.4966022999999997,
+   "calls_s": 0.003966666999986046,
+   "locked": true,
+   "lock_read_s": 0.009891627999877528,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 3.551534135000023,
+   "due_dev": 3.55563359,
+   "calls_s": 0.002625985000122455,
+   "locked": true,
+   "lock_read_s": 0.009812809999857564,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 3.6115676055000394,
+   "due_dev": 3.6158902699999995,
+   "calls_s": 0.00257273500028532,
+   "locked": true,
+   "lock_read_s": 0.009699758999886399,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 3.6716533040001136,
+   "due_dev": 3.6759564099999995,
+   "calls_s": 0.002707470999666839,
+   "locked": true,
+   "lock_read_s": 0.009733523999784666,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 3.731806762500182,
+   "due_dev": 3.73595862,
+   "calls_s": 0.0026543489998402947,
+   "locked": true,
+   "lock_read_s": 0.009815686999900208,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 3.791923106500101,
+   "due_dev": 3.7958038299999997,
+   "calls_s": 0.0021949239999230485,
+   "locked": true,
+   "lock_read_s": 0.009818751999773667,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 3.8520698385001504,
+   "due_dev": 3.8561164999999997,
+   "calls_s": 0.002317473999937647,
+   "locked": true,
+   "lock_read_s": 0.009866492000128346,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 3.912071639500027,
+   "due_dev": 3.91586388,
+   "calls_s": 0.0021774799997729133,
+   "locked": true,
+   "lock_read_s": 0.009723600000143051,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 3.9721069440000756,
+   "due_dev": 3.9764196999999997,
+   "calls_s": 0.0027200760000596347,
+   "locked": true,
+   "lock_read_s": 0.009809346000110963,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 4.03223283400007,
+   "due_dev": 4.03711812,
+   "calls_s": 0.003503025000100024,
+   "locked": true,
+   "lock_read_s": 0.009789493999960541,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 4.092238581499989,
+   "due_dev": 4.096207639999999,
+   "calls_s": 0.0024503859999640554,
+   "locked": true,
+   "lock_read_s": 0.009711010999581049,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 4.152272412500012,
+   "due_dev": 4.1567466699999995,
+   "calls_s": 0.002880948999973043,
+   "locked": true,
+   "lock_read_s": 0.00981383199996344,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 4.212416114499997,
+   "due_dev": 4.21623414,
+   "calls_s": 0.0020962779999535996,
+   "locked": true,
+   "lock_read_s": 0.00971504199969786,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 4.272433987500133,
+   "due_dev": 4.27597963,
+   "calls_s": 0.0018438179999975546,
+   "locked": true,
+   "lock_read_s": 0.00973510499989061,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 4.332452766999929,
+   "due_dev": 4.336866779999999,
+   "calls_s": 0.002786108999771386,
+   "locked": true,
+   "lock_read_s": 0.009734968999964622,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 4.392605007000008,
+   "due_dev": 4.39712548,
+   "calls_s": 0.0030694530000801024,
+   "locked": true,
+   "lock_read_s": 0.00986813899999106,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 4.452654445000022,
+   "due_dev": 4.45680266,
+   "calls_s": 0.002867155999865645,
+   "locked": true,
+   "lock_read_s": 0.009761286999946606,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 4.512651519500062,
+   "due_dev": 4.5207594,
+   "calls_s": 0.006499639000139723,
+   "locked": false,
+   "lock_read_s": 0.009723657999984425,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 4.5728141600000285,
+   "due_dev": 4.576766269999999,
+   "calls_s": 0.002227443999800016,
+   "locked": true,
+   "lock_read_s": 0.00985712399960903,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 4.632832160499905,
+   "due_dev": 4.6366054299999995,
+   "calls_s": 0.002038727999661205,
+   "locked": true,
+   "lock_read_s": 0.00975875999984055,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 4.693006072000007,
+   "due_dev": 4.69766844,
+   "calls_s": 0.003063673000269773,
+   "locked": true,
+   "lock_read_s": 0.009782336000171199,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 4.7530335839999,
+   "due_dev": 4.7574526,
+   "calls_s": 0.002687835999950039,
+   "locked": true,
+   "lock_read_s": 0.00969201099997008,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 4.813077141499949,
+   "due_dev": 4.81689074,
+   "calls_s": 0.0021814719998474175,
+   "locked": true,
+   "lock_read_s": 0.00974901100016723,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 4.87311010749996,
+   "due_dev": 4.87802476,
+   "calls_s": 0.0032769970002846094,
+   "locked": true,
+   "lock_read_s": 0.00969952800005558,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 4.933139189500156,
+   "due_dev": 4.9377106699999995,
+   "calls_s": 0.003228259000024991,
+   "locked": true,
+   "lock_read_s": 0.009764926999650925,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 4.993188345999985,
+   "due_dev": 4.99668195,
+   "calls_s": 0.00173142200037546,
+   "locked": true,
+   "lock_read_s": 0.009703941000225313,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 5.053186491499967,
+   "due_dev": 5.05766593,
+   "calls_s": 0.0026981649998560897,
+   "locked": true,
+   "lock_read_s": 0.009893986999941262,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 5.113224962499858,
+   "due_dev": 5.1178506299999995,
+   "calls_s": 0.003032726000128605,
+   "locked": true,
+   "lock_read_s": 0.009727900000143563,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 5.173251362500159,
+   "due_dev": 5.17755678,
+   "calls_s": 0.0029775089997201576,
+   "locked": true,
+   "lock_read_s": 0.009819202000016958,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 5.233354403000035,
+   "due_dev": 5.2380070199999995,
+   "calls_s": 0.002905444000134594,
+   "locked": true,
+   "lock_read_s": 0.009773822000170185,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 5.293419458000092,
+   "due_dev": 5.29772304,
+   "calls_s": 0.0025629960000514984,
+   "locked": true,
+   "lock_read_s": 0.00971984399984649,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 5.353438775499976,
+   "due_dev": 5.35705001,
+   "calls_s": 0.0018566110002211644,
+   "locked": true,
+   "lock_read_s": 0.009753096000167716,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 5.413450763000003,
+   "due_dev": 5.41819501,
+   "calls_s": 0.00322795900001438,
+   "locked": true,
+   "lock_read_s": 0.0097442639998917,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 5.473471687999922,
+   "due_dev": 5.47808192,
+   "calls_s": 0.002987672000017483,
+   "locked": true,
+   "lock_read_s": 0.009744373000103224,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 5.533519675500055,
+   "due_dev": 5.53734794,
+   "calls_s": 0.0022045420000722515,
+   "locked": true,
+   "lock_read_s": 0.00979945500012036,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 5.593532838500049,
+   "due_dev": 5.59825366,
+   "calls_s": 0.0031025799999042647,
+   "locked": true,
+   "lock_read_s": 0.009879117999844311,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 5.6535760060000015,
+   "due_dev": 5.65867025,
+   "calls_s": 0.0033623729996179463,
+   "locked": true,
+   "lock_read_s": 0.00970902999961254,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 5.713600989499901,
+   "due_dev": 5.717319799999999,
+   "calls_s": 0.0019630520000646356,
+   "locked": true,
+   "lock_read_s": 0.009743253999658918,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 5.773613765499906,
+   "due_dev": 5.77794179,
+   "calls_s": 0.0025682229997983086,
+   "locked": true,
+   "lock_read_s": 0.009723268000016105,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 5.833630313500074,
+   "due_dev": 5.83803594,
+   "calls_s": 0.0026427060001879,
+   "locked": true,
+   "lock_read_s": 0.009755403000326623,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 5.893808034999939,
+   "due_dev": 5.897436959999999,
+   "calls_s": 0.0020225860002938134,
+   "locked": true,
+   "lock_read_s": 0.009732514999996056,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 5.9539517609998525,
+   "due_dev": 5.958635259999999,
+   "calls_s": 0.003052988999570516,
+   "locked": true,
+   "lock_read_s": 0.00974670999994487,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 6.014093058999953,
+   "due_dev": 6.01835691,
+   "calls_s": 0.002507650000097783,
+   "locked": true,
+   "lock_read_s": 0.009702444000140531,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 6.074137399500208,
+   "due_dev": 6.07760182,
+   "calls_s": 0.0017268899996452092,
+   "locked": true,
+   "lock_read_s": 0.009737309999763966,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 6.134274078999928,
+   "due_dev": 6.13904978,
+   "calls_s": 0.003169689000060316,
+   "locked": true,
+   "lock_read_s": 0.009710834000088653,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 6.194311486000039,
+   "due_dev": 6.19883348,
+   "calls_s": 0.0027671559996633732,
+   "locked": true,
+   "lock_read_s": 0.00973058099998525,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 6.254326404500086,
+   "due_dev": 6.258174899999999,
+   "calls_s": 0.002224677999947744,
+   "locked": true,
+   "lock_read_s": 0.009699505000298814,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 6.314351894999964,
+   "due_dev": 6.31967375,
+   "calls_s": 0.00410648700017191,
+   "locked": true,
+   "lock_read_s": 0.009832344000187732,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 6.3743744744999855,
+   "due_dev": 6.37871989,
+   "calls_s": 0.0025825569996413833,
+   "locked": true,
+   "lock_read_s": 0.009790378999696259,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 6.434402618500012,
+   "due_dev": 6.43787484,
+   "calls_s": 0.0017851819998213614,
+   "locked": true,
+   "lock_read_s": 0.00977701400006481,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 6.494424662000022,
+   "due_dev": 6.4988300599999995,
+   "calls_s": 0.0026349720001235255,
+   "locked": true,
+   "lock_read_s": 0.009717290000025969,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 6.554451536500134,
+   "due_dev": 6.55893649,
+   "calls_s": 0.0028718979997393035,
+   "locked": true,
+   "lock_read_s": 0.0096843970000009,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 6.6144989579998175,
+   "due_dev": 6.617899309999999,
+   "calls_s": 0.0016700010000931798,
+   "locked": true,
+   "lock_read_s": 0.00970262000009825,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 6.674514608500134,
+   "due_dev": 6.67882961,
+   "calls_s": 0.002533042999857571,
+   "locked": true,
+   "lock_read_s": 0.009735954999996466,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 6.7345465844998476,
+   "due_dev": 6.73919449,
+   "calls_s": 0.0030081559998507146,
+   "locked": true,
+   "lock_read_s": 0.009707021999929566,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 6.79456361549996,
+   "due_dev": 6.79822439,
+   "calls_s": 0.0020247549996383896,
+   "locked": true,
+   "lock_read_s": 0.00970746799976041,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 6.854584322000127,
+   "due_dev": 6.85969949,
+   "calls_s": 0.003739086999758001,
+   "locked": true,
+   "lock_read_s": 0.009754411999892909,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 6.9146135784998695,
+   "due_dev": 6.91894059,
+   "calls_s": 0.0025829889996202837,
+   "locked": true,
+   "lock_read_s": 0.009755990000030579,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 6.974631419500145,
+   "due_dev": 6.97804289,
+   "calls_s": 0.0016504949999216478,
+   "locked": true,
+   "lock_read_s": 0.009710583000014594,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 7.034689514500086,
+   "due_dev": 7.03929821,
+   "calls_s": 0.0029632940004375996,
+   "locked": true,
+   "lock_read_s": 0.0097166250002374,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 7.094722268999972,
+   "due_dev": 7.09913344,
+   "calls_s": 0.00278474400010964,
+   "locked": true,
+   "lock_read_s": 0.009770005000063975,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 7.154749803500129,
+   "due_dev": 7.15833477,
+   "calls_s": 0.0019346139997651335,
+   "locked": true,
+   "lock_read_s": 0.009685228999842366,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 7.214784781499981,
+   "due_dev": 7.21931182,
+   "calls_s": 0.0028916159999425872,
+   "locked": true,
+   "lock_read_s": 0.009788770999875851,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 7.274946310000144,
+   "due_dev": 7.2792423799999995,
+   "calls_s": 0.0025283820000367996,
+   "locked": true,
+   "lock_read_s": 0.009716862999994191,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 7.33509358749997,
+   "due_dev": 7.33879416,
+   "calls_s": 0.0020319670002209023,
+   "locked": true,
+   "lock_read_s": 0.009746912000082375,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 7.395117681499823,
+   "due_dev": 7.39973025,
+   "calls_s": 0.0029922970002189686,
+   "locked": true,
+   "lock_read_s": 0.009763087999999698,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 7.455135258500111,
+   "due_dev": 7.45945839,
+   "calls_s": 0.0026891739998973208,
+   "locked": true,
+   "lock_read_s": 0.009747896999670047,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 7.51527168900016,
+   "due_dev": 7.51921307,
+   "calls_s": 0.0023004659997241106,
+   "locked": true,
+   "lock_read_s": 0.009708069999760482,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 7.575288413000214,
+   "due_dev": 7.58007676,
+   "calls_s": 0.0031316440004047763,
+   "locked": true,
+   "lock_read_s": 0.009707164000246848,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 7.635312080499992,
+   "due_dev": 7.6400852399999994,
+   "calls_s": 0.0031242029999702936,
+   "locked": true,
+   "lock_read_s": 0.009729000000334054,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 7.695350405000065,
+   "due_dev": 7.6987833199999995,
+   "calls_s": 0.0016610470001978683,
+   "locked": true,
+   "lock_read_s": 0.009815872000217496,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 7.755380835000028,
+   "due_dev": 7.75971208,
+   "calls_s": 0.002561655000135943,
+   "locked": true,
+   "lock_read_s": 0.009757568000168249,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 7.8154874655001,
+   "due_dev": 7.81993425,
+   "calls_s": 0.002706114000375237,
+   "locked": true,
+   "lock_read_s": 0.009823375999985728,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 7.875551525499928,
+   "due_dev": 7.8790848,
+   "calls_s": 0.0017965830002140137,
+   "locked": true,
+   "lock_read_s": 0.009748971000135498,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 7.9355793469999645,
+   "due_dev": 7.94048572,
+   "calls_s": 0.0031623640002180764,
+   "locked": true,
+   "lock_read_s": 0.009738104999996722,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 7.995639244500076,
+   "due_dev": 7.99994653,
+   "calls_s": 0.002553912000166747,
+   "locked": true,
+   "lock_read_s": 0.00974866300020949,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 8.05563887200007,
+   "due_dev": 8.059299170000001,
+   "calls_s": 0.002020197000092594,
+   "locked": true,
+   "lock_read_s": 0.009690523000244866,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 8.115796059500013,
+   "due_dev": 8.120369510000002,
+   "calls_s": 0.003147183000237419,
+   "locked": true,
+   "lock_read_s": 0.009708591000162414,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 8.175850644500054,
+   "due_dev": 8.18007028,
+   "calls_s": 0.0024477329998262576,
+   "locked": true,
+   "lock_read_s": 0.009720905999984097,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 8.235878188999928,
+   "due_dev": 8.2396087,
+   "calls_s": 0.002137774999937392,
+   "locked": true,
+   "lock_read_s": 0.009732264999911422,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 8.295927304499864,
+   "due_dev": 8.300294130000001,
+   "calls_s": 0.002652959999977611,
+   "locked": true,
+   "lock_read_s": 0.009745438000209106,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 8.355965054499947,
+   "due_dev": 8.36024169,
+   "calls_s": 0.002512042000034853,
+   "locked": true,
+   "lock_read_s": 0.009735806999742636,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 8.416015944000007,
+   "due_dev": 8.419477650000001,
+   "calls_s": 0.0017161079999823414,
+   "locked": true,
+   "lock_read_s": 0.009755256000062218,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 8.476085320499886,
+   "due_dev": 8.480407580000001,
+   "calls_s": 0.0026029820000985637,
+   "locked": true,
+   "lock_read_s": 0.0097314469999219,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 8.536147704499982,
+   "due_dev": 8.541449850000001,
+   "calls_s": 0.004232099000091694,
+   "locked": true,
+   "lock_read_s": 0.009792794000077265,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 8.596159637499849,
+   "due_dev": 8.59983478,
+   "calls_s": 0.002046724000138056,
+   "locked": true,
+   "lock_read_s": 0.009683251999831555,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 8.656189853999813,
+   "due_dev": 8.661003630000002,
+   "calls_s": 0.003373927999746229,
+   "locked": true,
+   "lock_read_s": 0.00967620099982014,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 8.71618230799994,
+   "due_dev": 8.72096235,
+   "calls_s": 0.0031179610000435787,
+   "locked": true,
+   "lock_read_s": 0.009864991000085865,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 8.776227393500038,
+   "due_dev": 8.77999876,
+   "calls_s": 0.002121346999956586,
+   "locked": true,
+   "lock_read_s": 0.009697628000139957,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 8.836256179499893,
+   "due_dev": 8.84113362,
+   "calls_s": 0.0032318610001311754,
+   "locked": true,
+   "lock_read_s": 0.009697334000065894,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 8.89628204799998,
+   "due_dev": 8.900844090000001,
+   "calls_s": 0.002924126000380056,
+   "locked": true,
+   "lock_read_s": 0.009691734000170982,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 8.956302480499986,
+   "due_dev": 8.959727560000001,
+   "calls_s": 0.001666929999828426,
+   "locked": true,
+   "lock_read_s": 0.00974259999975402,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 9.016335257000131,
+   "due_dev": 9.0206657,
+   "calls_s": 0.002684665999822755,
+   "locked": true,
+   "lock_read_s": 0.009828578999986348,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 9.07646209850001,
+   "due_dev": 9.08175398,
+   "calls_s": 0.0036388429998623906,
+   "locked": true,
+   "lock_read_s": 0.009724071999698936,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 9.136523259499965,
+   "due_dev": 9.14016307,
+   "calls_s": 0.001911805999952776,
+   "locked": true,
+   "lock_read_s": 0.009809376999783126,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 9.196558258999943,
+   "due_dev": 9.20097578,
+   "calls_s": 0.002685040999949706,
+   "locked": true,
+   "lock_read_s": 0.00968955600001209,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 9.256572624499933,
+   "due_dev": 9.260923830000001,
+   "calls_s": 0.002612109999972745,
+   "locked": true,
+   "lock_read_s": 0.009695150999959878,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 9.316616570499965,
+   "due_dev": 9.320177070000002,
+   "calls_s": 0.0018178830000579183,
+   "locked": true,
+   "lock_read_s": 0.009731451999869023,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 9.376636630500151,
+   "due_dev": 9.38096144,
+   "calls_s": 0.0025596760001462826,
+   "locked": true,
+   "lock_read_s": 0.009757448000073055,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 9.436634415999901,
+   "due_dev": 9.44083438,
+   "calls_s": 0.0024262990000352147,
+   "locked": true,
+   "lock_read_s": 0.009792339999876276,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 9.496660602000002,
+   "due_dev": 9.50017672,
+   "calls_s": 0.0017790140000215615,
+   "locked": true,
+   "lock_read_s": 0.009703511000225262,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 9.55678714349988,
+   "due_dev": 9.561139760000001,
+   "calls_s": 0.002590474000044196,
+   "locked": true,
+   "lock_read_s": 0.0097210610001639,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 9.616993782000026,
+   "due_dev": 9.62199376,
+   "calls_s": 0.003426777000186121,
+   "locked": true,
+   "lock_read_s": 0.009779230000276584,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 9.677019385500095,
+   "due_dev": 9.68061812,
+   "calls_s": 0.0018673530003070482,
+   "locked": true,
+   "lock_read_s": 0.009718295000311628,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 9.737042047500049,
+   "due_dev": 9.74134795,
+   "calls_s": 0.0025537520000398217,
+   "locked": true,
+   "lock_read_s": 0.009837729000082618,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 9.79706518250004,
+   "due_dev": 9.80160421,
+   "calls_s": 0.003066871999635623,
+   "locked": true,
+   "lock_read_s": 0.009813146999931632,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 9.857087100499827,
+   "due_dev": 9.860660670000001,
+   "calls_s": 0.0019459599998299382,
+   "locked": true,
+   "lock_read_s": 0.009683958999630704,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 9.91711112349989,
+   "due_dev": 9.92166888,
+   "calls_s": 0.0029289859999153123,
+   "locked": true,
+   "lock_read_s": 0.009682713999609405,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 9.977272400000098,
+   "due_dev": 9.981566460000002,
+   "calls_s": 0.0025721969996084226,
+   "locked": true,
+   "lock_read_s": 0.009743621999859897,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 10.03729616299985,
+   "due_dev": 10.04081708,
+   "calls_s": 0.0017999640003836248,
+   "locked": true,
+   "lock_read_s": 0.009731403000387218,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 10.097329578499966,
+   "due_dev": 10.101769650000001,
+   "calls_s": 0.002743510999607679,
+   "locked": true,
+   "lock_read_s": 0.009697233999759192,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 10.157363673499871,
+   "due_dev": 10.16166462,
+   "calls_s": 0.002554706999944756,
+   "locked": true,
+   "lock_read_s": 0.00986654999996972,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 10.2173990399999,
+   "due_dev": 10.22244045,
+   "calls_s": 0.004076841000369313,
+   "locked": true,
+   "lock_read_s": 0.009690690000297764,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 10.277409597499938,
+   "due_dev": 10.28213764,
+   "calls_s": 0.0031027629997879558,
+   "locked": true,
+   "lock_read_s": 0.009691205999843078,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 10.337434180500118,
+   "due_dev": 10.34201891,
+   "calls_s": 0.002944636999927752,
+   "locked": true,
+   "lock_read_s": 0.009691141000075731,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 10.397463346999837,
+   "due_dev": 10.401411170000001,
+   "calls_s": 0.0024703619997126225,
+   "locked": true,
+   "lock_read_s": 0.009716389999994135,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 10.457487690499882,
+   "due_dev": 10.462075200000001,
+   "calls_s": 0.0029537780001192004,
+   "locked": true,
+   "lock_read_s": 0.009686874000180978,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 10.517502576500025,
+   "due_dev": 10.52201765,
+   "calls_s": 0.002886581999973714,
+   "locked": true,
+   "lock_read_s": 0.009691985999779718,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 10.57751862449999,
+   "due_dev": 10.581165460000001,
+   "calls_s": 0.002008736999869143,
+   "locked": true,
+   "lock_read_s": 0.00980522000008932,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 10.637558578999935,
+   "due_dev": 10.642006960000002,
+   "calls_s": 0.0028025370002069394,
+   "locked": true,
+   "lock_read_s": 0.009753393000210053,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 10.697588830000203,
+   "due_dev": 10.702187830000002,
+   "calls_s": 0.0031671020001340366,
+   "locked": true,
+   "lock_read_s": 0.009739046000049711,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 10.757641863000048,
+   "due_dev": 10.761316240000001,
+   "calls_s": 0.0019423189996814472,
+   "locked": true,
+   "lock_read_s": 0.009777647999726469,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 10.817656360500049,
+   "due_dev": 10.82243992,
+   "calls_s": 0.00303934500016112,
+   "locked": true,
+   "lock_read_s": 0.009687911000128224,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 10.877802999500103,
+   "due_dev": 10.882017620000001,
+   "calls_s": 0.002453183999932662,
+   "locked": true,
+   "lock_read_s": 0.009754739000072732,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 10.937962229500155,
+   "due_dev": 10.941431730000001,
+   "calls_s": 0.00171231300009822,
+   "locked": true,
+   "lock_read_s": 0.009701080000013462,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 10.997990663500007,
+   "due_dev": 11.00242527,
+   "calls_s": 0.00282325900025171,
+   "locked": true,
+   "lock_read_s": 0.009697249000055308,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 11.058035721000062,
+   "due_dev": 11.06257384,
+   "calls_s": 0.002908265999849391,
+   "locked": true,
+   "lock_read_s": 0.00968210100018041,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 11.118061650500094,
+   "due_dev": 11.121669590000002,
+   "calls_s": 0.0020048090000273078,
+   "locked": true,
+   "lock_read_s": 0.009794039000098564,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 11.178111059000008,
+   "due_dev": 11.18258031,
+   "calls_s": 0.0028468030000112776,
+   "locked": true,
+   "lock_read_s": 0.009727448000376171,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 11.23826759049996,
+   "due_dev": 11.24253975,
+   "calls_s": 0.0025372810000590107,
+   "locked": true,
+   "lock_read_s": 0.009691825000118115,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 11.298398454999912,
+   "due_dev": 11.30218148,
+   "calls_s": 0.002145983999980672,
+   "locked": true,
+   "lock_read_s": 0.009775528000318445,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 11.358413871499941,
+   "due_dev": 11.36380753,
+   "calls_s": 0.004352958000254148,
+   "locked": true,
+   "lock_read_s": 0.009703971999897476,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 11.418434336500097,
+   "due_dev": 11.42302682,
+   "calls_s": 0.00294157999996969,
+   "locked": true,
+   "lock_read_s": 0.00969985000028828,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 11.478466462500108,
+   "due_dev": 11.48212958,
+   "calls_s": 0.002040050999767118,
+   "locked": true,
+   "lock_read_s": 0.009810444999857282,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 11.538484763999834,
+   "due_dev": 11.543020160000001,
+   "calls_s": 0.0028986040001655056,
+   "locked": true,
+   "lock_read_s": 0.009713831000226492,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 11.598513625499955,
+   "due_dev": 11.60288609,
+   "calls_s": 0.0026424009997754183,
+   "locked": true,
+   "lock_read_s": 0.009835192000082316,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 11.658548646499883,
+   "due_dev": 11.661939850000001,
+   "calls_s": 0.0016171249999388237,
+   "locked": true,
+   "lock_read_s": 0.009724917999847094,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 11.718576919000093,
+   "due_dev": 11.723305960000001,
+   "calls_s": 0.0030891999999766995,
+   "locked": true,
+   "lock_read_s": 0.009682023000095796,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 11.778619681000032,
+   "due_dev": 11.78313731,
+   "calls_s": 0.002894515999741998,
+   "locked": true,
+   "lock_read_s": 0.009722052999677544,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 11.838643350999918,
+   "due_dev": 11.842351110000001,
+   "calls_s": 0.0020707019998553733,
+   "locked": true,
+   "lock_read_s": 0.00970416199970714,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 11.898794451499827,
+   "due_dev": 11.903421980000001,
+   "calls_s": 0.0029717240004174528,
+   "locked": true,
+   "lock_read_s": 0.00979843700042693,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 11.95893432899995,
+   "due_dev": 11.96318915,
+   "calls_s": 0.0024789099998088204,
+   "locked": true,
+   "lock_read_s": 0.009724928999730764,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 12.018958185999917,
+   "due_dev": 12.022424560000001,
+   "calls_s": 0.0017028780002874555,
+   "locked": true,
+   "lock_read_s": 0.009713966000163055,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 12.079084648499956,
+   "due_dev": 12.08338187,
+   "calls_s": 0.002550530999997136,
+   "locked": true,
+   "lock_read_s": 0.009720532000301318,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 12.139118190499833,
+   "due_dev": 12.143341620000001,
+   "calls_s": 0.0024490579999110196,
+   "locked": true,
+   "lock_read_s": 0.009702983999886783,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 12.199182344999944,
+   "due_dev": 12.203052490000001,
+   "calls_s": 0.0022311419998004567,
+   "locked": true,
+   "lock_read_s": 0.009696665999854304,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 12.25918559450017,
+   "due_dev": 12.264009040000001,
+   "calls_s": 0.0031438589999197575,
+   "locked": true,
+   "lock_read_s": 0.009829936000187445,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 12.319218443000167,
+   "due_dev": 12.32406648,
+   "calls_s": 0.003198713000074349,
+   "locked": true,
+   "lock_read_s": 0.009812874000090233,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 12.379242483499844,
+   "due_dev": 12.3831054,
+   "calls_s": 0.002209387999755563,
+   "locked": true,
+   "lock_read_s": 0.009766442000000097,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 12.4392654165001,
+   "due_dev": 12.44704403,
+   "calls_s": 0.006704303999867989,
+   "locked": false,
+   "lock_read_s": 0.009825832999922568,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 12.499408143000077,
+   "due_dev": 12.50351739,
+   "calls_s": 0.002521593999972538,
+   "locked": true,
+   "lock_read_s": 0.009744203000082052,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 12.55944664099997,
+   "due_dev": 12.563068880000001,
+   "calls_s": 0.002019821999965643,
+   "locked": true,
+   "lock_read_s": 0.009728902000006201,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 12.61958105749989,
+   "due_dev": 12.62366549,
+   "calls_s": 0.002336985000056302,
+   "locked": true,
+   "lock_read_s": 0.009826257000440819,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 12.679728050500193,
+   "due_dev": 12.68348591,
+   "calls_s": 0.0020178409999971336,
+   "locked": true,
+   "lock_read_s": 0.009849227999893628,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 12.739859431000022,
+   "due_dev": 12.743319430000001,
+   "calls_s": 0.0017314579999947455,
+   "locked": true,
+   "lock_read_s": 0.009873191999759001,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 12.79985296000017,
+   "due_dev": 12.803876840000001,
+   "calls_s": 0.002266791999772977,
+   "locked": true,
+   "lock_read_s": 0.0097422099997857,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 12.859892036000003,
+   "due_dev": 12.863744650000001,
+   "calls_s": 0.0021174759999667003,
+   "locked": true,
+   "lock_read_s": 0.009827962000144908,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 2400000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 12.920029171499943,
+   "due_dev": 12.923472480000001,
+   "calls_s": 0.001740053000048647,
+   "locked": true,
+   "lock_read_s": 0.009883610000088083,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 13.53064931900017,
+   "due_dev": 13.535420890000001,
+   "calls_s": 0.0031881419999990612,
+   "locked": true,
+   "lock_read_s": 0.009900498999741103,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 13.590790336000191,
+   "due_dev": 13.595148960000001,
+   "calls_s": 0.00276672400013922,
+   "locked": true,
+   "lock_read_s": 0.009798649999993359,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 13.650944840000076,
+   "due_dev": 13.65470981,
+   "calls_s": 0.0021537150000767724,
+   "locked": true,
+   "lock_read_s": 0.0098695689998749,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 13.71093498599982,
+   "due_dev": 13.71522171,
+   "calls_s": 0.002668461999746796,
+   "locked": true,
+   "lock_read_s": 0.009718438999698265,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 13.771040527000023,
+   "due_dev": 13.775314980000001,
+   "calls_s": 0.0026756709999062878,
+   "locked": true,
+   "lock_read_s": 0.009811153000100603,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 13.831051206000012,
+   "due_dev": 13.83482751,
+   "calls_s": 0.0021619690000989067,
+   "locked": true,
+   "lock_read_s": 0.009814181000365352,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 13.891085255500224,
+   "due_dev": 13.8957306,
+   "calls_s": 0.00302328599991597,
+   "locked": true,
+   "lock_read_s": 0.009831204999954934,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 13.951182259500001,
+   "due_dev": 13.955402710000001,
+   "calls_s": 0.0027065839999522723,
+   "locked": true,
+   "lock_read_s": 0.00975903600010497,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 14.011230606000055,
+   "due_dev": 14.014708330000001,
+   "calls_s": 0.001759883999966405,
+   "locked": true,
+   "lock_read_s": 0.009687869000117644,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 14.071394171999998,
+   "due_dev": 14.07568404,
+   "calls_s": 0.0027141369996570575,
+   "locked": true,
+   "lock_read_s": 0.00972094400003698,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 14.131420948000171,
+   "due_dev": 14.13697554,
+   "calls_s": 0.00417342600030679,
+   "locked": true,
+   "lock_read_s": 0.009727081000164617,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 14.191416385999979,
+   "due_dev": 14.196055840000001,
+   "calls_s": 0.0034555339998405543,
+   "locked": true,
+   "lock_read_s": 0.00970501499978127,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 14.25146397550014,
+   "due_dev": 14.256168350000001,
+   "calls_s": 0.0029654110003320966,
+   "locked": true,
+   "lock_read_s": 0.009805924999909621,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 14.311581727999943,
+   "due_dev": 14.3158135,
+   "calls_s": 0.002888174999952753,
+   "locked": true,
+   "lock_read_s": 0.009891828000036185,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 14.371603269999955,
+   "due_dev": 14.37496776,
+   "calls_s": 0.00162946299997202,
+   "locked": true,
+   "lock_read_s": 0.009806424999624141,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 14.43174103799996,
+   "due_dev": 14.43642936,
+   "calls_s": 0.003254025000387628,
+   "locked": true,
+   "lock_read_s": 0.00984940300031667,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 14.491900797999987,
+   "due_dev": 14.49574683,
+   "calls_s": 0.0021090829995955573,
+   "locked": true,
+   "lock_read_s": 0.00975531799986129,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 14.552033505499955,
+   "due_dev": 14.55549193,
+   "calls_s": 0.0017218400003002898,
+   "locked": true,
+   "lock_read_s": 0.00981378999995286,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 14.61204537599995,
+   "due_dev": 14.615934970000001,
+   "calls_s": 0.0021517069999390515,
+   "locked": true,
+   "lock_read_s": 0.009779942000022857,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 14.672199631499943,
+   "due_dev": 14.67722599,
+   "calls_s": 0.004008819999853586,
+   "locked": true,
+   "lock_read_s": 0.009836369999902672,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 14.73231501050009,
+   "due_dev": 14.73616269,
+   "calls_s": 0.0020877510000900656,
+   "locked": true,
+   "lock_read_s": 0.009697537000192824,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 14.792357171500019,
+   "due_dev": 14.79701535,
+   "calls_s": 0.0030362550000972988,
+   "locked": true,
+   "lock_read_s": 0.009830469999997149,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 14.852488523999938,
+   "due_dev": 14.856302640000001,
+   "calls_s": 0.0021064520001345954,
+   "locked": true,
+   "lock_read_s": 0.009885946999929729,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 14.912493342999914,
+   "due_dev": 14.916014050000001,
+   "calls_s": 0.0017881569997371116,
+   "locked": true,
+   "lock_read_s": 0.00976734099958776,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 14.972533683000055,
+   "due_dev": 14.97672004,
+   "calls_s": 0.0025451159999647643,
+   "locked": true,
+   "lock_read_s": 0.009831661000134773,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 15.0326105045001,
+   "due_dev": 15.03643811,
+   "calls_s": 0.0020618920002561936,
+   "locked": true,
+   "lock_read_s": 0.009804525000163267,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 15.092757850500007,
+   "due_dev": 15.09614973,
+   "calls_s": 0.0016402669998569763,
+   "locked": true,
+   "lock_read_s": 0.009851881000031426,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 15.152867702999924,
+   "due_dev": 15.15659789,
+   "calls_s": 0.00202360299999782,
+   "locked": true,
+   "lock_read_s": 0.009840372999860847,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 15.213004767500186,
+   "due_dev": 15.217078070000001,
+   "calls_s": 0.0025051319998965482,
+   "locked": true,
+   "lock_read_s": 0.009781172000202787,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 15.273036312999949,
+   "due_dev": 15.27707852,
+   "calls_s": 0.002824163000241242,
+   "locked": true,
+   "lock_read_s": 0.009695785000076285,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 15.33304832699996,
+   "due_dev": 15.33773384,
+   "calls_s": 0.0031330079996223503,
+   "locked": true,
+   "lock_read_s": 0.009840905999681127,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 15.393081521000056,
+   "due_dev": 15.39733968,
+   "calls_s": 0.002666012000190676,
+   "locked": true,
+   "lock_read_s": 0.009695863000160898,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 15.453097435500077,
+   "due_dev": 15.456528420000001,
+   "calls_s": 0.0017237909996765666,
+   "locked": true,
+   "lock_read_s": 0.00967228299987255,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 15.513201537000002,
+   "due_dev": 15.517013890000001,
+   "calls_s": 0.002167628999814042,
+   "locked": true,
+   "lock_read_s": 0.0098605379998844,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 15.573336808500008,
+   "due_dev": 15.577748210000001,
+   "calls_s": 0.003036444999906962,
+   "locked": true,
+   "lock_read_s": 0.00980539099964517,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 15.633486661499976,
+   "due_dev": 15.63707059,
+   "calls_s": 0.00201441600029284,
+   "locked": true,
+   "lock_read_s": 0.009725392000291322,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 15.693505530999918,
+   "due_dev": 15.698068280000001,
+   "calls_s": 0.0029352030001064122,
+   "locked": true,
+   "lock_read_s": 0.009815234000143391,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 15.753594113999874,
+   "due_dev": 15.75759174,
+   "calls_s": 0.002361159999964002,
+   "locked": true,
+   "lock_read_s": 0.0098625370001173,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 15.813639232500044,
+   "due_dev": 15.81742021,
+   "calls_s": 0.002159098999982234,
+   "locked": true,
+   "lock_read_s": 0.009751944000072399,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 15.873733680500086,
+   "due_dev": 15.878316450000002,
+   "calls_s": 0.0029642479998983617,
+   "locked": true,
+   "lock_read_s": 0.009754167999744823,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 15.933862050999924,
+   "due_dev": 15.938193810000001,
+   "calls_s": 0.0027440590001788223,
+   "locked": true,
+   "lock_read_s": 0.009825132000059966,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 15.993989769999885,
+   "due_dev": 15.99793135,
+   "calls_s": 0.0022909360000085144,
+   "locked": true,
+   "lock_read_s": 0.009884529000373732,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 16.054064578999984,
+   "due_dev": 16.05827767,
+   "calls_s": 0.0025859299998955976,
+   "locked": true,
+   "lock_read_s": 0.009810634999666945,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 16.1140532494999,
+   "due_dev": 16.11874079,
+   "calls_s": 0.003023862000191002,
+   "locked": true,
+   "lock_read_s": 0.009847901000284764,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 16.174091108499944,
+   "due_dev": 16.178046419999998,
+   "calls_s": 0.0023067209999680927,
+   "locked": true,
+   "lock_read_s": 0.00981078900031207,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 16.234192776500038,
+   "due_dev": 16.23826472,
+   "calls_s": 0.002466283000103431,
+   "locked": true,
+   "lock_read_s": 0.009784121999928175,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 16.294239081000125,
+   "due_dev": 16.29875349,
+   "calls_s": 0.002894724999805476,
+   "locked": true,
+   "lock_read_s": 0.009741697999743337,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 16.354270062500003,
+   "due_dev": 16.35805611,
+   "calls_s": 0.0021532410000872915,
+   "locked": true,
+   "lock_read_s": 0.009680186999958096,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 16.414285133500123,
+   "due_dev": 16.41893495,
+   "calls_s": 0.0030055910001465236,
+   "locked": true,
+   "lock_read_s": 0.00971065500016266,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 16.47429509049997,
+   "due_dev": 16.47872815,
+   "calls_s": 0.0027812759999505943,
+   "locked": true,
+   "lock_read_s": 0.009747243999754573,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 16.534319023000013,
+   "due_dev": 16.53786796,
+   "calls_s": 0.0019153739999637764,
+   "locked": true,
+   "lock_read_s": 0.009722375999899668,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 16.594333913500044,
+   "due_dev": 16.598835559999998,
+   "calls_s": 0.002856906000033632,
+   "locked": true,
+   "lock_read_s": 0.00985899600027551,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 16.65438343150013,
+   "due_dev": 16.659601119999998,
+   "calls_s": 0.003992177999862179,
+   "locked": true,
+   "lock_read_s": 0.009692502000234526,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 16.714419650999982,
+   "due_dev": 16.71816927,
+   "calls_s": 0.00215496400005577,
+   "locked": true,
+   "lock_read_s": 0.009704141999918647,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 16.774457032500113,
+   "due_dev": 16.778824619999998,
+   "calls_s": 0.0025957620000554016,
+   "locked": true,
+   "lock_read_s": 0.009719848999793612,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 16.834533196999992,
+   "due_dev": 16.83893278,
+   "calls_s": 0.002648146999945311,
+   "locked": true,
+   "lock_read_s": 0.009679710000000341,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 16.89454584149983,
+   "due_dev": 16.89883269,
+   "calls_s": 0.0028147959997113503,
+   "locked": true,
+   "lock_read_s": 0.009761541999978363,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 16.954581484499958,
+   "due_dev": 16.959068079999998,
+   "calls_s": 0.0027320889998918574,
+   "locked": true,
+   "lock_read_s": 0.009693902999970305,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 17.014620258999926,
+   "due_dev": 17.018962679999998,
+   "calls_s": 0.0025736770003277343,
+   "locked": true,
+   "lock_read_s": 0.009711125000194443,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 17.07466552499983,
+   "due_dev": 17.078193719999998,
+   "calls_s": 0.0017885210004351393,
+   "locked": true,
+   "lock_read_s": 0.009716704000311438,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 17.13471182149981,
+   "due_dev": 17.139486849999997,
+   "calls_s": 0.0029966800002512173,
+   "locked": true,
+   "lock_read_s": 0.009716566999941278,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 17.19478463749994,
+   "due_dev": 17.19900573,
+   "calls_s": 0.0024985150002976297,
+   "locked": true,
+   "lock_read_s": 0.00970951600038461,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 17.254821421999985,
+   "due_dev": 17.2582068,
+   "calls_s": 0.001630035999824031,
+   "locked": true,
+   "lock_read_s": 0.009723891999783518,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 17.314872671000092,
+   "due_dev": 17.3192976,
+   "calls_s": 0.0026512459999139537,
+   "locked": true,
+   "lock_read_s": 0.009734144000049127,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 17.374895911499987,
+   "due_dev": 17.37920476,
+   "calls_s": 0.0025712100000419014,
+   "locked": true,
+   "lock_read_s": 0.009769529000095645,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 17.434929413000063,
+   "due_dev": 17.43948112,
+   "calls_s": 0.0033717460000843857,
+   "locked": true,
+   "lock_read_s": 0.009886240000014368,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 17.494940206999985,
+   "due_dev": 17.49928868,
+   "calls_s": 0.0025783829996726126,
+   "locked": true,
+   "lock_read_s": 0.009749865999765461,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 17.555110718499826,
+   "due_dev": 17.55991979,
+   "calls_s": 0.0030693730000166397,
+   "locked": true,
+   "lock_read_s": 0.009704694999982166,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 17.615126779499874,
+   "due_dev": 17.61852454,
+   "calls_s": 0.0016505500002494955,
+   "locked": true,
+   "lock_read_s": 0.009731374000239157,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 17.67524791300014,
+   "due_dev": 17.67958892,
+   "calls_s": 0.0025636969999141,
+   "locked": true,
+   "lock_read_s": 0.009687102000043524,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 17.735289407000213,
+   "due_dev": 17.73983514,
+   "calls_s": 0.0029070949999550066,
+   "locked": true,
+   "lock_read_s": 0.009676439000031678,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 17.79530946750018,
+   "due_dev": 17.79896272,
+   "calls_s": 0.0020107509999434114,
+   "locked": true,
+   "lock_read_s": 0.009707390000130545,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 17.855336421500066,
+   "due_dev": 17.85994992,
+   "calls_s": 0.0029825130000062927,
+   "locked": true,
+   "lock_read_s": 0.009737507999943773,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 17.915357088500013,
+   "due_dev": 17.92039433,
+   "calls_s": 0.0039092819997677,
+   "locked": true,
+   "lock_read_s": 0.009817820000080246,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 17.975388675500124,
+   "due_dev": 17.97885471,
+   "calls_s": 0.001739025999995647,
+   "locked": true,
+   "lock_read_s": 0.009782994000033796,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 18.03544434899999,
+   "due_dev": 18.04001519,
+   "calls_s": 0.002958992000003491,
+   "locked": true,
+   "lock_read_s": 0.00968673800025499,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 18.095471855500012,
+   "due_dev": 18.09996274,
+   "calls_s": 0.0028647109998019005,
+   "locked": true,
+   "lock_read_s": 0.00979525200000353,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 18.155528328500026,
+   "due_dev": 18.15916704,
+   "calls_s": 0.002005864000238944,
+   "locked": true,
+   "lock_read_s": 0.009710950000226148,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 18.215561304999817,
+   "due_dev": 18.220006639999998,
+   "calls_s": 0.0026818449996426352,
+   "locked": true,
+   "lock_read_s": 0.00971093899988773,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 18.275602153499968,
+   "due_dev": 18.27991609,
+   "calls_s": 0.002562356999987969,
+   "locked": true,
+   "lock_read_s": 0.009708860000046116,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 18.33562991150014,
+   "due_dev": 18.339025959999997,
+   "calls_s": 0.0016257400002359645,
+   "locked": true,
+   "lock_read_s": 0.009695302000181982,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 18.395810381500112,
+   "due_dev": 18.40006222,
+   "calls_s": 0.0024930350000431645,
+   "locked": true,
+   "lock_read_s": 0.00969328500013944,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 18.45583417650004,
+   "due_dev": 18.460006359999998,
+   "calls_s": 0.0024100109999380948,
+   "locked": true,
+   "lock_read_s": 0.009702120999918407,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 18.51587779450007,
+   "due_dev": 18.51947505,
+   "calls_s": 0.0018429530000503291,
+   "locked": true,
+   "lock_read_s": 0.009690933999991103,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 18.57589597900009,
+   "due_dev": 18.58050504,
+   "calls_s": 0.003028832999916631,
+   "locked": true,
+   "lock_read_s": 0.009704460000193649,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 18.635944473999942,
+   "due_dev": 18.64034352,
+   "calls_s": 0.002663340000253811,
+   "locked": true,
+   "lock_read_s": 0.009729732000323565,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 18.69590826299986,
+   "due_dev": 18.699403959999998,
+   "calls_s": 0.0017633660004321428,
+   "locked": true,
+   "lock_read_s": 0.009743434000029083,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 18.75595564849996,
+   "due_dev": 18.76030492,
+   "calls_s": 0.0026113750000149594,
+   "locked": true,
+   "lock_read_s": 0.00970150500006639,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 18.816003559000055,
+   "due_dev": 18.820286229999997,
+   "calls_s": 0.002543115000207763,
+   "locked": true,
+   "lock_read_s": 0.009745749000103388,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 18.87602083699985,
+   "due_dev": 18.87978597,
+   "calls_s": 0.002467598999828624,
+   "locked": true,
+   "lock_read_s": 0.009697510000023613,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 18.936040336500007,
+   "due_dev": 18.940471029999998,
+   "calls_s": 0.002673601999958919,
+   "locked": true,
+   "lock_read_s": 0.009838232999754837,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 18.996091225499992,
+   "due_dev": 19.000344679999998,
+   "calls_s": 0.0024806199999147793,
+   "locked": true,
+   "lock_read_s": 0.009749666000061552,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 19.05613035500012,
+   "due_dev": 19.05961653,
+   "calls_s": 0.0017346469999210967,
+   "locked": true,
+   "lock_read_s": 0.009745589999965887,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 19.116292606999835,
+   "due_dev": 19.12153592,
+   "calls_s": 0.0036274929998398875,
+   "locked": true,
+   "lock_read_s": 0.00974300299958486,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 19.17631602650015,
+   "due_dev": 19.180652329999997,
+   "calls_s": 0.002594284999759111,
+   "locked": true,
+   "lock_read_s": 0.009746344999712164,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 19.236369185499957,
+   "due_dev": 19.23999354,
+   "calls_s": 0.002003437999974267,
+   "locked": true,
+   "lock_read_s": 0.009707104999961302,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 19.296385635000124,
+   "due_dev": 19.30076509,
+   "calls_s": 0.00264501299989206,
+   "locked": true,
+   "lock_read_s": 0.00974521799980721,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 19.35641975899986,
+   "due_dev": 19.360641559999998,
+   "calls_s": 0.002453698999943299,
+   "locked": true,
+   "lock_read_s": 0.009765404999598104,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 19.41644670350009,
+   "due_dev": 19.419848509999998,
+   "calls_s": 0.001642761999846698,
+   "locked": true,
+   "lock_read_s": 0.009766658999978972,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 19.47648848549984,
+   "due_dev": 19.48093173,
+   "calls_s": 0.0027169649997631495,
+   "locked": true,
+   "lock_read_s": 0.00971657399986725,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 19.536510665999888,
+   "due_dev": 19.54131965,
+   "calls_s": 0.0031461569997190963,
+   "locked": true,
+   "lock_read_s": 0.009892604000015126,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 19.59652367800006,
+   "due_dev": 19.59990531,
+   "calls_s": 0.0016115040002659953,
+   "locked": true,
+   "lock_read_s": 0.009697977000087121,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 19.656548182499908,
+   "due_dev": 19.66126305,
+   "calls_s": 0.0030672080001750146,
+   "locked": true,
+   "lock_read_s": 0.009722443000100611,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 19.71656510399984,
+   "due_dev": 19.72095408,
+   "calls_s": 0.0026168910003434576,
+   "locked": true,
+   "lock_read_s": 0.00971383300020534,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 19.776613893499928,
+   "due_dev": 19.780035289999997,
+   "calls_s": 0.0016761030001362087,
+   "locked": true,
+   "lock_read_s": 0.009736564999911934,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 19.83663397499997,
+   "due_dev": 19.840911769999998,
+   "calls_s": 0.002566843999829871,
+   "locked": true,
+   "lock_read_s": 0.009711553999750322,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 19.896769584499985,
+   "due_dev": 19.90111463,
+   "calls_s": 0.002567237000221212,
+   "locked": true,
+   "lock_read_s": 0.009724196000206575,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 19.956937954500077,
+   "due_dev": 19.96038729,
+   "calls_s": 0.001690084000074421,
+   "locked": true,
+   "lock_read_s": 0.009724504000132583,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 20.01697055800012,
+   "due_dev": 20.021415169999997,
+   "calls_s": 0.002701725999941118,
+   "locked": true,
+   "lock_read_s": 0.009706153000024642,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 20.077133320999955,
+   "due_dev": 20.0813351,
+   "calls_s": 0.002449419000186026,
+   "locked": true,
+   "lock_read_s": 0.009767829999873356,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 20.137161254500008,
+   "due_dev": 20.140608489999998,
+   "calls_s": 0.001685102999999799,
+   "locked": true,
+   "lock_read_s": 0.009693732999949134,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 20.197170200000045,
+   "due_dev": 20.201733899999997,
+   "calls_s": 0.0029711710003539338,
+   "locked": true,
+   "lock_read_s": 0.00968603000001167,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 20.257220988500087,
+   "due_dev": 20.262174849999997,
+   "calls_s": 0.0035294740000608726,
+   "locked": true,
+   "lock_read_s": 0.009849553000094602,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 20.31723161349984,
+   "due_dev": 20.32100233,
+   "calls_s": 0.0021278450003592297,
+   "locked": true,
+   "lock_read_s": 0.009687792000022455,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 20.377248536500034,
+   "due_dev": 20.38158196,
+   "calls_s": 0.0025596119999136135,
+   "locked": true,
+   "lock_read_s": 0.009722074999899633,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 20.437284903000023,
+   "due_dev": 20.44177538,
+   "calls_s": 0.002857514999959676,
+   "locked": true,
+   "lock_read_s": 0.009691050999663275,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 20.49730354800012,
+   "due_dev": 20.500931559999998,
+   "calls_s": 0.0019820249999611406,
+   "locked": true,
+   "lock_read_s": 0.009689347999938036,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 20.557315361499903,
+   "due_dev": 20.562057359999997,
+   "calls_s": 0.0030642339997939416,
+   "locked": true,
+   "lock_read_s": 0.009707346999675792,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 20.617333390499827,
+   "due_dev": 20.622035099999998,
+   "calls_s": 0.002930997000021307,
+   "locked": true,
+   "lock_read_s": 0.00981302499985759,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 20.677392482500114,
+   "due_dev": 20.680828079999998,
+   "calls_s": 0.001677812000252743,
+   "locked": true,
+   "lock_read_s": 0.00974465399986002,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 20.73743894199986,
+   "due_dev": 20.741763409999997,
+   "calls_s": 0.002563663999808341,
+   "locked": true,
+   "lock_read_s": 0.00974054799962687,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 20.797482652000028,
+   "due_dev": 20.80415885,
+   "calls_s": 0.006061834999854909,
+   "locked": true,
+   "lock_read_s": 0.009783050999885745,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 20.857510615499933,
+   "due_dev": 20.86093438,
+   "calls_s": 0.001672783000230993,
+   "locked": true,
+   "lock_read_s": 0.00969065600020258,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 20.917529972500034,
+   "due_dev": 20.92184747,
+   "calls_s": 0.0027512450001268007,
+   "locked": true,
+   "lock_read_s": 0.009690166000382305,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 20.977563393999954,
+   "due_dev": 20.981761629999998,
+   "calls_s": 0.0024204879996432282,
+   "locked": true,
+   "lock_read_s": 0.00969887299970651,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 21.037587592500024,
+   "due_dev": 21.04112223,
+   "calls_s": 0.0017464799998379021,
+   "locked": true,
+   "lock_read_s": 0.009729612999763049,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 21.09763469600018,
+   "due_dev": 21.1019492,
+   "calls_s": 0.0025563629997122916,
+   "locked": true,
+   "lock_read_s": 0.009734015000049112,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 21.15780059600005,
+   "due_dev": 21.16200541,
+   "calls_s": 0.0024366080001527735,
+   "locked": true,
+   "lock_read_s": 0.009687385000233917,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 21.217941981,
+   "due_dev": 21.221336859999997,
+   "calls_s": 0.0017954800000552495,
+   "locked": true,
+   "lock_read_s": 0.00975447000018903,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 21.278102883999928,
+   "due_dev": 21.28238874,
+   "calls_s": 0.0025432419997741817,
+   "locked": true,
+   "lock_read_s": 0.009745257999838941,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 21.338143865999985,
+   "due_dev": 21.34247014,
+   "calls_s": 0.0026157339998462703,
+   "locked": true,
+   "lock_read_s": 0.0097672529996089,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 21.398191742999895,
+   "due_dev": 21.40207826,
+   "calls_s": 0.002645368000230519,
+   "locked": true,
+   "lock_read_s": 0.009834044999934122,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 21.45824602449999,
+   "due_dev": 21.46292119,
+   "calls_s": 0.0030721429998266103,
+   "locked": true,
+   "lock_read_s": 0.009696179999991728,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 21.51829782050009,
+   "due_dev": 21.52265542,
+   "calls_s": 0.002620225999635295,
+   "locked": true,
+   "lock_read_s": 0.009708226999919134,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 21.57841986299987,
+   "due_dev": 21.58181369,
+   "calls_s": 0.0016389350003009895,
+   "locked": true,
+   "lock_read_s": 0.009720623000248452,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 21.638430457499993,
+   "due_dev": 21.64282277,
+   "calls_s": 0.002645080000093003,
+   "locked": true,
+   "lock_read_s": 0.009692654999980732,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 21.698557664000017,
+   "due_dev": 21.703177919999998,
+   "calls_s": 0.002972227000100247,
+   "locked": true,
+   "lock_read_s": 0.009708131000024878,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 21.758608815499898,
+   "due_dev": 21.76214335,
+   "calls_s": 0.0017672589997346222,
+   "locked": true,
+   "lock_read_s": 0.00971528899981422,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 21.818783471000007,
+   "due_dev": 21.8232268,
+   "calls_s": 0.0026751639998110477,
+   "locked": true,
+   "lock_read_s": 0.00969901899998149,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 21.878950124999992,
+   "due_dev": 21.88359014,
+   "calls_s": 0.0028858450000370794,
+   "locked": true,
+   "lock_read_s": 0.009774457000276016,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 21.938953153999986,
+   "due_dev": 21.942921509999998,
+   "calls_s": 0.002208511999924667,
+   "locked": true,
+   "lock_read_s": 0.009699905999696057,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 21.999101776499913,
+   "due_dev": 22.004011079999998,
+   "calls_s": 0.003274177000093914,
+   "locked": true,
+   "lock_read_s": 0.00972889300010138,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 22.05912233399994,
+   "due_dev": 22.0637732,
+   "calls_s": 0.002976804999889282,
+   "locked": true,
+   "lock_read_s": 0.009778344000096695,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 22.119190947500044,
+   "due_dev": 22.12269103,
+   "calls_s": 0.001717718999771023,
+   "locked": true,
+   "lock_read_s": 0.009724281999751838,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 22.179306730499984,
+   "due_dev": 22.183648769999998,
+   "calls_s": 0.0025713619997986825,
+   "locked": true,
+   "lock_read_s": 0.00985595900010594,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 22.23940467900001,
+   "due_dev": 22.24364802,
+   "calls_s": 0.002438555000026099,
+   "locked": true,
+   "lock_read_s": 0.009722844999942026,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 22.29948640950011,
+   "due_dev": 22.30294216,
+   "calls_s": 0.0017837509999480972,
+   "locked": true,
+   "lock_read_s": 0.009718021000026056,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 22.359537434999947,
+   "due_dev": 22.36400681,
+   "calls_s": 0.0026665759996831184,
+   "locked": true,
+   "lock_read_s": 0.009688716999789904,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 22.419599471000026,
+   "due_dev": 22.423940329999997,
+   "calls_s": 0.002556052000272757,
+   "locked": true,
+   "lock_read_s": 0.00969211500023448,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 22.47979392399991,
+   "due_dev": 22.48372471,
+   "calls_s": 0.0025190450000991405,
+   "locked": true,
+   "lock_read_s": 0.009709744000247156,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 22.539934537999912,
+   "due_dev": 22.544225469999997,
+   "calls_s": 0.00252233699984572,
+   "locked": true,
+   "lock_read_s": 0.009698743000171817,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 22.59998503450003,
+   "due_dev": 22.60430147,
+   "calls_s": 0.0025211600000147882,
+   "locked": true,
+   "lock_read_s": 0.009689028000138933,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 22.660030676500153,
+   "due_dev": 22.663424069999998,
+   "calls_s": 0.0016451060000690632,
+   "locked": true,
+   "lock_read_s": 0.009835477999786235,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 22.720062253500075,
+   "due_dev": 22.72433951,
+   "calls_s": 0.002527953000026173,
+   "locked": true,
+   "lock_read_s": 0.009841978000167728,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 22.780088389000007,
+   "due_dev": 22.78466684,
+   "calls_s": 0.002935767000053602,
+   "locked": true,
+   "lock_read_s": 0.009696785999949498,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 22.84007613799997,
+   "due_dev": 22.84379972,
+   "calls_s": 0.0020585359998221975,
+   "locked": true,
+   "lock_read_s": 0.00970502000018314,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 22.900122721000148,
+   "due_dev": 22.90477454,
+   "calls_s": 0.002996944999722473,
+   "locked": true,
+   "lock_read_s": 0.009695727999769588,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 22.960267018500055,
+   "due_dev": 22.96483085,
+   "calls_s": 0.0029390029999376566,
+   "locked": true,
+   "lock_read_s": 0.009687808999842673,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 23.02028281850015,
+   "due_dev": 23.023990599999998,
+   "calls_s": 0.002086223999867798,
+   "locked": true,
+   "lock_read_s": 0.009762436000073649,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 23.080267160500075,
+   "due_dev": 23.08475708,
+   "calls_s": 0.0026794929999596206,
+   "locked": true,
+   "lock_read_s": 0.009702693999770418,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 23.140395652000024,
+   "due_dev": 23.14475981,
+   "calls_s": 0.002568820999840682,
+   "locked": true,
+   "lock_read_s": 0.009697120000055293,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 23.200440468000124,
+   "due_dev": 23.20415945,
+   "calls_s": 0.002060129999790661,
+   "locked": true,
+   "lock_read_s": 0.009708317999866267,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 23.26046987300016,
+   "due_dev": 23.265003309999997,
+   "calls_s": 0.0028960939998796675,
+   "locked": true,
+   "lock_read_s": 0.009681064999767841,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 23.32049493299981,
+   "due_dev": 23.325063179999997,
+   "calls_s": 0.002922359999956825,
+   "locked": true,
+   "lock_read_s": 0.00970290900022519,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 23.38051447300001,
+   "due_dev": 23.38408342,
+   "calls_s": 0.0019815140003629494,
+   "locked": true,
+   "lock_read_s": 0.009803747000205476,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 23.440553256500024,
+   "due_dev": 23.44500184,
+   "calls_s": 0.0028132699999332544,
+   "locked": true,
+   "lock_read_s": 0.009735754999837809,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 23.500595300000036,
+   "due_dev": 23.504938969999998,
+   "calls_s": 0.0026054360000671295,
+   "locked": true,
+   "lock_read_s": 0.009714981999877637,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 23.560642824999952,
+   "due_dev": 23.56448046,
+   "calls_s": 0.0022650579999208276,
+   "locked": true,
+   "lock_read_s": 0.009750262000125076,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 23.62074599549996,
+   "due_dev": 23.62561148,
+   "calls_s": 0.003207470000234025,
+   "locked": true,
+   "lock_read_s": 0.00973045600039768,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 23.68078681850008,
+   "due_dev": 23.68500154,
+   "calls_s": 0.0024481489999743644,
+   "locked": true,
+   "lock_read_s": 0.0097160850000364,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 23.74086497800008,
+   "due_dev": 23.744292259999998,
+   "calls_s": 0.0017666480002844764,
+   "locked": true,
+   "lock_read_s": 0.009746702000029472,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 23.800908844000006,
+   "due_dev": 23.80544515,
+   "calls_s": 0.002908099000251241,
+   "locked": true,
+   "lock_read_s": 0.0097174340003221,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 23.861053249499815,
+   "due_dev": 23.86551488,
+   "calls_s": 0.0026597340001899283,
+   "locked": true,
+   "lock_read_s": 0.009689725000043836,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 23.921096216499965,
+   "due_dev": 23.92451294,
+   "calls_s": 0.0016574969999965106,
+   "locked": true,
+   "lock_read_s": 0.009688511999684124,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 23.98109860999995,
+   "due_dev": 23.98538733,
+   "calls_s": 0.00251618199990844,
+   "locked": true,
+   "lock_read_s": 0.009727987000132998,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 24.041114860499903,
+   "due_dev": 24.04539071,
+   "calls_s": 0.0025001640001391934,
+   "locked": true,
+   "lock_read_s": 0.009736415000134002,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 24.10113213799998,
+   "due_dev": 24.1047442,
+   "calls_s": 0.0019644409999273194,
+   "locked": true,
+   "lock_read_s": 0.009820056000080513,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 24.16117002299989,
+   "due_dev": 24.16552948,
+   "calls_s": 0.0025965480003833363,
+   "locked": true,
+   "lock_read_s": 0.00968351800020173,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 24.221188497000018,
+   "due_dev": 24.225388539999997,
+   "calls_s": 0.0024420689996986766,
+   "locked": true,
+   "lock_read_s": 0.009705751999717904,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5200000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 24.281212900999893,
+   "due_dev": 24.28464931,
+   "calls_s": 0.0017134909999185766,
+   "locked": true,
+   "lock_read_s": 0.00971485100035352,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 24.891900280999938,
+   "due_dev": 24.896279579999998,
+   "calls_s": 0.0026133029996344703,
+   "locked": true,
+   "lock_read_s": 0.009812296999825776,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 24.951915251499976,
+   "due_dev": 24.956550569999997,
+   "calls_s": 0.002986785000302916,
+   "locked": true,
+   "lock_read_s": 0.00970309800004543,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 25.011960984,
+   "due_dev": 25.01567473,
+   "calls_s": 0.002086427999984153,
+   "locked": true,
+   "lock_read_s": 0.009741611999743327,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 25.071990188999955,
+   "due_dev": 25.076646359999998,
+   "calls_s": 0.0030320490000121936,
+   "locked": true,
+   "lock_read_s": 0.009710242999972252,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 25.132056619500005,
+   "due_dev": 25.136622589999998,
+   "calls_s": 0.0029288870000527822,
+   "locked": true,
+   "lock_read_s": 0.009806390999983705,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 25.192072687000024,
+   "due_dev": 25.19565372,
+   "calls_s": 0.0019614729999375413,
+   "locked": true,
+   "lock_read_s": 0.009760518999883061,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 25.252109627499912,
+   "due_dev": 25.25691367,
+   "calls_s": 0.0030579750000470085,
+   "locked": true,
+   "lock_read_s": 0.00972550799997407,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 25.31214077149999,
+   "due_dev": 25.31652372,
+   "calls_s": 0.0026291369999853487,
+   "locked": true,
+   "lock_read_s": 0.009708757999760564,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 25.37217306400008,
+   "due_dev": 25.37580535,
+   "calls_s": 0.002010691000123188,
+   "locked": true,
+   "lock_read_s": 0.009666771999945922,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 25.43221017099982,
+   "due_dev": 25.43653083,
+   "calls_s": 0.0025655909998931747,
+   "locked": true,
+   "lock_read_s": 0.009716516000025877,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 25.492265694000007,
+   "due_dev": 25.49652081,
+   "calls_s": 0.002502965000076074,
+   "locked": true,
+   "lock_read_s": 0.009697282000161067,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 25.552247381500006,
+   "due_dev": 25.555987329999997,
+   "calls_s": 0.002078754000194749,
+   "locked": true,
+   "lock_read_s": 0.00970302099995024,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 25.612258433000008,
+   "due_dev": 25.6169819,
+   "calls_s": 0.003070112999921548,
+   "locked": true,
+   "lock_read_s": 0.009725072000037471,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 25.67231152049997,
+   "due_dev": 25.67723763,
+   "calls_s": 0.003642675000264717,
+   "locked": true,
+   "lock_read_s": 0.009679914000116696,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 25.732339631499883,
+   "due_dev": 25.73604198,
+   "calls_s": 0.0019482880002215097,
+   "locked": true,
+   "lock_read_s": 0.009842841000136104,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 25.792388322999972,
+   "due_dev": 25.796996919999998,
+   "calls_s": 0.0035722920001717284,
+   "locked": true,
+   "lock_read_s": 0.009755209000104514,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 25.852416236499934,
+   "due_dev": 25.85737958,
+   "calls_s": 0.0033271349998358346,
+   "locked": true,
+   "lock_read_s": 0.009744919999775448,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 25.91246523050004,
+   "due_dev": 25.916224879999998,
+   "calls_s": 0.0021310860001904075,
+   "locked": true,
+   "lock_read_s": 0.009726298000259703,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 25.972497738000005,
+   "due_dev": 25.977172959999997,
+   "calls_s": 0.0033945190002668824,
+   "locked": true,
+   "lock_read_s": 0.009838816999945266,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 26.032520963500154,
+   "due_dev": 26.03731059,
+   "calls_s": 0.0031477930001528875,
+   "locked": true,
+   "lock_read_s": 0.0097557809999671,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 26.09255550350004,
+   "due_dev": 26.09644697,
+   "calls_s": 0.00223517999984324,
+   "locked": true,
+   "lock_read_s": 0.009699059000013222,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 26.152588704499912,
+   "due_dev": 26.15706357,
+   "calls_s": 0.002868906000003335,
+   "locked": true,
+   "lock_read_s": 0.009708622999824001,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 26.212619507999896,
+   "due_dev": 26.217168559999998,
+   "calls_s": 0.0029219259999990754,
+   "locked": true,
+   "lock_read_s": 0.009698160999960237,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 26.272609541500014,
+   "due_dev": 26.276169359999997,
+   "calls_s": 0.0017918459998327307,
+   "locked": true,
+   "lock_read_s": 0.00973222699985854,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 26.332771264999913,
+   "due_dev": 26.33718378,
+   "calls_s": 0.002803815999868675,
+   "locked": true,
+   "lock_read_s": 0.009713044999898557,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 26.392790246499935,
+   "due_dev": 26.39765109,
+   "calls_s": 0.0032469399998262816,
+   "locked": true,
+   "lock_read_s": 0.009706489000109286,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 26.452891032000192,
+   "due_dev": 26.45655454,
+   "calls_s": 0.0020250859997759108,
+   "locked": true,
+   "lock_read_s": 0.009682612999768025,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 26.51292922999984,
+   "due_dev": 26.51743239,
+   "calls_s": 0.0028854619999947317,
+   "locked": true,
+   "lock_read_s": 0.009759081000083825,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 26.573108821000027,
+   "due_dev": 26.57733288,
+   "calls_s": 0.002467872000124771,
+   "locked": true,
+   "lock_read_s": 0.009742239999923186,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 26.633132989500044,
+   "due_dev": 26.6366932,
+   "calls_s": 0.0019348680002622132,
+   "locked": true,
+   "lock_read_s": 0.009755099999892991,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 26.693141600500113,
+   "due_dev": 26.697444349999998,
+   "calls_s": 0.0025314630001957994,
+   "locked": true,
+   "lock_read_s": 0.009789233999981661,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 26.753164158500024,
+   "due_dev": 26.75777059,
+   "calls_s": 0.002975483000227541,
+   "locked": true,
+   "lock_read_s": 0.009684562000074948,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 26.81317926850004,
+   "due_dev": 26.81687246,
+   "calls_s": 0.002052391999768588,
+   "locked": true,
+   "lock_read_s": 0.009873784999854252,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 26.873201346500053,
+   "due_dev": 26.87793266,
+   "calls_s": 0.003079130000060104,
+   "locked": true,
+   "lock_read_s": 0.009750375000294298,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 26.933198140499965,
+   "due_dev": 26.93774821,
+   "calls_s": 0.0028556689999277296,
+   "locked": true,
+   "lock_read_s": 0.009705877999749646,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 26.993249337500032,
+   "due_dev": 26.997069749999998,
+   "calls_s": 0.002149197999642638,
+   "locked": true,
+   "lock_read_s": 0.009764000999894051,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 27.05327875849996,
+   "due_dev": 27.0581715,
+   "calls_s": 0.0032232140001724474,
+   "locked": true,
+   "lock_read_s": 0.009716593000121065,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 27.113319020500125,
+   "due_dev": 27.11770937,
+   "calls_s": 0.0027609290000327746,
+   "locked": true,
+   "lock_read_s": 0.009741898999891418,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 27.173352914500096,
+   "due_dev": 27.1769857,
+   "calls_s": 0.00213803899987397,
+   "locked": true,
+   "lock_read_s": 0.00980247400002554,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 27.233383158000002,
+   "due_dev": 27.238698319999997,
+   "calls_s": 0.004050816000017221,
+   "locked": true,
+   "lock_read_s": 0.009766862000105903,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 27.29342756599999,
+   "due_dev": 27.298465489999998,
+   "calls_s": 0.0039944969998941815,
+   "locked": true,
+   "lock_read_s": 0.009750533999977051,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 27.35349782050008,
+   "due_dev": 27.35692486,
+   "calls_s": 0.0016870029999154212,
+   "locked": true,
+   "lock_read_s": 0.009771181999894907,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 27.413516700000077,
+   "due_dev": 27.417906329999997,
+   "calls_s": 0.002640019999944343,
+   "locked": true,
+   "lock_read_s": 0.009754496999903495,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 27.47360219899985,
+   "due_dev": 27.478529979999998,
+   "calls_s": 0.0037131509998289403,
+   "locked": true,
+   "lock_read_s": 0.009765755999978865,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 27.533638361500167,
+   "due_dev": 27.53728314,
+   "calls_s": 0.002022234999913053,
+   "locked": true,
+   "lock_read_s": 0.00970185100004528,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 27.593675688999976,
+   "due_dev": 27.59799714,
+   "calls_s": 0.0025625940002100833,
+   "locked": true,
+   "lock_read_s": 0.00978867599997102,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 27.65371266799991,
+   "due_dev": 27.65794373,
+   "calls_s": 0.002467944000272837,
+   "locked": true,
+   "lock_read_s": 0.0096833150000748,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 27.71376381750001,
+   "due_dev": 27.71767689,
+   "calls_s": 0.0022643740003331914,
+   "locked": true,
+   "lock_read_s": 0.009832874000039737,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 27.773783511500188,
+   "due_dev": 27.77837842,
+   "calls_s": 0.002961601999686536,
+   "locked": true,
+   "lock_read_s": 0.0096948870000233,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 27.83393422900002,
+   "due_dev": 27.83822171,
+   "calls_s": 0.002519991000099253,
+   "locked": true,
+   "lock_read_s": 0.009699358000034408,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 27.89408833949998,
+   "due_dev": 27.89751037,
+   "calls_s": 0.001685529000042152,
+   "locked": true,
+   "lock_read_s": 0.00974600300014572,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 27.954130774999896,
+   "due_dev": 27.958471879999998,
+   "calls_s": 0.002631361999647197,
+   "locked": true,
+   "lock_read_s": 0.009732349999922008,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 28.014293848499918,
+   "due_dev": 28.01872846,
+   "calls_s": 0.002798418000111269,
+   "locked": true,
+   "lock_read_s": 0.00982173700003841,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 28.074301738000003,
+   "due_dev": 28.07805591,
+   "calls_s": 0.002113080000071932,
+   "locked": true,
+   "lock_read_s": 0.009744333000071492,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 28.134323097499916,
+   "due_dev": 28.13892547,
+   "calls_s": 0.0029264149998198263,
+   "locked": true,
+   "lock_read_s": 0.00971872699983578,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 28.19445400099996,
+   "due_dev": 28.1987576,
+   "calls_s": 0.002564646000337234,
+   "locked": true,
+   "lock_read_s": 0.00971065700014151,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 28.254483778000136,
+   "due_dev": 28.257996329999997,
+   "calls_s": 0.0017739899999469344,
+   "locked": true,
+   "lock_read_s": 0.009810947999994823,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 28.314516491000003,
+   "due_dev": 28.31891098,
+   "calls_s": 0.0026607769996189745,
+   "locked": true,
+   "lock_read_s": 0.009817232999921544,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 28.374530417000035,
+   "due_dev": 28.378889389999998,
+   "calls_s": 0.0026268980000168085,
+   "locked": true,
+   "lock_read_s": 0.009737830000176473,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 28.43457182900009,
+   "due_dev": 28.438315319999997,
+   "calls_s": 0.0021174799999243987,
+   "locked": true,
+   "lock_read_s": 0.00972483400028068,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 28.494596596999923,
+   "due_dev": 28.49905556,
+   "calls_s": 0.0028206030001456384,
+   "locked": true,
+   "lock_read_s": 0.009680121000201325,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 28.554623006000167,
+   "due_dev": 28.55917522,
+   "calls_s": 0.0029186339997977484,
+   "locked": true,
+   "lock_read_s": 0.009736774999964837,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 28.614783944500005,
+   "due_dev": 28.61833945,
+   "calls_s": 0.001827485999911005,
+   "locked": true,
+   "lock_read_s": 0.009761733999766875,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 28.674830969499887,
+   "due_dev": 28.679382869999998,
+   "calls_s": 0.002936004000275716,
+   "locked": true,
+   "lock_read_s": 0.009750488000008772,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 28.73492482400005,
+   "due_dev": 28.73965488,
+   "calls_s": 0.0031160560001808335,
+   "locked": true,
+   "lock_read_s": 0.009728827000344609,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 28.79508148000004,
+   "due_dev": 28.79870835,
+   "calls_s": 0.0019951389999732783,
+   "locked": true,
+   "lock_read_s": 0.009691017000022839,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 28.855222431999977,
+   "due_dev": 28.8596109,
+   "calls_s": 0.002622591000090324,
+   "locked": true,
+   "lock_read_s": 0.009710906000236719,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 28.91526293999984,
+   "due_dev": 28.91964602,
+   "calls_s": 0.0026312420000067505,
+   "locked": true,
+   "lock_read_s": 0.009725123999942298,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 28.975269181500032,
+   "due_dev": 28.97869862,
+   "calls_s": 0.001669914000103745,
+   "locked": true,
+   "lock_read_s": 0.009682624000106443,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 29.03529003600009,
+   "due_dev": 29.03970396,
+   "calls_s": 0.002660103999915009,
+   "locked": true,
+   "lock_read_s": 0.0096956410002349,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 29.095331114500084,
+   "due_dev": 29.099607849999998,
+   "calls_s": 0.0025273119999837945,
+   "locked": true,
+   "lock_read_s": 0.009816700000101264,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 29.1553485955,
+   "due_dev": 29.159384319999997,
+   "calls_s": 0.002668974999778584,
+   "locked": true,
+   "lock_read_s": 0.00980562299992016,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 29.215365940000112,
+   "due_dev": 29.22006138,
+   "calls_s": 0.003054936999888014,
+   "locked": true,
+   "lock_read_s": 0.00976586699971449,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 29.27540778399996,
+   "due_dev": 29.279987589999998,
+   "calls_s": 0.002937941999789473,
+   "locked": true,
+   "lock_read_s": 0.009748624000167183,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 29.335462693999837,
+   "due_dev": 29.33916482,
+   "calls_s": 0.002094576000217785,
+   "locked": true,
+   "lock_read_s": 0.009681386000011116,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 29.39549070749999,
+   "due_dev": 29.40006111,
+   "calls_s": 0.0029387029999270453,
+   "locked": true,
+   "lock_read_s": 0.009823911999774282,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 29.45554290499997,
+   "due_dev": 29.460009529999997,
+   "calls_s": 0.0028481019999162527,
+   "locked": true,
+   "lock_read_s": 0.009683691999725852,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 29.515568405499828,
+   "due_dev": 29.519353369999997,
+   "calls_s": 0.00215822499967544,
+   "locked": true,
+   "lock_read_s": 0.009693013999822142,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 29.57559027550004,
+   "due_dev": 29.58023394,
+   "calls_s": 0.0030077110000092944,
+   "locked": true,
+   "lock_read_s": 0.00969303299962121,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 29.63560867000017,
+   "due_dev": 29.640223629999998,
+   "calls_s": 0.002970048999941355,
+   "locked": true,
+   "lock_read_s": 0.009682477999831463,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 29.695781366000126,
+   "due_dev": 29.69976484,
+   "calls_s": 0.002263718999984121,
+   "locked": true,
+   "lock_read_s": 0.00980008300030022,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 29.75593402649989,
+   "due_dev": 29.760570509999997,
+   "calls_s": 0.0030150279999361373,
+   "locked": true,
+   "lock_read_s": 0.009731403999921895,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 29.81608393649995,
+   "due_dev": 29.82073311,
+   "calls_s": 0.003091136999955779,
+   "locked": true,
+   "lock_read_s": 0.009750216000156797,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 29.87613626999997,
+   "due_dev": 29.87986794,
+   "calls_s": 0.002112947000114218,
+   "locked": true,
+   "lock_read_s": 0.009728760000143666,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 29.936188703500008,
+   "due_dev": 29.94063539,
+   "calls_s": 0.0026990629999090743,
+   "locked": true,
+   "lock_read_s": 0.009824562000176229,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 29.996207055999918,
+   "due_dev": 30.00052001,
+   "calls_s": 0.0025966090001929842,
+   "locked": true,
+   "lock_read_s": 0.009749158999966312,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 30.056231136000058,
+   "due_dev": 30.05974801,
+   "calls_s": 0.0017662989998825651,
+   "locked": true,
+   "lock_read_s": 0.009723624999878666,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 30.116272671999784,
+   "due_dev": 30.12057216,
+   "calls_s": 0.0025302499998360872,
+   "locked": true,
+   "lock_read_s": 0.009739654999975755,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 30.176342820000176,
+   "due_dev": 30.18056694,
+   "calls_s": 0.0024841900003593764,
+   "locked": true,
+   "lock_read_s": 0.009847793000062666,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 30.236374973999954,
+   "due_dev": 30.24048199,
+   "calls_s": 0.002495177000128024,
+   "locked": true,
+   "lock_read_s": 0.009772683999926812,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 30.296399450000013,
+   "due_dev": 30.30098446,
+   "calls_s": 0.0029667870003322605,
+   "locked": true,
+   "lock_read_s": 0.009692070000255626,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 30.35641067849991,
+   "due_dev": 30.360996999999998,
+   "calls_s": 0.0029605159998027375,
+   "locked": true,
+   "lock_read_s": 0.009734517999731906,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 30.416466178500034,
+   "due_dev": 30.42020831,
+   "calls_s": 0.00216862300021603,
+   "locked": true,
+   "lock_read_s": 0.009693728999991436,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 30.476494222999918,
+   "due_dev": 30.48105816,
+   "calls_s": 0.0029196759996921173,
+   "locked": true,
+   "lock_read_s": 0.009884657999919,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 30.53657095949995,
+   "due_dev": 30.541116459999998,
+   "calls_s": 0.002922321999903943,
+   "locked": true,
+   "lock_read_s": 0.009716245000163326,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 30.59656912450003,
+   "due_dev": 30.60029712,
+   "calls_s": 0.002068416999918554,
+   "locked": true,
+   "lock_read_s": 0.009724861999984569,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 30.656599788999984,
+   "due_dev": 30.660890079999998,
+   "calls_s": 0.0024970219997157983,
+   "locked": true,
+   "lock_read_s": 0.009724890999677882,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 30.716768035999998,
+   "due_dev": 30.721025519999998,
+   "calls_s": 0.0024871329997040448,
+   "locked": true,
+   "lock_read_s": 0.009694746999684867,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 30.776921153500012,
+   "due_dev": 30.780594949999998,
+   "calls_s": 0.002061066000351275,
+   "locked": true,
+   "lock_read_s": 0.009758839000369335,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 30.836947888000072,
+   "due_dev": 30.841275839999998,
+   "calls_s": 0.0025741769995875075,
+   "locked": true,
+   "lock_read_s": 0.009709418999591435,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 30.8970771655,
+   "due_dev": 30.90133112,
+   "calls_s": 0.0025705779999043443,
+   "locked": true,
+   "lock_read_s": 0.00975364800024181,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 30.957135070500158,
+   "due_dev": 30.96077202,
+   "calls_s": 0.002033541999935551,
+   "locked": true,
+   "lock_read_s": 0.009725067000090348,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 31.017145447499875,
+   "due_dev": 31.021675509999998,
+   "calls_s": 0.0030243579999478243,
+   "locked": true,
+   "lock_read_s": 0.009786788999917917,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 31.077191644999843,
+   "due_dev": 31.08145339,
+   "calls_s": 0.0025132199998552096,
+   "locked": true,
+   "lock_read_s": 0.009863054999641463,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 31.137199797999916,
+   "due_dev": 31.140662029999998,
+   "calls_s": 0.0016919150002649985,
+   "locked": true,
+   "lock_read_s": 0.00971718700020574,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 31.19722606399996,
+   "due_dev": 31.20182324,
+   "calls_s": 0.0029788330002702423,
+   "locked": true,
+   "lock_read_s": 0.009692271999938384,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 31.25722784099997,
+   "due_dev": 31.26176465,
+   "calls_s": 0.002898074999848177,
+   "locked": true,
+   "lock_read_s": 0.00970039399999223,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 31.317251043000006,
+   "due_dev": 31.32078332,
+   "calls_s": 0.0017833609999797773,
+   "locked": true,
+   "lock_read_s": 0.009716813000068214,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 31.377298859000053,
+   "due_dev": 31.381643479999997,
+   "calls_s": 0.002586527999937971,
+   "locked": true,
+   "lock_read_s": 0.009710610999718483,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 31.437349778500078,
+   "due_dev": 31.442058239999998,
+   "calls_s": 0.003044704999865644,
+   "locked": true,
+   "lock_read_s": 0.009740222999880643,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 31.497389215999927,
+   "due_dev": 31.50114867,
+   "calls_s": 0.0021143619997019414,
+   "locked": true,
+   "lock_read_s": 0.009716819000004762,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 31.55745615350009,
+   "due_dev": 31.5618075,
+   "calls_s": 0.0026016389997494116,
+   "locked": true,
+   "lock_read_s": 0.009708158999728767,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 31.61746140149996,
+   "due_dev": 31.62197289,
+   "calls_s": 0.0028738169999087404,
+   "locked": true,
+   "lock_read_s": 0.009721725999952469,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 31.677498821500045,
+   "due_dev": 31.680942299999998,
+   "calls_s": 0.001688069000010728,
+   "locked": true,
+   "lock_read_s": 0.009821761999774026,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 31.73758021200009,
+   "due_dev": 31.741912619999997,
+   "calls_s": 0.0026127250002900837,
+   "locked": true,
+   "lock_read_s": 0.009718148000047222,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 31.79760466099989,
+   "due_dev": 31.802052359999998,
+   "calls_s": 0.0028004799996779184,
+   "locked": true,
+   "lock_read_s": 0.009723382999709429,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 31.857622470499965,
+   "due_dev": 31.861010869999998,
+   "calls_s": 0.0016308649996972235,
+   "locked": true,
+   "lock_read_s": 0.009748597999987396,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 31.917627700999923,
+   "due_dev": 31.92284664,
+   "calls_s": 0.00424879799993505,
+   "locked": true,
+   "lock_read_s": 0.009860060999926645,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 31.977772309499844,
+   "due_dev": 31.98237746,
+   "calls_s": 0.002987695999763673,
+   "locked": true,
+   "lock_read_s": 0.009762698000031378,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 32.03782115500012,
+   "due_dev": 32.04160161,
+   "calls_s": 0.002187731999583775,
+   "locked": true,
+   "lock_read_s": 0.009767503999682958,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 32.097878157500084,
+   "due_dev": 32.102492850000004,
+   "calls_s": 0.0030082099997343903,
+   "locked": true,
+   "lock_read_s": 0.009730299999773706,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 32.15791311900016,
+   "due_dev": 32.162487510000005,
+   "calls_s": 0.002826194000135729,
+   "locked": true,
+   "lock_read_s": 0.009686284000054002,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 32.217929959999964,
+   "due_dev": 32.22156452,
+   "calls_s": 0.0021434800000861287,
+   "locked": true,
+   "lock_read_s": 0.009695787000055134,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 32.278072276000124,
+   "due_dev": 32.28237815,
+   "calls_s": 0.0025291590000051656,
+   "locked": true,
+   "lock_read_s": 0.00975419399992461,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 32.338079919000094,
+   "due_dev": 32.342331720000004,
+   "calls_s": 0.002488023999831057,
+   "locked": true,
+   "lock_read_s": 0.009685008999895217,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 32.398118822000136,
+   "due_dev": 32.401552110000004,
+   "calls_s": 0.0016891719997147447,
+   "locked": true,
+   "lock_read_s": 0.009801324999898497,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 32.45814563000003,
+   "due_dev": 32.46298824,
+   "calls_s": 0.0033954690002246934,
+   "locked": true,
+   "lock_read_s": 0.009723148000375659,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 32.518174346500025,
+   "due_dev": 32.52253434,
+   "calls_s": 0.002607344999887573,
+   "locked": true,
+   "lock_read_s": 0.009723028999815142,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 32.578182430000034,
+   "due_dev": 32.581899050000004,
+   "calls_s": 0.0020668369998020353,
+   "locked": true,
+   "lock_read_s": 0.00970800599998256,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 32.638212295999985,
+   "due_dev": 32.64270365,
+   "calls_s": 0.002848413000265282,
+   "locked": true,
+   "lock_read_s": 0.009689615000297636,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 32.698227599499965,
+   "due_dev": 32.70276496,
+   "calls_s": 0.0028984390000914573,
+   "locked": true,
+   "lock_read_s": 0.009682819999852654,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 32.75824709550005,
+   "due_dev": 32.76169289,
+   "calls_s": 0.0016818670001157443,
+   "locked": true,
+   "lock_read_s": 0.009719372000290605,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 32.81828177300015,
+   "due_dev": 32.82276703,
+   "calls_s": 0.002840490999915346,
+   "locked": true,
+   "lock_read_s": 0.009731116999773803,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 32.87833145300015,
+   "due_dev": 32.88317396,
+   "calls_s": 0.003193303999978525,
+   "locked": true,
+   "lock_read_s": 0.009846436000316316,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 32.938362450000085,
+   "due_dev": 32.942325270000005,
+   "calls_s": 0.002328035000118689,
+   "locked": true,
+   "lock_read_s": 0.009774205000212532,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 32.99839170299994,
+   "due_dev": 33.00320712,
+   "calls_s": 0.0030698069999743893,
+   "locked": true,
+   "lock_read_s": 0.009696387000076356,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 33.058417541,
+   "due_dev": 33.063342750000004,
+   "calls_s": 0.003437064000081591,
+   "locked": true,
+   "lock_read_s": 0.009797267000067222,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 33.11844991149983,
+   "due_dev": 33.12256927,
+   "calls_s": 0.002534805999857781,
+   "locked": true,
+   "lock_read_s": 0.009693672999674163,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 33.178462146,
+   "due_dev": 33.18281039,
+   "calls_s": 0.002601882999897498,
+   "locked": true,
+   "lock_read_s": 0.009741326000039408,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 33.23845953349993,
+   "due_dev": 33.2429149,
+   "calls_s": 0.0027741459998651408,
+   "locked": true,
+   "lock_read_s": 0.009702572999685799,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 33.29848143650011,
+   "due_dev": 33.30282959,
+   "calls_s": 0.002772251999886066,
+   "locked": true,
+   "lock_read_s": 0.009796697000183485,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 33.35851385200011,
+   "due_dev": 33.362901130000004,
+   "calls_s": 0.0026324400000703463,
+   "locked": true,
+   "lock_read_s": 0.009701835000214487,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 33.418541106500015,
+   "due_dev": 33.42311113,
+   "calls_s": 0.002920590000030643,
+   "locked": true,
+   "lock_read_s": 0.009710529000130919,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 33.47856362500008,
+   "due_dev": 33.482452120000005,
+   "calls_s": 0.002230503999726352,
+   "locked": true,
+   "lock_read_s": 0.009727467999709916,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 33.53858829700005,
+   "due_dev": 33.543169500000005,
+   "calls_s": 0.0029614240002047154,
+   "locked": true,
+   "lock_read_s": 0.00973359999989043,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 33.59864161499998,
+   "due_dev": 33.604555420000004,
+   "calls_s": 0.004587444000208052,
+   "locked": true,
+   "lock_read_s": 0.009786088000055315,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 33.65869124200012,
+   "due_dev": 33.66213989,
+   "calls_s": 0.0017027230001076532,
+   "locked": true,
+   "lock_read_s": 0.009693064000202867,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 33.71873314300007,
+   "due_dev": 33.723217420000005,
+   "calls_s": 0.0027452269996501855,
+   "locked": true,
+   "lock_read_s": 0.009789762999844243,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 33.77878247050012,
+   "due_dev": 33.783268320000005,
+   "calls_s": 0.0028824800001530093,
+   "locked": true,
+   "lock_read_s": 0.009698973000013211,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 33.838918708999955,
+   "due_dev": 33.842577580000004,
+   "calls_s": 0.0020284810002522136,
+   "locked": true,
+   "lock_read_s": 0.009748256999955629,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 33.89908714349993,
+   "due_dev": 33.905265930000006,
+   "calls_s": 0.005128753000008146,
+   "locked": true,
+   "lock_read_s": 0.009706772999834357,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 33.959137048499954,
+   "due_dev": 33.96326311,
+   "calls_s": 0.002362626000376622,
+   "locked": true,
+   "lock_read_s": 0.009686756000064634,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 34.019195657999965,
+   "due_dev": 34.022884770000005,
+   "calls_s": 0.0023293230001399934,
+   "locked": true,
+   "lock_read_s": 0.009824762999869563,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 34.07921666199989,
+   "due_dev": 34.0837615,
+   "calls_s": 0.0029098039999553293,
+   "locked": true,
+   "lock_read_s": 0.00970797899981335,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 34.13926193900012,
+   "due_dev": 34.14406779,
+   "calls_s": 0.0032022450000113167,
+   "locked": true,
+   "lock_read_s": 0.00972571300007985,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 34.19938370899998,
+   "due_dev": 34.20831213,
+   "calls_s": 0.007758478000141622,
+   "locked": false,
+   "lock_read_s": 0.009871850999843446,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 34.25944469099996,
+   "due_dev": 34.26421485,
+   "calls_s": 0.003042049999748997,
+   "locked": true,
+   "lock_read_s": 0.009702973000003112,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 34.319461270499886,
+   "due_dev": 34.3239813,
+   "calls_s": 0.0030316180000227178,
+   "locked": true,
+   "lock_read_s": 0.009702392000235704,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 34.37948926100011,
+   "due_dev": 34.38294217,
+   "calls_s": 0.0017062699998859898,
+   "locked": true,
+   "lock_read_s": 0.00972063299968795,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 34.43952601999998,
+   "due_dev": 34.44387556,
+   "calls_s": 0.0026363070001025335,
+   "locked": true,
+   "lock_read_s": 0.009731935000218073,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 34.49956874100002,
+   "due_dev": 34.50386049,
+   "calls_s": 0.0025257120000787836,
+   "locked": true,
+   "lock_read_s": 0.009736157000133971,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 34.559618450499926,
+   "due_dev": 34.56313831,
+   "calls_s": 0.0017753859997355903,
+   "locked": true,
+   "lock_read_s": 0.009750058000008721,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 34.61967895499989,
+   "due_dev": 34.62464628,
+   "calls_s": 0.0033052920002774044,
+   "locked": true,
+   "lock_read_s": 0.009730301000217878,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 34.67972605499998,
+   "due_dev": 34.68470113,
+   "calls_s": 0.0038893490000191377,
+   "locked": true,
+   "lock_read_s": 0.00977761800004373,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 34.73975863149995,
+   "due_dev": 34.74384229,
+   "calls_s": 0.0026495679999243293,
+   "locked": true,
+   "lock_read_s": 0.009704509000130201,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 34.799767159999924,
+   "due_dev": 34.804239710000004,
+   "calls_s": 0.0027646429998640087,
+   "locked": true,
+   "lock_read_s": 0.009724725000069157,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 34.85992824700006,
+   "due_dev": 34.864546430000004,
+   "calls_s": 0.0030024420002519037,
+   "locked": true,
+   "lock_read_s": 0.009764721999999892,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 34.92008152299996,
+   "due_dev": 34.92374059,
+   "calls_s": 0.0019312229997012764,
+   "locked": true,
+   "lock_read_s": 0.009707285999866144,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 34.980091533499824,
+   "due_dev": 34.984558750000005,
+   "calls_s": 0.0027136180001434695,
+   "locked": true,
+   "lock_read_s": 0.009731311999985337,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 35.04013654799999,
+   "due_dev": 35.04456042,
+   "calls_s": 0.0026838270000553166,
+   "locked": true,
+   "lock_read_s": 0.009725831000196195,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 35.10017140350004,
+   "due_dev": 35.10371576,
+   "calls_s": 0.001815800000258605,
+   "locked": true,
+   "lock_read_s": 0.009742226000071241,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 35.160184529999974,
+   "due_dev": 35.164559450000006,
+   "calls_s": 0.002628989999720943,
+   "locked": true,
+   "lock_read_s": 0.009823597999911726,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 35.22019681200014,
+   "due_dev": 35.22455506,
+   "calls_s": 0.002608328999940568,
+   "locked": true,
+   "lock_read_s": 0.00982300799978475,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 35.280238072000046,
+   "due_dev": 35.28489107,
+   "calls_s": 0.0035186240002076374,
+   "locked": true,
+   "lock_read_s": 0.009751555000093504,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 35.34024943650002,
+   "due_dev": 35.34470064,
+   "calls_s": 0.0027207719999751134,
+   "locked": true,
+   "lock_read_s": 0.009703688000172406,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 35.40025630349992,
+   "due_dev": 35.40470114,
+   "calls_s": 0.0027049380000789824,
+   "locked": true,
+   "lock_read_s": 0.009741714000028878,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 35.46029074450014,
+   "due_dev": 35.463852980000006,
+   "calls_s": 0.001808248000088497,
+   "locked": true,
+   "lock_read_s": 0.009706131999791978,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 2400000000.0,
+   "t0_dev": 35.520317899499986,
+   "due_dev": 35.52490634,
+   "calls_s": 0.0028523439996206434,
+   "locked": true,
+   "lock_read_s": 0.009677741999894351,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5200000000.0,
+   "t0_dev": 35.580358881999935,
+   "due_dev": 35.584906780000004,
+   "calls_s": 0.0029053940002086165,
+   "locked": true,
+   "lock_read_s": 0.009778814000128477,
+   "calls_overran_settle": false
+  },
+  {
+   "park": 5800000000.0,
+   "freq": 5800000000.0,
+   "t0_dev": 35.64037228550001,
+   "due_dev": 35.643980240000005,
+   "calls_s": 0.0019081249997725536,
+   "locked": true,
+   "lock_read_s": 0.00971063499991942,
+   "calls_overran_settle": false
+  }
+ ]
+}

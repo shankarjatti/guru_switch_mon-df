@@ -1,0 +1,50 @@
+# converted from twinrx_usrp_source.xml for GNU Radio 3.8
+id: twinrx_usrp_source
+label: TwinRX USRP Source
+category: DoA
+flags:
+- throttle
+parameters:
+- id: samp_rate
+  label: Samp Rate
+  dtype: float
+  default: '1000000'
+- id: center_freq
+  label: Center Freq (Hz)
+  dtype: float
+  default: '2400000000'
+- id: gain
+  label: Gain Value
+  dtype: float
+  default: '40'
+- id: sources
+  label: Num Channels
+  dtype: int
+  default: '4'
+  hide: part
+- id: addresses
+  label: Device Address
+  dtype: string
+  default: '"addr=192.168.40.2"'
+outputs:
+- domain: stream
+  dtype: complex
+  vlen: 1
+  multiplicity: ${ sources }
+asserts:
+- ${ sources > 1 }
+- ${ sources != 3 }
+- ${ sources < 5 }
+templates:
+  imports: import doa
+  make: "doa.twinrx_usrp_source(\n    samp_rate=${samp_rate},\n    center_freq=${center_freq},\n    gain=${gain},\n\
+    \    sources=${sources},\n    addresses=${addresses}\n)"
+  callbacks:
+  - set_samp_rate(${samp_rate})
+  - set_center_freq(${center_freq}, ${sources})
+  - set_gain(${gain})
+  - set_sources(${sources})
+documentation: "This block is a wrapper to the USRP source block when using an X310 with 1 or 2 TwinRXs.\
+  \ \nArgs:\n$samp_rate: Sample rate\n$center_freq: Center frequency\n$gain: Gain to be applied\n$sources:\
+  \ Number of input streams\n$addresses: Device address"
+file_format: 1

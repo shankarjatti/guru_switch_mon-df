@@ -1,0 +1,779 @@
+// twinrx_engine: radio-clock hopping for the USRP-2945 (X310 + 2x TwinRX).
+//
+// The timing-critical half of doa.twinrx_radio_source, in C++ so it never
+// waits on Python's interpreter lock:
+//   * receive thread: X310 -> lock-free ring buffer (4 channels, planar)
+//   * scheduler thread: one timed command batch per slot, sent one slot ahead
+// Python (the GNU Radio block) only copies samples out of the ring and places
+// the hop tags from the slot table this engine keeps.
+//
+// Everything here repeats what was verified on this unit on 2026-09-28
+// (guru/sched_hop_test.py, tune_method_phase_test.py, fast_chain_check.py):
+//   * setup: subdev A:0 A:1 B:0 B:1, antennas RX1/RX2/RX1/RX2, LO exported by
+//     board B (ch0/ch1 external, ch2 internal + export, ch3 companion), DDC at
+//     0 Hz and never commanded while hopping
+//   * band change at radio time S: gains at S, channel c's RF tune at
+//     S + c*0.4 ms, the same RF tunes again at S + 3 ms (phase-equal to guru's
+//     host double tune; a single pass leaves the LO in another phase state)
+//   * per slot: read lo_locked at S + lock_check, THEN send slot k+1 (a read
+//     issued while a timed command waits is queued behind it)
+//   * a slot is valid only if sent with min_slack to spare, finished before
+//     S, and locked
+//   * sample n is taken at start + n/fs; packet timestamps (which step at 2x
+//     on this X310) only detect gaps
+//
+// Burst mode (burst=1): each batch also carries a timed "send pre-roll + dwell
+// samples, then stop" stream command, so the X310 sends nothing while the LO
+// relocks. Every burst must start on its commanded sample and hold exactly its
+// commanded length; the bursts go on the same continuous timeline (gaps are
+// zeros), so the block and everything after it work as in continuous mode.
+//
+// C API for ctypes; see twinrx_radio_source.py.
+
+#include <uhd/usrp/multi_usrp.hpp>
+#include <uhd/types/tune_request.hpp>
+#include <uhd/utils/thread.hpp>
+
+#include <pthread.h>
+#include <sched.h>
+
+#include <algorithm>
+#include <atomic>
+#include <chrono>
+#include <cmath>
+#include <complex>
+#include <condition_variable>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <deque>
+#include <mutex>
+#include <string>
+#include <thread>
+#include <vector>
+
+namespace {
+
+using cf = std::complex<float>;
+using clk = std::chrono::steady_clock;
+
+constexpr int NCH = 4;
+constexpr double STEP = 0.0004;
+constexpr double SECOND_PASS = 0.003;
+constexpr size_t LO_MASTER = 2;
+
+double host_now() {
+    return std::chrono::duration<double>(clk::now().time_since_epoch()).count();
+}
+
+struct Slot {
+    long id;
+    double S;
+    double freq;
+    double next;
+    int valid;      // -1 unknown, 0 invalid, 1 valid
+    int why;        // 0 ok, 1 skipped, 2 late, 3 unlocked, 4 burst never came
+};
+
+struct Engine {
+    // configuration
+    std::string args;
+    double fs = 1e6;
+    std::vector<double> freq, gain, dwell;
+    std::vector<std::vector<double>> gains;   // per band, per channel (clamped)
+    std::vector<double> trim;
+    double settle = 0.01, gpre = 0.00025, lock_check = 0.007, min_slack = 0.008;
+    double start_delay = 0.5;
+    int rt_prio = 0;
+    // Burst mode: the X310 sends only each dwell (plus a short pre-roll that
+    // falls inside the switching time and is never used), nothing while the
+    // LO relocks. The bursts are put back on the same continuous sample
+    // timeline, the switching gaps filled with zeros, so everything after the
+    // engine sees exactly what it sees in continuous mode.
+    bool burst = false;
+    double preroll = 0.00025;
+
+    uhd::usrp::multi_usrp::sptr u;
+    uhd::rx_streamer::sptr rx;
+    size_t spp = 0;
+    double start_dev = 0;
+
+    // ring buffer
+    size_t ring_n = 1 << 22;                  // samples per channel (~4 s)
+    std::vector<cf> ring[NCH];
+    std::atomic<uint64_t> w_idx{0}, r_idx{0};
+    std::mutex dmx;
+    std::condition_variable dcv;
+
+    // state
+    std::atomic<bool> run{false};
+    std::thread t_rx, t_sched;
+    std::mutex smx;
+    std::deque<Slot> slots;
+    long next_id = 0;
+    std::atomic<bool> lost{false};
+    std::string lost_why;
+    std::mutex lmx;
+    std::atomic<long> n_slots{0}, n_valid{0}, n_skipped{0}, n_late{0}, n_unlocked{0};
+    std::atomic<long> n_overflow{0}, n_timeout{0}, n_other_err{0};
+    std::atomic<double> max_send_ms{0};
+    std::atomic<double> avg_send_ms{0};         // running average (EMA, 1/50)
+    std::atomic<double> pkt_scale{0};
+    std::atomic<double> dev_offset{0};        // radio time - host clock, from the scheduler
+    std::atomic<int> rt_sched_ok{-1}, rt_rx_ok{-1};
+    std::string log;
+
+    // burst mode: every burst commanded, in time order (sample index of its
+    // first sample on the continuous timeline, and its length)
+    struct Burst { long id; long long n0; long long len; };
+    std::mutex bmx;
+    std::deque<Burst> expect;
+    std::atomic<long> n_burst_ok{0}, n_burst_missing{0};
+    // the last burst as the radio delivered it: samples counted packet by
+    // packet, and its first sample's radio time stamp (as a sample index)
+    std::atomic<long long> last_burst_got{0}, last_burst_n0{-1}, last_burst_len{0};
+    std::atomic<long long> burst_got_min{0}, burst_got_max{0};
+    // two independent running counters for the screen: every dwell sample the
+    // radio delivered (added packet by packet, pre-roll not included), and +1
+    // for every complete dwell burst -- neither is computed from the other
+    std::atomic<long long> total_dwell_samples{0}, total_dwells{0};
+    std::mutex cmx;          // both totals change together, once per complete burst
+
+    // optional per-slot timing record (TWINRX_ENGINE_TIMING=file): where the
+    // scheduler's time goes, written at stop. Times in ms relative to the slot's S.
+    struct Tim { long k; int band; double lock_issue, lock_done, send_start, dev_read,
+                 band_done, send_end; int late; };
+    std::vector<Tim> tim;
+    bool tim_on = false;
+
+    void note(const std::string& s) {
+        std::lock_guard<std::mutex> g(lmx);
+        log += s + "\n";
+        std::fprintf(stderr, "[engine] %s\n", s.c_str());
+    }
+    void lose(const std::string& why) {
+        bool exp = false;
+        if (lost.compare_exchange_strong(exp, true)) {
+            {
+                std::lock_guard<std::mutex> g(lmx);
+                lost_why = why;
+            }
+            note("TIMING LOST: " + why + " -- no dwell is used from here on; restart");
+        }
+    }
+
+    int set_rt(int prio) {
+        if (prio <= 0) return -1;
+        sched_param sp{};
+        sp.sched_priority = prio;
+        return pthread_setschedparam(pthread_self(), SCHED_FIFO, &sp) == 0 ? 1 : 0;
+    }
+
+    // ---------------------------------------------------------------- setup
+    void setup() {
+        for (double v : {settle, gpre}) {
+            double n = v * fs;
+            if (std::fabs(n - std::round(n)) > 1e-6)
+                throw std::runtime_error("switching time and guard must be whole samples");
+        }
+        for (double d : dwell) {
+            double n = d * fs;
+            if (std::fabs(n - std::round(n)) > 1e-6)
+                throw std::runtime_error("every dwell must be a whole number of samples");
+        }
+        if (burst) {
+            double n = preroll * fs;
+            if (preroll < 0 || std::fabs(n - std::round(n)) > 1e-6)
+                throw std::runtime_error("burst pre-roll must be a whole number of samples");
+            // the stream command is the last one of each batch: it must come
+            // after the second tune pass, or the radio's command queue (which
+            // runs in order) would reach it late
+            if (settle - gpre - preroll < SECOND_PASS + 0.0005)
+                throw std::runtime_error("burst mode: switching time too short for the "
+                                         "second tune pass + guard + pre-roll");
+        }
+        u = uhd::usrp::multi_usrp::make(args);
+        u->set_clock_source("internal", 0);
+        // REF OUT on: the X310's 10 MHz for the lab transmitter's CLKIN, so the
+        // tone is made from the same clock the samples are counted with (a
+        // free-running HackRF drifted 0.54 ppm in 16 min: 50 -> 34 cycles)
+        try {
+            u->set_clock_source_out(true, 0);
+        } catch (const std::exception& e) {
+            note(std::string("REF OUT could not be switched on: ") + e.what());
+        }
+        u->set_rx_subdev_spec(uhd::usrp::subdev_spec_t("A:0 A:1 B:0 B:1"), 0);
+        u->set_rx_rate(fs);
+        for (int attempt = 1;; ++attempt) {
+            try {
+                u->set_time_unknown_pps(uhd::time_spec_t(0.0));
+                break;
+            } catch (const std::exception& e) {
+                note("PPS time sync attempt " + std::to_string(attempt) + " failed: " + e.what());
+                if (attempt == 3) throw;
+            }
+        }
+        for (size_t ch = 0; ch < NCH; ++ch) {
+            u->set_rx_antenna(ch % 2 == 0 ? "RX1" : "RX2", ch);
+            u->set_rx_dc_offset(true, ch);
+        }
+        for (size_t ch = 0; ch < NCH; ++ch) {
+            try {
+                u->set_rx_lo_export_enabled(false, uhd::usrp::multi_usrp::ALL_LOS, ch);
+            } catch (const std::exception& e) {
+                note("clearing LO export on ch" + std::to_string(ch) + ": " + e.what());
+            }
+        }
+        const char* src[NCH] = {"external", "external", "internal", "companion"};
+        for (size_t ch = 0; ch < NCH; ++ch)
+            u->set_rx_lo_source(src[ch], uhd::usrp::multi_usrp::ALL_LOS, ch);
+        u->set_rx_lo_export_enabled(true, uhd::usrp::multi_usrp::ALL_LOS, LO_MASTER);
+
+        gains.assign(freq.size(), std::vector<double>(NCH, 0));
+        for (size_t b = 0; b < freq.size(); ++b)
+            for (size_t ch = 0; ch < NCH; ++ch) {
+                auto r = u->get_rx_gain_range(ch);
+                gains[b][ch] = std::max(r.start(), std::min(r.stop(), gain[b] + trim[ch]));
+            }
+        for (size_t ch = 0; ch < NCH; ++ch) u->set_rx_gain(gains[0][ch], ch);
+        uhd::tune_request_t req(freq[0]);
+        req.rf_freq = freq[0];
+        req.rf_freq_policy = uhd::tune_request_t::POLICY_MANUAL;
+        req.dsp_freq = 0.0;
+        req.dsp_freq_policy = uhd::tune_request_t::POLICY_MANUAL;
+        for (size_t ch = 0; ch < NCH; ++ch) {
+            auto res = u->set_rx_freq(req, ch);
+            if (res.actual_dsp_freq != 0.0)
+                throw std::runtime_error("DDC not at 0 Hz on ch" + std::to_string(ch));
+        }
+        uhd::stream_args_t sa("fc32", "sc16");
+        sa.channels = {0, 1, 2, 3};
+        rx = u->get_rx_stream(sa);
+        spp = rx->get_max_num_samps();
+        for (auto& r : ring) r.assign(ring_n, cf(0, 0));
+    }
+
+    void band_change(size_t i, double T) {
+        u->set_command_time(uhd::time_spec_t(T));
+        for (size_t ch = 0; ch < NCH; ++ch) u->set_rx_gain(gains[i][ch], ch);
+        uhd::tune_request_t req(freq[i]);
+        req.rf_freq = freq[i];
+        req.rf_freq_policy = uhd::tune_request_t::POLICY_MANUAL;
+        req.dsp_freq_policy = uhd::tune_request_t::POLICY_NONE;
+        for (size_t ch = 0; ch < NCH; ++ch) {
+            u->set_command_time(uhd::time_spec_t(T + ch * STEP));
+            u->set_rx_freq(req, ch);
+        }
+        u->set_command_time(uhd::time_spec_t(T + SECOND_PASS));
+        for (size_t ch = 0; ch < NCH; ++ch) u->set_rx_freq(req, ch);
+        u->clear_command_time();
+    }
+
+    // -------------------------------------------------------------- receive
+    void rx_loop() {
+        rt_rx_ok = set_rt(rt_prio > 1 ? rt_prio - 1 : rt_prio);
+        uhd::rx_metadata_t md;
+        std::vector<cf> tmp[NCH];
+        for (auto& t : tmp) t.resize(spp);
+        std::vector<void*> bp(NCH);
+        bool first = true;
+        double prev_ts = 0;
+        size_t prev_got = 0;
+        std::vector<double> steps;
+        while (run) {
+            for (int c = 0; c < NCH; ++c) bp[c] = tmp[c].data();
+            size_t got = rx->recv(bp, spp, md, 0.1, true);
+            if (md.error_code != uhd::rx_metadata_t::ERROR_CODE_NONE) {
+                if (md.error_code == uhd::rx_metadata_t::ERROR_CODE_TIMEOUT) {
+                    if (!first) ++n_timeout;
+                    continue;
+                }
+                if (md.error_code == uhd::rx_metadata_t::ERROR_CODE_OVERFLOW) ++n_overflow;
+                else ++n_other_err;
+                lose(std::string("stream error: ") + md.strerror());
+                continue;
+            }
+            if (got == 0) continue;
+            double ts = md.time_spec.get_real_secs();
+            if (first) {
+                first = false;
+                if (std::fabs(ts - start_dev) > 1e-6)
+                    lose("first packet at " + std::to_string(ts) + " s, commanded start " +
+                         std::to_string(start_dev));
+            } else {
+                double step = (ts - prev_ts) / (prev_got / fs);
+                if (pkt_scale.load() == 0) {
+                    steps.push_back(step);
+                    if (steps.size() == 200) {
+                        std::vector<double> s = steps;
+                        std::nth_element(s.begin(), s.begin() + 100, s.end());
+                        pkt_scale = s[100];
+                        note("packet timestamp step scale " + std::to_string(pkt_scale.load()) +
+                             " (used only to detect gaps)");
+                    }
+                } else if (std::fabs(step - pkt_scale.load()) > 0.01 * pkt_scale.load()) {
+                    lose("packet timestamps jumped (step x" + std::to_string(step) +
+                         ") -- samples lost");
+                }
+            }
+            prev_ts = ts;
+            prev_got = got;
+            uint64_t w = w_idx.load(std::memory_order_relaxed);
+            if (w + got - r_idx.load(std::memory_order_acquire) > ring_n) {
+                lose("host ring buffer full -- the flowgraph is not keeping up");
+                continue;
+            }
+            for (size_t k = 0; k < got;) {
+                size_t pos = (w + k) % ring_n;
+                size_t len = std::min(got - k, ring_n - pos);
+                for (int c = 0; c < NCH; ++c)
+                    std::memcpy(&ring[c][pos], &tmp[c][k], len * sizeof(cf));
+                k += len;
+            }
+            w_idx.store(w + got, std::memory_order_release);
+            dcv.notify_all();
+        }
+    }
+
+    // ------------------------------------------------------- receive, bursts
+    // A slot whose burst never came: it must not be used even if its lock
+    // check passed. Called before the samples of that dwell are made visible,
+    // so the block (which re-reads the verdicts after every read) cannot tag it.
+    void burst_missing(long id) {
+        ++n_burst_missing;
+        std::lock_guard<std::mutex> g(smx);
+        for (auto& s : slots)
+            if (s.id == id) {
+                if (s.valid == 1) --n_valid;
+                s.valid = 0;
+                s.why = 4;
+            }
+    }
+
+    // write len samples (nullptr = zeros) at the ring's write position
+    bool ring_put(const std::vector<cf>* src, size_t len) {
+        uint64_t w = w_idx.load(std::memory_order_relaxed);
+        if (w + len - r_idx.load(std::memory_order_acquire) > ring_n) {
+            lose("host ring buffer full -- the flowgraph is not keeping up");
+            return false;
+        }
+        for (size_t k = 0; k < len;) {
+            size_t pos = (w + k) % ring_n;
+            size_t n = std::min(len - k, ring_n - pos);
+            for (int c = 0; c < NCH; ++c) {
+                if (src) std::memcpy(&ring[c][pos], &src[c][k], n * sizeof(cf));
+                else std::memset(static_cast<void*>(&ring[c][pos]), 0, n * sizeof(cf));
+            }
+            k += n;
+        }
+        w_idx.store(w + len, std::memory_order_release);
+        dcv.notify_all();
+        return true;
+    }
+
+    void rx_loop_burst() {
+        rt_rx_ok = set_rt(rt_prio > 1 ? rt_prio - 1 : rt_prio);
+        const long long pre_n_rx = std::llround(preroll * fs);
+        uhd::rx_metadata_t md;
+        std::vector<cf> tmp[NCH];
+        for (auto& t : tmp) t.resize(spp);
+        std::vector<void*> bp(NCH);
+        bool in_burst = false, any = false;
+        Burst cur{};
+        long long got_in = 0, dwell_in = 0;
+        while (run) {
+            for (int c = 0; c < NCH; ++c) bp[c] = tmp[c].data();
+            size_t got = rx->recv(bp, spp, md, 0.1, true);
+            if (md.error_code != uhd::rx_metadata_t::ERROR_CODE_NONE) {
+                if (md.error_code == uhd::rx_metadata_t::ERROR_CODE_TIMEOUT) {
+                    // bursts come every slot (a few ms): 100 ms of nothing
+                    // while hopping means the radio stopped sending
+                    if (any && run) {
+                        ++n_timeout;
+                        lose("no burst from the radio for 100 ms while hopping");
+                    }
+                    continue;
+                }
+                if (md.error_code == uhd::rx_metadata_t::ERROR_CODE_LATE_COMMAND) {
+                    // the batch reached the radio after the burst's start
+                    // time: no samples for that slot (it is already counted
+                    // late); found as missing when the next burst arrives
+                    continue;
+                }
+                if (md.error_code == uhd::rx_metadata_t::ERROR_CODE_OVERFLOW) ++n_overflow;
+                else ++n_other_err;
+                lose(std::string("stream error: ") + md.strerror());
+                continue;
+            }
+            if (got == 0) continue;
+            if (!in_burst) {
+                // first packet of a burst: its time stamp is the commanded
+                // start -- it must be exactly the sample the scheduler asked for
+                const double nf = (md.time_spec.get_real_secs() - start_dev) * fs;
+                const long long n0 = std::llround(nf);
+                if (std::fabs(nf - n0) > 0.01)
+                    lose("burst starts between samples (" + std::to_string(nf) + ")");
+                bool found = false;
+                std::vector<long> missing;
+                {
+                    std::lock_guard<std::mutex> g(bmx);
+                    while (!expect.empty() && expect.front().n0 < n0) {
+                        missing.push_back(expect.front().id);
+                        expect.pop_front();
+                    }
+                    if (!expect.empty() && expect.front().n0 == n0) {
+                        cur = expect.front();
+                        expect.pop_front();
+                        found = true;
+                    }
+                }
+                for (long id : missing) burst_missing(id);
+                if (!found) {
+                    lose("burst at sample " + std::to_string(n0) + " was never commanded");
+                    continue;
+                }
+                const long long w = static_cast<long long>(w_idx.load());
+                if (n0 < w) {
+                    lose("burst at sample " + std::to_string(n0) + " overlaps the previous one");
+                    continue;
+                }
+                if (n0 > w && !ring_put(nullptr, static_cast<size_t>(n0 - w))) continue;
+                in_burst = true;
+                any = true;
+                got_in = 0;
+                dwell_in = 0;
+            }
+            if (got_in + static_cast<long long>(got) > cur.len) {
+                lose("burst longer than commanded (" + std::to_string(got_in + got) + " > " +
+                     std::to_string(cur.len) + " samples)");
+                in_burst = false;
+                continue;
+            }
+            if (!ring_put(tmp, got)) continue;
+            // samples of this packet that lie after the burst's pre-roll = dwell samples
+            {
+                const long long pre = pre_n_rx;
+                const long long before = std::max(0LL, std::min(got_in, pre));
+                const long long after = std::max(0LL, std::min(got_in + static_cast<long long>(got), pre));
+                dwell_in += static_cast<long long>(got) - (after - before);
+            }
+            got_in += got;
+            if (got_in == cur.len) {            // complete (end-of-burst on this packet)
+                in_burst = false;
+                ++n_burst_ok;
+                {
+                    // this burst's dwell samples (counted packet by packet above)
+                    // and +1 dwell, published together: a reading never sees a
+                    // half-received burst
+                    std::lock_guard<std::mutex> g(cmx);
+                    total_dwell_samples += dwell_in;
+                    ++total_dwells;
+                }
+                last_burst_got = got_in;
+                last_burst_n0 = cur.n0;
+                last_burst_len = cur.len;
+                if (burst_got_min.load() == 0 || got_in < burst_got_min.load()) burst_got_min = got_in;
+                if (got_in > burst_got_max.load()) burst_got_max = got_in;
+            } else if (md.end_of_burst) {
+                in_burst = false;
+                lose("burst shorter than commanded (" + std::to_string(got_in) + " of " +
+                     std::to_string(cur.len) + " samples)");
+            }
+        }
+    }
+
+    // ------------------------------------------------------------ scheduler
+    void sched_loop() {
+        rt_sched_ok = set_rt(rt_prio);
+        tim_on = std::getenv("TWINRX_ENGINE_TIMING") != nullptr;
+        double off = 0;
+        auto dev_now = [&]() {
+            double a = host_now();
+            double d = u->get_time_now().get_real_secs();
+            off = d - (a + host_now()) / 2.0;
+            dev_offset = off;
+            return d;
+        };
+        auto sleep_until = [&](double t) {
+            while (run) {
+                double r = t - (host_now() + off);
+                if (r <= 0) return;
+                std::this_thread::sleep_for(std::chrono::duration<double>(
+                    r > 0.001 ? r - 0.0005 : 0.0001));
+            }
+        };
+        const size_t nb = freq.size();
+        // Slots are counted in whole samples from the stream start, so every
+        // boundary -- switch, dwell start, next switch -- falls on an exact
+        // sample and the dwell is the same number of samples on every slot.
+        std::vector<long long> slot_n(nb);
+        for (size_t i = 0; i < nb; ++i) slot_n[i] = std::llround((settle + dwell[i]) * fs);
+        auto t_of = [&](long long n) { return start_dev + static_cast<double>(n) / fs; };
+        long long nS = static_cast<long long>(std::ceil(
+            (std::max(dev_now(), start_dev) + std::max(start_delay, 0.2) - start_dev) * fs));
+        long k = 0;
+
+        // burst mode: each burst starts pre-roll before the dwell (whose first
+        // sample is guard_pre before the end of the switching time)
+        const long long burst_off = std::llround((settle - gpre - preroll) * fs);
+        const long long pre_n = std::llround(preroll * fs);
+        struct Cur { long id; double S; size_t i; bool sent; bool late; } cur{};
+        double cur_lock_issue = 0, cur_lock_done = 0;
+        auto send = [&](long k, long long nS) {
+            size_t i = k % nb;
+            const double S = t_of(nS);
+            Cur c{0, S, i, false, false};
+            {
+                std::lock_guard<std::mutex> g(smx);
+                c.id = next_id++;
+                slots.push_back(Slot{c.id, S, freq[i], freq[(i + 1) % nb], -1, 0});
+            }
+            const double t_start = host_now();
+            if (S - dev_now() < min_slack) {
+                ++n_skipped;
+                return c;
+            }
+            double h0 = host_now();
+            band_change(i, S);
+            const double t_band = host_now();
+            if (burst) {
+                const long long n0 = nS + burst_off;
+                const long long len = pre_n + std::llround(dwell[i] * fs);
+                {
+                    std::lock_guard<std::mutex> g(bmx);
+                    expect.push_back(Burst{c.id, n0, len});
+                }
+                uhd::stream_cmd_t sc(uhd::stream_cmd_t::STREAM_MODE_NUM_SAMPS_AND_DONE);
+                sc.num_samps = static_cast<size_t>(len);
+                sc.stream_now = false;
+                sc.time_spec = uhd::time_spec_t(t_of(n0));
+                rx->issue_stream_cmd(sc);
+            }
+            double h1 = host_now();
+            const double ms = (h1 - h0) * 1e3;
+            if (ms > max_send_ms) max_send_ms = ms;
+            avg_send_ms = avg_send_ms.load() == 0 ? ms : 0.98 * avg_send_ms.load() + 0.02 * ms;
+            c.sent = true;
+            c.late = h1 + off >= S;
+            if (c.late) ++n_late;
+            if (tim_on && tim.size() < 200000) {
+                // relative to the PREVIOUS slot's S (the one being checked)
+                const double P = S - (settle + dwell[(i + nb - 1) % nb]);
+                tim.push_back(Tim{k, static_cast<int>(i), cur_lock_issue, cur_lock_done,
+                                  (t_start + off - P) * 1e3, (h0 + off - P) * 1e3,
+                                  (t_band + off - P) * 1e3, (h1 + off - P) * 1e3,
+                                  c.late ? 1 : 0});
+            }
+            return c;
+        };
+        auto finish = [&](const Cur& c, int valid, int why) {
+            std::lock_guard<std::mutex> g(smx);
+            for (auto& s : slots)
+                if (s.id == c.id) { s.valid = valid; s.why = why; }
+        };
+
+        cur = send(k, nS);
+        while (run) {
+            sleep_until(cur.S + lock_check);
+            if (!run) break;
+            ++n_slots;
+            int why = 0;
+            bool ok = false;
+            if (!cur.sent) why = 1;
+            else if (cur.late) why = 2;
+            else {
+                cur_lock_issue = (host_now() + off - cur.S) * 1e3;
+                ok = u->get_rx_sensor("lo_locked", LO_MASTER).to_bool();
+                cur_lock_done = (host_now() + off - cur.S) * 1e3;
+                if (!ok) { ++n_unlocked; why = 3; }
+            }
+            finish(cur, ok ? 1 : 0, why);
+            if (ok) ++n_valid;
+            nS += slot_n[cur.i];
+            ++k;
+            cur = send(k, nS);
+        }
+    }
+};
+
+}  // namespace
+
+extern "C" {
+
+void* eng_create(const char* args, double fs, int nbands, const double* freqs,
+                 const double* gains, const double* dwells, const double* trim4,
+                 double settle, double gpre, double lock_check, double min_slack,
+                 double start_delay, int rt_prio, int burst, double preroll,
+                 char* err, int errlen) {
+    auto* e = new Engine();
+    try {
+        e->args = args;
+        e->fs = fs;
+        e->freq.assign(freqs, freqs + nbands);
+        e->gain.assign(gains, gains + nbands);
+        e->dwell.assign(dwells, dwells + nbands);
+        e->trim.assign(trim4, trim4 + NCH);
+        e->settle = settle;
+        e->gpre = gpre;
+        e->lock_check = lock_check;
+        e->min_slack = min_slack;
+        e->start_delay = start_delay;
+        e->rt_prio = rt_prio;
+        e->burst = burst != 0;
+        e->preroll = preroll;
+        e->setup();
+        return e;
+    } catch (const std::exception& ex) {
+        std::snprintf(err, errlen, "%s", ex.what());
+        delete e;
+        return nullptr;
+    }
+}
+
+double eng_start(void* h, int hop) {
+    auto* e = static_cast<Engine*>(h);
+    e->start_dev = e->u->get_time_now().get_real_secs() + 0.2;
+    if (e->burst) {
+        // no continuous stream: the scheduler commands one burst per dwell.
+        // start_dev is still sample 0 of the timeline the bursts are put on.
+        if (!hop) {
+            e->note("burst mode needs hopping on -- nothing will be received");
+            return -1.0;
+        }
+        e->run = true;
+        e->t_rx = std::thread(&Engine::rx_loop_burst, e);
+        e->t_sched = std::thread(&Engine::sched_loop, e);
+        return e->start_dev;
+    }
+    uhd::stream_cmd_t cmd(uhd::stream_cmd_t::STREAM_MODE_START_CONTINUOUS);
+    cmd.stream_now = false;
+    cmd.time_spec = uhd::time_spec_t(e->start_dev);
+    e->rx->issue_stream_cmd(cmd);
+    e->run = true;
+    e->t_rx = std::thread(&Engine::rx_loop, e);
+    if (hop) e->t_sched = std::thread(&Engine::sched_loop, e);
+    return e->start_dev;
+}
+
+// Copy up to max_n samples into the four channel buffers; waits up to
+// wait_ms for data. Returns the number copied.
+long eng_read(void* h, void* c0, void* c1, void* c2, void* c3, long max_n, double wait_ms) {
+    auto* e = static_cast<Engine*>(h);
+    uint64_t r = e->r_idx.load(std::memory_order_relaxed);
+    uint64_t w = e->w_idx.load(std::memory_order_acquire);
+    if (w == r && wait_ms > 0) {
+        std::unique_lock<std::mutex> lk(e->dmx);
+        e->dcv.wait_for(lk, std::chrono::duration<double, std::milli>(wait_ms), [&] {
+            return e->w_idx.load(std::memory_order_acquire) != r || !e->run;
+        });
+        w = e->w_idx.load(std::memory_order_acquire);
+    }
+    long n = static_cast<long>(std::min<uint64_t>(w - r, static_cast<uint64_t>(max_n)));
+    cf* out[NCH] = {static_cast<cf*>(c0), static_cast<cf*>(c1), static_cast<cf*>(c2),
+                    static_cast<cf*>(c3)};
+    for (long k = 0; k < n;) {
+        size_t pos = (r + k) % e->ring_n;
+        size_t len = std::min<size_t>(n - k, e->ring_n - pos);
+        for (int c = 0; c < NCH; ++c) std::memcpy(out[c] + k, &e->ring[c][pos], len * sizeof(cf));
+        k += len;
+    }
+    e->r_idx.store(r + n, std::memory_order_release);
+    return n;
+}
+
+// Slot records with id >= from_id: out rows of 6 doubles
+// (id, S, freq, next, valid, why). Returns the number written.
+int eng_slots(void* h, long from_id, double* out, int max_rows) {
+    auto* e = static_cast<Engine*>(h);
+    std::lock_guard<std::mutex> g(e->smx);
+    // Never read the radio here: this runs on the flowgraph thread, and a read
+    // queues behind any timed command still waiting. The scheduler's host
+    // clock offset is enough to drop records more than 5 s old.
+    const double now_dev = host_now() + e->dev_offset.load();
+    while (e->slots.size() > 64 && e->slots.front().S < now_dev - 5.0)
+        e->slots.pop_front();
+    int n = 0;
+    for (const auto& s : e->slots) {
+        if (s.id < from_id) continue;
+        if (n >= max_rows) break;
+        double* o = out + 6 * n++;
+        o[0] = s.id; o[1] = s.S; o[2] = s.freq; o[3] = s.next; o[4] = s.valid; o[5] = s.why;
+    }
+    return n;
+}
+
+// stats: slots, valid, skipped, late, unlocked, max_send_ms, lost, overflow,
+// timeout, other_err, pkt_scale, rt_sched_ok, rt_rx_ok, avg_send_ms,
+// bursts_ok, bursts_missing (burst mode)
+void eng_stats(void* h, double* o) {
+    auto* e = static_cast<Engine*>(h);
+    o[0] = e->n_slots.load(); o[1] = e->n_valid.load(); o[2] = e->n_skipped.load();
+    o[3] = e->n_late.load(); o[4] = e->n_unlocked.load(); o[5] = e->max_send_ms.load();
+    o[6] = e->lost ? 1 : 0; o[7] = e->n_overflow.load(); o[8] = e->n_timeout.load();
+    o[9] = e->n_other_err.load(); o[10] = e->pkt_scale.load();
+    o[11] = e->rt_sched_ok.load(); o[12] = e->rt_rx_ok.load();
+    o[13] = e->avg_send_ms.load();
+    o[14] = e->n_burst_ok.load(); o[15] = e->n_burst_missing.load();
+}
+
+// last burst: samples received (counted), its first sample's index on the
+// timeline (from the radio's time stamp), samples commanded, and the smallest
+// and largest burst received so far
+void eng_burst_info(void* h, double* o) {
+    auto* e = static_cast<Engine*>(h);
+    o[0] = static_cast<double>(e->last_burst_got.load());
+    o[1] = static_cast<double>(e->last_burst_n0.load());
+    o[2] = static_cast<double>(e->last_burst_len.load());
+    o[3] = static_cast<double>(e->burst_got_min.load());
+    o[4] = static_cast<double>(e->burst_got_max.load());
+    {
+        std::lock_guard<std::mutex> g(e->cmx);
+        o[5] = static_cast<double>(e->total_dwell_samples.load());
+        o[6] = static_cast<double>(e->total_dwells.load());
+    }
+    // samples waiting in the ring for the flowgraph (if this grows, it is not keeping up)
+    o[7] = static_cast<double>(e->w_idx.load() - e->r_idx.load());
+}
+
+int eng_lost_reason(void* h, char* buf, int len) {
+    auto* e = static_cast<Engine*>(h);
+    std::lock_guard<std::mutex> g(e->lmx);
+    std::snprintf(buf, len, "%s", e->lost_why.c_str());
+    return e->lost ? 1 : 0;
+}
+
+void eng_stop(void* h) {
+    auto* e = static_cast<Engine*>(h);
+    if (!e->run) return;
+    e->run = false;
+    e->dcv.notify_all();
+    if (e->t_sched.joinable()) e->t_sched.join();
+    // burst mode: the last commanded burst ends by itself
+    if (!e->burst) {
+        try {
+            e->rx->issue_stream_cmd(uhd::stream_cmd_t(uhd::stream_cmd_t::STREAM_MODE_STOP_CONTINUOUS));
+        } catch (const std::exception& ex) {
+            e->note(std::string("stopping the stream: ") + ex.what());
+        }
+    }
+    if (e->t_rx.joinable()) e->t_rx.join();
+    if (const char* path = std::getenv("TWINRX_ENGINE_TIMING")) {
+        if (FILE* f = std::fopen(path, "w")) {
+            std::fprintf(f, "k band lock_issue lock_done send_start dev_read band_done send_end late"
+                            "   (ms after the checked slot's S)\n");
+            for (const auto& t : e->tim)
+                std::fprintf(f, "%ld %d %.3f %.3f %.3f %.3f %.3f %.3f %d\n", t.k, t.band,
+                             t.lock_issue, t.lock_done, t.send_start, t.dev_read, t.band_done,
+                             t.send_end, t.late);
+            std::fclose(f);
+        }
+    }
+}
+
+void eng_destroy(void* h) {
+    auto* e = static_cast<Engine*>(h);
+    eng_stop(h);
+    delete e;
+}
+
+}  // extern "C"

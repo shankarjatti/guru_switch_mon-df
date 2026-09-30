@@ -1,0 +1,110 @@
+{
+  "1000000000": {
+    "export_chan": 0,
+    "gain_db": 30.0,
+    "lo_sources": [
+      "internal",
+      "companion",
+      "external",
+      "external"
+    ],
+    "measured": "2026-09-18 19:11:08",
+    "method": "broadband-legacy",
+    "offsets": [
+      0.0,
+      -14.57,
+      -24.35,
+      84.77
+    ]
+  },
+  "2000000000": {
+    "export_chan": 2,
+    "gain_db": 30.0,
+    "lo_sources": [
+      "external",
+      "external",
+      "internal",
+      "companion"
+    ],
+    "measured": "2026-09-19 17:44:56",
+    "method": "tone",
+    "offsets": [
+      0.0,
+      -75.326,
+      49.809,
+      -126.961
+    ]
+  },
+  "2400000000": {
+    "export_chan": 2,
+    "gain_db": 30.0,
+    "lo_sources": [
+      "external",
+      "external",
+      "internal",
+      "companion"
+    ],
+    "measured": "2026-09-19 18:29:40",
+    "method": "tone",
+    "offsets": [
+      0.0,
+      -39.593,
+      78.483,
+      -85.865
+    ]
+  },
+  "3000000000": {
+    "export_chan": 0,
+    "gain_db": 30.0,
+    "lo_sources": [
+      "internal",
+      "companion",
+      "external",
+      "external"
+    ],
+    "measured": "2026-09-18 19:11:08",
+    "method": "broadband-legacy",
+    "offsets": [
+      0.0,
+      -30.24,
+      -56.18,
+      53.96
+    ]
+  },
+  "4000000000": {
+    "export_chan": 0,
+    "gain_db": 30.0,
+    "lo_sources": [
+      "internal",
+      "companion",
+      "external",
+      "external"
+    ],
+    "measured": "2026-09-18 19:11:08",
+    "method": "broadband-legacy",
+    "offsets": [
+      0.0,
+      -11.97,
+      -18.24,
+      93.87
+    ]
+  },
+  "5000000000": {
+    "export_chan": 0,
+    "gain_db": 30.0,
+    "lo_sources": [
+      "internal",
+      "companion",
+      "external",
+      "external"
+    ],
+    "measured": "2026-09-18 19:11:08",
+    "method": "broadband-legacy",
+    "offsets": [
+      0.0,
+      -27.52,
+      -29.74,
+      83.92
+    ]
+  }
+}

@@ -1,0 +1,3462 @@
+commit b3673fb83b5d91cf0cf34196d5293504790c4dc2
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-29 18:53:49 +0530
+
+    last CALIBRATE table (measurement)
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/phase_table_live_deg.txt | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+commit 1c7fe33d1a66e679da8c3955b64e585c57b5949e
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-29 18:24:53 +0530
+
+    2 MS/s flowgraph fell behind after 11 min: meters only process their own band; .grc regenerated
+    
+    User's 2 MS/s run: TIMING LOST after 56,116 slots -- "host ring buffer full,
+    the flowgraph is not keeping up". Radio side fine (0 unlocked, 10,000 samples
+    every dwell). top -H: the Python blocks together ~100 % of one core (one GIL):
+    4 phase meters ~36 %, the Switching-plot DC remover 13 %, ...
+    - hop_phase_meter: collects and FFTs only its own band's dwells (every meter
+      used to process every band)
+    - hop_dc_remove only for tones near 0 Hz (the band-pass already removes 0 Hz
+      for 200 kHz)
+    - engine: ring fill in eng_burst_info, to see whether the flowgraph keeps up
+    - guru_burst.grc and guru_fast.grc regenerated from the current generator
+      (guru_fast.grc had been overwritten by an older GRC save on 2026-09-28;
+      that copy kept as guru_fast.grc.gui_saved_20260928_2026, untracked)
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/guru_burst.grc               |  42 +---------
+ guru/guru_burst.py                |  43 +++++------
+ guru/guru_fast.grc                | 158 ++++++++++++++++++++++++--------------
+ guru/guru_fast.py                 | 116 ++++++++++++++++++++--------
+ guru/make_guru_fast.py            |   5 +-
+ guru/oot/engine/twinrx_engine.cpp |   2 +
+ guru/oot/hop_blocks.py            |   5 +-
+ guru/oot/twinrx_radio_source.py   |   3 +-
+ 8 files changed, 219 insertions(+), 155 deletions(-)
+
+commit 07033723efd797977f112d83b8461388345a3ef3
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-29 18:16:53 +0530
+
+    last CALIBRATE table and HackRF ppm value (measurements)
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/hackrf_ppm.txt           | 2 +-
+ guru/phase_table_live_deg.txt | 8 ++++----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+commit ce45dd2b4e31915ccfa8471e68c14ce49115fa7b
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-29 17:59:43 +0530
+
+    guru_burst: 2 MS/s and a 200 kHz tone (HackRF still only a source)
+    
+    User: "use 200k only, and 2 MHz sample rate". make_guru_fast --samp-rate
+    (200 MHz / integer checked); run_hop --burst starts the HackRF with a plain
+    200 kHz; close-up waveform view (1000 cycles per dwell would be a solid band),
+    autoscale always, Switching plot mean-removed + display filter.
+    
+    Measured (all bands, no rtprio): 10,000 samples per dwell exactly (two
+    independent counters, every reading), tones +190.8/+180.2/+177.9 kHz, cycles
+    953.8/901.0/889.3 counted, CAL OK (0.05 deg), phases <= 0.1 deg, 5630/5632
+    slots, 0 unlocked, 0 overflow.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/RUN_GURU_FAST.md  |  41 +++++++--------
+ guru/guru_burst.grc    | 137 +++++++++++++++++++++++++++++--------------------
+ guru/guru_burst.py     | 120 +++++++++++++++++++++++++++----------------
+ guru/make_guru_fast.py |  13 ++++-
+ guru/run_hop.sh        |   4 +-
+ 5 files changed, 191 insertions(+), 124 deletions(-)
+
+commit 3f313be7db4a3377fdef9fe6597881b35c36cf66
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-29 17:52:46 +0530
+
+    counters published together per burst; the tone is only ever the strongest line
+    
+    - engine: a burst's dwell samples (counted packet by packet) and +1 dwell are
+      added to the totals together, under one lock, when the burst is complete.
+      Before, a reading mid-burst gave e.g. 19,408,754 / 3,881 = 5000.97. Now 20
+      random readings per band: exactly 5000.000000.
+    - meter: the tone is the strongest line of the whole band (channels summed),
+      SNR gated on that line; if it lies inside the +/-2 kHz 0 Hz guard the dwell
+      has NO tone -- the weaker transmitter carrier leak is never taken instead
+      (it was: 2.4 GHz showed -8,828 Hz = the leak). Screen says "NOT measured".
+    Test (synthetic): tone +1240 Hz + leak -8760 Hz -> no tone; +10 kHz and
+    -9807 Hz -> exact phases. Radio (TX pure source, -3.8 ppm): 2.4 GHz tone at
+    +835 Hz -> NOT measured, CAL refused; 5.2 / 5.8 GHz measured.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/guru_burst.grc               |  8 +++++---
+ guru/guru_burst.py                | 29 ++++++++++++++++-------------
+ guru/make_guru_fast.py            |  3 +++
+ guru/oot/engine/twinrx_engine.cpp | 22 +++++++++++++++++-----
+ guru/oot/hop_blocks.py            | 38 +++++++++++++++++++++++++-------------
+ 5 files changed, 66 insertions(+), 34 deletions(-)
+
+commit 8fb55ea89d80e19f236936715468de4ad8680834
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-29 17:43:40 +0530
+
+    hop_phase_meter: log report for its own band only (log showed every line 3x)
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/oot/hop_blocks.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+commit 952d7a6542061403f5e8841bf740a45ee0b67c53
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-29 17:38:39 +0530
+
+    TX is only a source: no clock correction fed back to the HackRF
+    
+    User: "everything should be calculated from the RX side; TX side is just a
+    source". run_hop --burst starts the HackRF with a plain 10 kHz (no --ppm)
+    and no longer measures/adjusts it at start (transmitter mode
+    'v3-source-only' restarts one that was corrected). The meters search the
+    tone on both sides of 0 Hz (-60..+60 kHz, |f| >= 2 kHz), since the
+    HackRF's own clock (-2.8 ppm measured) puts it at about +3 kHz on 2.4 GHz and
+    -6 kHz on 5.8 GHz. Screen: tone with sign, cycles counted as turns.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/guru_burst.grc    | 16 ++++++++--------
+ guru/guru_burst.py     | 34 +++++++++++++++++-----------------
+ guru/make_guru_fast.py |  9 ++++++---
+ guru/run_hop.sh        | 24 +++---------------------
+ 4 files changed, 34 insertions(+), 49 deletions(-)
+
+commit 6887e42597d09abca5dd6f84d81b0565b500ac56
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-29 17:31:22 +0530
+
+    guru_burst: samples and dwells from two independent engine counters; tone + cycles live
+    
+    User: "samples and dwells should be calculated independently" and tone
+    frequency + cycles back, updating in real time.
+    - engine: total_dwell_samples += the dwell samples of every packet received
+      (pre-roll part excluded, sample by sample); total_dwells += 1 per complete
+      burst. Neither is derived from the other.
+    - screen (10x/s): SAMPLES RECEIVED / DWELLS from those; second line: tone
+      frequency and the cycles counted on the last dwell of the lab tone's band.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/guru_burst.grc               | 18 ++++++++-----
+ guru/guru_burst.py                | 55 +++++++++++++++++++++++----------------
+ guru/make_guru_fast.py            | 25 +++++++++++++-----
+ guru/oot/engine/twinrx_engine.cpp | 15 +++++++++++
+ guru/oot/twinrx_radio_source.py   |  5 ++--
+ 5 files changed, 81 insertions(+), 37 deletions(-)
+
+commit becaa12887e1ba618c725a7680173823399c5222
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-29 17:26:12 +0530
+
+    guru_burst: bottom line = two running counters only (samples received, dwells)
+    
+    User: no paragraph -- total samples received and number of dwells, updating
+    continuously; samples / dwells gives the samples per dwell. Both counted
+    sample by sample by the meter on every dwell of every band.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/guru_burst.grc    | 54 ++++++++-----------------------
+ guru/guru_burst.py     | 87 +++++++++++++-------------------------------------
+ guru/make_guru_fast.py | 59 ++++++----------------------------
+ 3 files changed, 46 insertions(+), 154 deletions(-)
+
+commit 9f8d77e3ef50cc7f39cf689aa24decee768cd374
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-29 17:25:01 +0530
+
+    clock correction: ask the transmitter, never assume it from a file
+    
+    User's run 17:18: tone 17,549 Hz = 87.75 cycles. Cause (my bug): the HackRF
+    had been restarted by hand with --ppm 0; run_hop kept it and the start-up
+    measurement assumed the correction stored in hackrf_ppm.txt (-3.374 ppm) was
+    active, computed -6.417 ppm and applied it -> tone over-corrected by
+    +3.1 ppm. The receiver measured it correctly (87.74 counted / 87.75).
+    
+    - hackrf_tone_source: UDP 'get' -> freq, offset, ppm, vga, generated offset
+    - tone_freq_check: --applied-ppm defaults to asking the transmitter; refuses
+      to run if it cannot tell
+    - run_hop: no --applied-ppm from the file; transmitter mode 'v2' so an older
+      transmitter (no 'get') is restarted
+    - screen: the clock line asks the transmitter once a second and shows
+      correction in the transmitter + drift seen on the tone
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/guru_burst.grc        | 66 ++++++++++++++++++++++++++--------------------
+ guru/guru_burst.py         | 40 ++++++++++++++++++++--------
+ guru/hackrf_tone_source.py |  8 +++++-
+ guru/make_guru_fast.py     | 24 ++++++++++++++---
+ guru/run_hop.sh            |  4 +--
+ guru/tone_freq_check.py    | 12 +++++++--
+ hackrf_tone_source.py      |  8 +++++-
+ 7 files changed, 114 insertions(+), 48 deletions(-)
+
+commit 07a501c02b0548b9a07cb009b8c23a4ac932912b
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-29 17:15:44 +0530
+
+    guru_burst: live dwell counts from radio and meter, cycles counted on the signal
+    
+    User: "I should really see how many samples arrive in 5 ms, don't show a
+    fixed value; cycles should update in real time".
+    - engine eng_burst_info: the last burst as delivered (samples counted packet
+      by packet, radio time stamp of its first sample), min/max so far
+    - meter: running dwell number, per-dwell sample count with min/max of the
+      last 200, cycles COUNTED from the signal's own rotation (sum of the phase
+      step per sample, strongest channel) next to the FFT-frequency estimate
+    - DWELL CHECK line updated 10x per second from those; red if any count differs
+    Tested: 4990-sample window reported as 4990 (min 4990); counted cycles
+    within 0.012 of truth (49.998 / 50.000, 34.347 / 34.359). Radio: dwell #1394
+    5000 samples [min 5000 max 5000], burst 5250 = 250 pre-roll + 5000.
+    
+    hackrf_tone_source watchdog: a failed restart (HackRF USB unplugged) used to
+    leave a dead stream nobody watched; it now retries every 3 s, logging each.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/guru_burst.grc               | 74 ++++++++++++++++++++++-----------------
+ guru/guru_burst.py                | 66 ++++++++++++++++++++--------------
+ guru/hackrf_tone_source.py        | 24 ++++++++-----
+ guru/make_guru_fast.py            | 40 +++++++++++++--------
+ guru/oot/engine/twinrx_engine.cpp | 21 +++++++++++
+ guru/oot/hop_blocks.py            | 15 +++++++-
+ guru/oot/twinrx_radio_source.py   | 12 +++++++
+ hackrf_tone_source.py             | 24 ++++++++-----
+ 8 files changed, 185 insertions(+), 91 deletions(-)
+
+commit d65192a12e625149b87c0e87027231514ca9e66e
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-29 17:05:43 +0530
+
+    engine: X310 REF OUT on; screen shows the HackRF-vs-X310 clock drift
+    
+    Root cause of "cycles 50 -> 34 in a long run" (user's 16 min run, 81,751/
+    81,756 slots, 5000 samples every dwell): the tone is made by the HackRF's own
+    crystal, the samples are counted with the X310's -- two free-running clocks,
+    measured drifting 0.54 ppm apart in 16 min (-3.374 -> -3.913 ppm). Software
+    cannot hold them together; one shared clock can: X310 REF OUT (switched on
+    here at every start) -> HackRF CLKIN.
+    
+    Also: DWELL CHECK line shows the drift in ppm vs the start-up correction;
+    the meter log line has a time stamp and each band's tone frequency.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/guru_burst.grc               | 68 ++++++++++++++++++++++-----------------
+ guru/guru_burst.py                | 34 ++++++++++++++------
+ guru/make_guru_fast.py            | 14 ++++++++
+ guru/oot/engine/twinrx_engine.cpp |  8 +++++
+ guru/oot/hop_blocks.py            |  8 +++--
+ 5 files changed, 90 insertions(+), 42 deletions(-)
+
+commit 8739f100d9b045da4da30b1c85217ac4d07d0a1c
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-29 16:32:43 +0530
+
+    guru_burst: say why a dwell was not used (LO not locked vs PC late)
+    
+    'LO lock NOT confirmed on every dwell' was shown when dwells were late
+    (PC sent the band change late) with 0 unlocked -- wrong reason. Now the
+    line names the reason per band (not locked / late / skipped / no burst).
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/guru_burst.grc    | 26 +++++++++++++++---------
+ guru/guru_burst.py     | 55 ++++++++++++++++++++++++++++++--------------------
+ guru/make_guru_fast.py | 25 ++++++++++++++++-------
+ 3 files changed, 67 insertions(+), 39 deletions(-)
+
+commit 17bdfd7433e0ee459695a85df66816d19102cf1e
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-29 16:23:24 +0530
+
+    guru_burst: clean display -- +/-10 kHz display filter around the tone, autoscale
+    
+    Measured 2026-09-29 16:00-16:17 (tone_level_check at 5.2/5.8 GHz, raw dwell):
+    no clipping (peak <= 0.125 FS), every spurious line <= -37 dBc, but a flat
+    noise floor ~22 dB below the tone over the 300 kHz display band that does not
+    change with the HackRF level and is identical on all channels -> the
+    HackRF's own transmit noise. It made the sine look distorted; the 5.8 GHz
+    signal (16x stronger than 2.4 GHz) was also drawn off the fixed +/-0.6 plot.
+    
+    - narrow_band(): zero-phase FFT filter +/- N Hz around each dwell's tone,
+      the SAME filter on all channels (phase between channels untouched), for
+      the plots only; phase, cycles and CALIBRATE use the unfiltered samples
+    - hop_band_select / hop_dc_remove narrow_hz; make_guru_fast --display-filter
+    - dwell plot and Switching plot autoscale (bands differ ~16x in level)
+    
+    Test (22 dB white noise + 0 Hz leakage): ripple 3.95 % -> 0.62 %, phases
+    exact (30/-70/140), tags exact. On the radio: CAL OK (worst window 0.05 deg),
+    3632/3632 slots, 0 late, 5000 samples every dwell, clean sine at 2.4/5.8 GHz.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/guru_burst.grc                | 13 ++++---
+ guru/guru_burst.py                 | 38 ++++++++++-----------
+ guru/make_guru_fast.py             | 22 ++++++++----
+ guru/oot/hop_band_select.block.yml | 10 +++++-
+ guru/oot/hop_blocks.py             | 69 +++++++++++++++++++++++++++-----------
+ guru/oot/hop_dc_remove.block.yml   | 10 +++++-
+ 6 files changed, 111 insertions(+), 51 deletions(-)
+
+commit f49808c254cf2c1c9f4400e5e73e635e6248ec99
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-29 15:58:03 +0530
+
+    hop_calibrator: wait 1.5 s + 5 dwells of a steady tone before measuring
+    
+    The HackRF keeps sending its old baseband ~1.2 s after a retune; at 10 kHz
+    that old signal can pass for a tone, and the calibration mixed the two
+    (spread 0.64-0.77 deg, REJECTED). With this: 5.2/5.8 GHz pass, and a full
+    CALIBRATE passed (worst window 0.78 deg). ch2 per-dwell spread in the GUI is
+    0.16-0.26 deg (ch1/ch3 0.02) -- close to the 0.3 deg limit, left as it is.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/oot/hop_calibrator.py | 36 ++++++++++++++++++++++++------------
+ 1 file changed, 24 insertions(+), 12 deletions(-)
+
+commit bb5a5020ac28b0b86f33c2b3ae2e68b6714871b4
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-29 15:51:35 +0530
+
+    run_hop --burst measures the HackRF clock error at every start; tone_level_check
+    
+    Measured 2026-09-29 15:48-15:51 (tone_level_check, noise_origin test):
+    - SNR in the 300 kHz display band stays ~28 dB for HackRF VGA 14..30 dB
+      (signal +16 dB): the wobble on the sine scales with the signal
+    - residual after an ideal sine is identical on all 4 channels (coherence
+      0.991-0.996); the receiver's own noise is 31-45 dB below the tone
+      -> the wobble is in the HackRF's signal (and cancels in chN - ch0)
+    - HackRF clock vs X310 drifted -4.5 -> -5.2 -> -3.2 ppm during the day, so
+      a stored correction leaves the 10 kHz tone at 9.2-14.5 kHz.
+      tone_freq_check --set-live applies a fresh measurement to the running
+      HackRF; run_hop --burst does it before starting the receiver. Right after
+      it: 9960 / 9856 / 9780 Hz = 49.8 / 49.3 / 48.9 cycles per 5 ms.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/hackrf_ppm.txt      |   2 +-
+ guru/run_hop.sh          |  18 ++++++-
+ guru/tone_freq_check.py  |  13 +++--
+ guru/tone_level_check.py | 138 +++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 165 insertions(+), 6 deletions(-)
+
+commit ce7342e05f4cd21d5846adc647584d6caf2bf23c
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-29 13:37:55 +0530
+
+    guru_burst: 10 kHz tone, one whole 5 ms dwell on screen, per-dwell DWELL CHECK
+    
+    - hop_phase_meter: per window its sample count, tone frequency (FFT peak,
+      interpolated) and cycles; remove_dc subtracts each window's measured mean
+      (the receiver's 0 Hz leakage is only 13-16 dB below the tone, measured) --
+      without it the phase is wrong (synthetic test: -175 deg vs 25 deg true)
+    - hop_band_select remove_dc, new hop_dc_remove (delays one dwell so each
+      window's mean is known): the plots show the tone, not tone + leakage
+    - hop_calibrator: waits until 5 dwells in a row have the tone (max 3 s)
+      instead of a fixed 0.5 s -- the HackRF's ~1 s TX buffer made 10 kHz
+      CALIBRATE reject (20/111 windows without tone)
+    - hackrf_tone_source --ppm / UDP 'ppm': generate offset - ppm*f so the tone
+      ARRIVES at the offset; tone_freq_check measures it (--save-ppm)
+    - run_hop --burst: HackRF with --offset 10e3 --ppm (hackrf_ppm.txt),
+      restarts a transmitter started for another offset
+    - make_guru_fast --tone-offset/--dwell-plot; fast_chain_check --tone-offset
+    
+    Measured (no rtprio): every dwell exactly 5000 samples, bursts 2629/2629,
+    CALIBRATE OK, phases +0.013/-0.014/+0.001 deg; tone 9177-10828 Hz over the
+    session (HackRF clock -4.5..-5.2 ppm, drifting) -> 45.9-54.1 cycles per dwell.
+    Exactly 50.00 needs the HackRF locked to the X310 (REF OUT -> CLKIN).
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/fast_chain_check.py           |  29 +++++-
+ guru/guru_burst.grc                | 203 +++++++++++++++++++++----------------
+ guru/guru_burst.py                 | 143 +++++++++++++-------------
+ guru/hackrf_ppm.txt                |   1 +
+ guru/hackrf_tone_source.py         |  39 +++++--
+ guru/install_blocks.sh             |   3 +-
+ guru/make_guru_fast.py             |  86 ++++++++++++++--
+ guru/oot/hop_band_select.block.yml |   7 +-
+ guru/oot/hop_blocks.py             | 156 +++++++++++++++++++++++++++-
+ guru/oot/hop_calibrator.py         |  30 +++++-
+ guru/oot/hop_dc_remove.block.yml   |  35 +++++++
+ guru/oot/hop_phase_meter.block.yml |  10 +-
+ guru/run_hop.sh                    |  33 +++++-
+ guru/tone_freq_check.py            |  22 +++-
+ hackrf_tone_source.py              |  39 +++++--
+ 15 files changed, 637 insertions(+), 199 deletions(-)
+
+commit 03f222b718d68e3aad66bf07ca669dc74d370e21
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-29 12:57:35 +0530
+
+    guru_burst: 5 ms dwell / 7 ms switching in burst mode (nothing sent while switching)
+    
+    Engine burst mode: each band-change batch also carries a timed
+    NUM_SAMPS_AND_DONE stream command (0.25 ms pre-roll + dwell). Every burst
+    must start on its commanded sample and hold exactly its commanded length
+    (else timing lost); bursts go back on the continuous sample timeline with
+    zeros in the gaps, so tags, correction, meters and CALIBRATE are unchanged.
+    A missing burst invalidates its slot before its samples become visible; the
+    block re-reads verdicts after each read. burst=False keeps continuous mode
+    exactly as before (flowgraph regression: only the new params differ).
+    
+    Measured: 4112/4112 and 2360/2360 bursts exact, every dwell 5000 samples,
+    0 unlocked, phase = continuous within test drift (<= 0.57 deg). Late 14.5 %
+    and 1.65 % without rtprio -- UHD tune calls stalling to ~6 ms on the PC.
+    
+    Also: make_guru_fast --burst/--preroll/--out/--rt-priority, run_hop --burst,
+    fast_chain_check --burst/--dwell/--settle, optional TWINRX_ENGINE_TIMING record.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/RUN_GURU_FAST.md                  |   28 +
+ guru/fast_chain_check.py               |   36 +-
+ guru/guru_burst.grc                    | 2693 ++++++++++++++++++++++++++++++++
+ guru/guru_burst.py                     |  972 ++++++++++++
+ guru/install_blocks.sh                 |    4 +-
+ guru/make_guru_fast.py                 |   53 +-
+ guru/oot/engine/twinrx_engine.cpp      |  250 ++-
+ guru/oot/twinrx_radio_source.block.yml |   14 +
+ guru/oot/twinrx_radio_source.py        |   56 +-
+ guru/run_hop.sh                        |   10 +-
+ 10 files changed, 4060 insertions(+), 56 deletions(-)
+
+commit 069cdbae29fa9e4f124916dec3ea35cd19257e32
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-29 12:37:43 +0530
+
+    hackrf_tone_source: watchdog also catches the stall that drops samples with TIMEOUT
+    
+    In one kind of HackRF stall the gr-soapy sink keeps consuming samples and
+    drops them with 'Soapy sink error: TIMEOUT', so the sample rate the watchdog
+    measured stayed normal and nothing restarted it (2026-09-28: 1387 TIMEOUTs,
+    NO TONE on 5.2 GHz). GR 3.10 prints that warning on stdout, so the process's
+    stdout/stderr now pass through a pipe that counts it and forwards everything
+    unchanged; >= 3 per second for 2 s restarts the stream. Tested with the real
+    GR logger: healthy 0 restarts, 1/s 0 restarts, 10/s restart after 2 s.
+    
+    tone_freq_check.py: where the lab tone lands on each band (HackRF at -4.5 ppm
+    vs the X310, measured 2026-09-29).
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/hackrf_tone_source.py | 126 +++++++++++++++++++++++++++++++++----
+ guru/tone_freq_check.py    | 152 +++++++++++++++++++++++++++++++++++++++++++++
+ hackrf_tone_source.py      | 126 +++++++++++++++++++++++++++++++++----
+ 3 files changed, 382 insertions(+), 22 deletions(-)
+
+commit d1351777f617e29e56158184d030314e6b2c879a
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-28 18:11:04 +0530
+
+    run_hop.sh: run guru_fast.py and the tone script from the script's own folder
+    
+    A copy of the project (guru10ms) must run its own files, not ~/radar2/guru's.
+    From ~/radar2/guru the behaviour is unchanged (guru/hackrf_tone_source.py is
+    identical to ~/radar2/hackrf_tone_source.py).
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/run_hop.sh | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+commit f6ff6cee493e8310d72a6473a5577eb2cfafafc5
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-28 17:17:25 +0530
+
+    guru_fast: readouts like guru with lock status; no fake 0.000; HackRF stall fixes
+    
+    Main tab: sine plot of the lab-tone band + chN-ch0 readouts, with LO LOCK per
+    band and a SHOWING line that turns red when the band has no tone. GNU Radio
+    3.8's number sink draws NaN as 0.000000, so the readouts are labels that say
+    NO TONE instead. The one-cycle plot and per-band lines move to the Switching
+    tab. hackrf_tone_source: no retune onto the frequency it is already on (what
+    makes the HackRF stall), stall caught in 2 s, log written line by line.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/RUN_GURU_FAST.md           |  24 ++++--
+ guru/gui_band_tour.py           |  22 ++++-
+ guru/guru_fast.grc              | 183 ++++++++++++++++++++++++++++++++++++++--
+ guru/guru_fast.py               | 131 +++++++++++++++++++++++-----
+ guru/hackrf_tone_source.py      |  15 +++-
+ guru/make_guru_fast.py          | 108 ++++++++++++++++++++++--
+ guru/oot/hop_blocks.py          |   2 +
+ guru/oot/twinrx_radio_source.py |  15 ++++
+ guru/phase_table_live_deg.txt   |   8 +-
+ hackrf_tone_source.py           |  15 +++-
+ 10 files changed, 473 insertions(+), 50 deletions(-)
+
+commit 3369ea99c6bcaf0e06d19b22b27e1dcb224fffe8
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-28 17:04:01 +0530
+
+    guru_fast: HackRF fixed on the lab-tone band, one-cycle main plot, per-band lines
+    
+    Main tab: one plot of the whole 60 ms cycle (tone band shows its 10 ms dwell,
+    the other dwells are flat), RECEIVING NOW following the dwells, and one line
+    per band (SIGNAL/FLAT + phase vs ch0, nan when flat). The HackRF only moves
+    when LAB TONE is changed or during CALIBRATE, which measures all bands and
+    returns it. Status line shows typical and worst send time against the limit.
+    RUN_GURU_FAST.md: how to run, calibrate and check it.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/RUN_GURU_FAST.md             |  105 +++
+ guru/gui_band_tour.py             |    6 +-
+ guru/guru.grc                     |    6 +-
+ guru/guru.py                      |    8 +-
+ guru/guru_fast.grc                | 1666 +++++++++++++++++++------------------
+ guru/guru_fast.py                 |  629 ++++++--------
+ guru/make_guru_fast.py            |  188 +++--
+ guru/oot/engine/twinrx_engine.cpp |    8 +-
+ guru/oot/hop_blocks.py            |   13 +
+ guru/oot/hop_calibrator.py        |   13 +-
+ guru/oot/twinrx_radio_source.py   |   12 +-
+ guru/phase_table_deg.txt          |   13 +-
+ guru/phase_table_live_deg.txt     |    7 +
+ guru/phase_table_rad.cfg          |    6 +-
+ 14 files changed, 1409 insertions(+), 1271 deletions(-)
+
+commit 62a5b52e6f29ecd577f6e8fdb6d8d5bed6eaaf6c
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-28 16:26:10 +0530
+
+    guru_fast: C++ radio-clock engine, exact 10 ms dwell, switching view, CALIBRATE
+    
+    The receive loop and scheduler move into libtwinrx_engine.so (C++, UHD
+    direct): 90005/90008 slots used over a 30 min GUI soak vs 99.46 % with the
+    Python scheduler. Slots are counted in whole samples: every dwell is exactly
+    10000 samples and every slot 20000 (dwell_exact_check.py). New Switching tab
+    shows one full cycle as the radio sees it; CALIBRATE re-measures the table on
+    the live chain and applies it only if every band passes. make_guru_fast.py
+    takes --bands; run_hop.sh --fast; install_blocks.sh builds and installs.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/README.md                         | 110 +++++++-
+ guru/dwell_exact_check.py              |  74 +++++
+ guru/gui_band_tour.py                  |  30 +-
+ guru/guru.grc                          |   6 +-
+ guru/guru.py                           |  12 +-
+ guru/guru_fast.grc                     | 419 ++++++++++++++++++++++++++--
+ guru/guru_fast.py                      | 145 +++++++++-
+ guru/install_blocks.sh                 |  33 +++
+ guru/make_guru_fast.py                 | 167 ++++++++++-
+ guru/oot/engine/build.sh               |   9 +
+ guru/oot/engine/twinrx_engine.cpp      | 491 +++++++++++++++++++++++++++++++++
+ guru/oot/hop_blocks.py                 |  31 +++
+ guru/oot/hop_calibrator.py             | 111 ++++++++
+ guru/oot/phase_correct_hopping.py      |  24 ++
+ guru/oot/twinrx_radio_source.block.yml |  13 +-
+ guru/oot/twinrx_radio_source.py        | 478 ++++++++++++--------------------
+ guru/phase_table_deg.txt               |   8 +-
+ guru/phase_table_rad.cfg               |   6 +-
+ guru/run_hop.sh                        |  15 +-
+ 19 files changed, 1787 insertions(+), 395 deletions(-)
+
+commit 834d324ffa3f7fede3c6f85b957ffcb0b960f5ab
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-28 15:21:30 +0530
+
+    guru: pyuhd radio-clock source, new phase table, tag-triggered plot
+    
+    Through gr-uhd the radio-clock schedule left ch0 180 deg off on 6-12 % of
+    5.8 GHz dwells; through pyuhd never (gr_flip_test.py). twinrx_radio_source
+    drives the X310 through pyuhd, and twinrx_hopping_source is back to its
+    verified host-timed original. Table recalibrated through the fast chain
+    itself (all bands within 0.15 deg after correction). The plot triggers on a
+    window-start tag so it never draws across two dwell windows.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/fast_chain_check.py                 | 163 +++++++++++++
+ guru/gr_flip_test.py                     | 211 ++++++++++++++++
+ guru/gui_band_tour.py                    |  72 ++++++
+ guru/guru.grc                            |   6 +-
+ guru/guru.py                             |  13 +-
+ guru/guru_fast.grc                       | 160 +++++-------
+ guru/guru_fast.py                        |  85 +++----
+ guru/hop_blocks_selftest.py              | 111 +++++++++
+ guru/make_guru_fast.py                   |  50 +++-
+ guru/oot/hop_band_select.block.yml       |  10 +-
+ guru/oot/hop_blocks.py                   | 167 +++----------
+ guru/oot/twinrx_hopping_source.block.yml |  40 ---
+ guru/oot/twinrx_hopping_source.py        | 211 +---------------
+ guru/oot/twinrx_radio_source.block.yml   | 175 ++++++++++++++
+ guru/oot/twinrx_radio_source.py          | 403 +++++++++++++++++++++++++++++++
+ guru/phase_table_deg.txt                 |  15 +-
+ guru/phase_table_rad.cfg                 |   6 +-
+ guru/sched_hop_test.py                   |  16 ++
+ guru/tag_audit.py                        |  83 -------
+ 19 files changed, 1349 insertions(+), 648 deletions(-)
+
+commit fd90f585491f0f6f0ddd7af764230275db42dc5b
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-28 13:22:05 +0530
+
+    guru: radio-clock hopping (10 ms on / 10 ms off) with sample-exact hop marks
+    
+    twinrx_hopping_source gains schedule="radio": each band change is one timed
+    batch on the X310 clock (staggered channel writes + a second timed pass,
+    measured phase-equal to the host double tune), sent one slot ahead, never
+    read behind a pending command, and a slot that was late or unlocked is
+    never used. Stream 0 carries hop_off / hop_on tags on the exact samples.
+    phase_correct_hopping can follow those tags; hop_band_select and
+    hop_phase_meter are new. guru_fast.grc is generated from guru.grc by
+    make_guru_fast.py; guru.grc is unchanged in behaviour.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ guru/dwell_test.py                       |  396 ++++++
+ guru/grc_timing_test.py                  |  201 +++
+ guru/guru_fast.grc                       | 2153 ++++++++++++++++++++++++++++++
+ guru/guru_fast.py                        |  894 +++++++++++++
+ guru/make_guru_fast.py                   |  151 +++
+ guru/oot/hop_band_select.block.yml       |   36 +
+ guru/oot/hop_blocks.py                   |  437 ++++++
+ guru/oot/hop_phase_meter.block.yml       |   62 +
+ guru/oot/phase_correct_hopping.block.yml |    7 +
+ guru/oot/phase_correct_hopping.py        |   21 +-
+ guru/oot/twinrx_hopping_source.block.yml |   40 +
+ guru/oot/twinrx_hopping_source.py        |  211 ++-
+ guru/sched_hop_test.py                   |  326 +++++
+ guru/tag_audit.py                        |   83 ++
+ guru/timed_tune_test.py                  |  170 +++
+ guru/tune_method_phase_test.py           |  189 +++
+ guru/tune_speed_test.py                  |  300 +++++
+ 17 files changed, 5674 insertions(+), 3 deletions(-)
+
+commit 64762d1d1d28c452da32986507381aed93ca4446
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-28 11:43:30 +0530
+
+    guru: restore the verified working state and snapshot it
+    
+    Undo the 5 ms dwell / 1 ms settle / LO-fallback change that a GRC re-save
+    put into a021f7d, and make guru/oot match the blocks that actually run
+    (DDC POLICY_NONE fix, set_samp_rate restored). BACKUP_WORKING_2026-09-28
+    holds the installed blocks from ~/gnuradio-3.8 as well, with a restore
+    script and full notes.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ BACKUP_WORKING_2026-09-28/BACKUP_NOTES.md          |  253 ++
+ BACKUP_WORKING_2026-09-28/RESTORE.sh               |   52 +
+ BACKUP_WORKING_2026-09-28/SHA256SUMS               |   71 +
+ BACKUP_WORKING_2026-09-28/env/git_log.txt          |   20 +
+ BACKUP_WORKING_2026-09-28/env/setup_env.sh         |   22 +
+ BACKUP_WORKING_2026-09-28/env/system_info.txt      |   14 +
+ BACKUP_WORKING_2026-09-28/guru/BLOCK_DIAGRAM.md    |   58 +
+ .../guru/GURU_BLOCK_DIAGRAM.png                    |  Bin 0 -> 282051 bytes
+ BACKUP_WORKING_2026-09-28/guru/HOP_RESULT.png      |  Bin 0 -> 472280 bytes
+ BACKUP_WORKING_2026-09-28/guru/HOP_SEQUENCE.png    |  Bin 0 -> 175149 bytes
+ BACKUP_WORKING_2026-09-28/guru/HOP_TEST_PLAN.png   |  Bin 0 -> 364435 bytes
+ BACKUP_WORKING_2026-09-28/guru/HOW_IT_WORKS.png    |  Bin 0 -> 369160 bytes
+ BACKUP_WORKING_2026-09-28/guru/README.md           |  261 ++
+ BACKUP_WORKING_2026-09-28/guru/STABILITY_PLAN.png  |  Bin 0 -> 344489 bytes
+ BACKUP_WORKING_2026-09-28/guru/SWITCHING_LOOP.png  |  Bin 0 -> 117800 bytes
+ BACKUP_WORKING_2026-09-28/guru/b210_tone_source.py |  282 +++
+ .../guru/calibrate_phase_vs_gain.py                |  170 ++
+ BACKUP_WORKING_2026-09-28/guru/chain_check.py      |  126 +
+ BACKUP_WORKING_2026-09-28/guru/ddc_fifo_test.py    |   85 +
+ BACKUP_WORKING_2026-09-28/guru/guru.grc            | 2660 ++++++++++++++++++++
+ .../guru/guru.grc.bak_preblock                     | 2275 +++++++++++++++++
+ .../guru/guru.grc.bak_precorr                      | 1811 +++++++++++++
+ .../guru/guru.grc.bak_pregaincal                   | 1842 ++++++++++++++
+ .../guru/guru.grc.bak_pregate                      | 2210 ++++++++++++++++
+ BACKUP_WORKING_2026-09-28/guru/guru.grc.bak_prehop | 1842 ++++++++++++++
+ .../guru/guru.grc.bak_prespec                      | 2342 +++++++++++++++++
+ .../guru/guru.grc.bak_snipfix                      | 1923 ++++++++++++++
+ BACKUP_WORKING_2026-09-28/guru/guru.grc.saved_1611 | 1833 ++++++++++++++
+ .../guru/guru.grc.with_gaincal                     | 1886 ++++++++++++++
+ BACKUP_WORKING_2026-09-28/guru/guru.py             |  924 +++++++
+ BACKUP_WORKING_2026-09-28/guru/guru.py.bak_precorr |  660 +++++
+ BACKUP_WORKING_2026-09-28/guru/guru.py.saved_1611  |  668 +++++
+ .../guru/hackrf_tone_source.py                     |  454 ++++
+ .../guru/oot/phase_correct_hopping.block.yml       |  252 ++
+ .../guru/oot/phase_correct_hopping.py              |  327 +++
+ .../guru/oot/twinrx_hopping_source.block.yml       |  338 +++
+ .../guru/oot/twinrx_hopping_source.py              |  747 ++++++
+ .../guru/oot/twinrx_usrp_source.py                 |  346 +++
+ .../guru/phase_restart_test.py                     |  168 ++
+ BACKUP_WORKING_2026-09-28/guru/phase_table_deg.txt |    9 +
+ .../guru/phase_table_measure.py                    |  319 +++
+ BACKUP_WORKING_2026-09-28/guru/phase_table_rad.cfg |    6 +
+ BACKUP_WORKING_2026-09-28/guru/run_guru.sh         |   23 +
+ BACKUP_WORKING_2026-09-28/guru/run_hop.sh          |  205 ++
+ BACKUP_WORKING_2026-09-28/guru/stall_watch.py      |   73 +
+ .../guru/twinrx_gain_phase_cal.py                  |  112 +
+ BACKUP_WORKING_2026-09-28/guru/twinrx_hop_test.py  |  467 ++++
+ BACKUP_WORKING_2026-09-28/guru/twinrx_lo_cal.json  |  110 +
+ BACKUP_WORKING_2026-09-28/guru/twinrx_lo_check.py  |  783 ++++++
+ .../guru/twinrx_phase_offsets.cfg                  |    3 +
+ .../guru/twinrx_phase_vs_gain.cfg                  |   32 +
+ .../guru/twinrx_session_zero.cfg                   |    8 +
+ .../installed/doa/__init__.py                      |   46 +
+ .../installed/doa/average_and_save.py              |   80 +
+ BACKUP_WORKING_2026-09-28/installed/doa/compass.py |  156 ++
+ .../installed/doa/doa_swig.py                      | 1989 +++++++++++++++
+ .../installed/doa/findmax_and_save.py              |   81 +
+ .../installed/doa/phase_correct_hier.py            |  102 +
+ .../installed/doa/phase_correct_hopping.py         |  327 +++
+ .../installed/doa/save_antenna_calib.py            |   75 +
+ .../installed/doa/twinrx_hopping_source.py         |  747 ++++++
+ .../installed/doa/twinrx_phase_offset_est.py       |   72 +
+ .../installed/doa/twinrx_usrp_source.py            |  346 +++
+ .../doa_twinrx_phase_offset_est.block.yml          |   29 +
+ .../grc_blocks/phase_correct_hier.block.yml        |   36 +
+ .../grc_blocks/phase_correct_hopping.block.yml     |  252 ++
+ .../grc_blocks/twinrx_hopping_source.block.yml     |  338 +++
+ .../grc_blocks/twinrx_usrp_source.block.yml        |   50 +
+ BACKUP_WORKING_2026-09-28/logs/fast_5ms_run_rx.log |  700 ++++++
+ .../logs/verified_run_hackrf_tone.log              |  157 ++
+ BACKUP_WORKING_2026-09-28/logs/verified_run_rx.log |  110 +
+ .../transmitter/hackrf_tone_source.py              |  454 ++++
+ guru/README.md                                     |  277 +-
+ guru/guru.grc                                      |  759 ++++--
+ guru/guru.py                                       |   14 +-
+ guru/hackrf_tone_source.py                         |  454 ++++
+ guru/oot/phase_correct_hopping.block.yml           |  252 ++
+ guru/oot/phase_correct_hopping.py                  |  327 +++
+ guru/oot/twinrx_hopping_source.py                  |   32 +-
+ guru/oot/twinrx_usrp_source.py                     |  106 +-
+ guru/run_hop.sh                                    |  205 ++
+ 81 files changed, 37354 insertions(+), 291 deletions(-)
+
+commit a021f7dd3599682e57e1d82a7416bbb0c0245232
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-25 12:45:19 +0530
+
+    guru: recalibrate phase table (10-cycle average) and note repo GRC re-save
+    
+    Re-measured all three bands at 10 cycles per band, 0 SNR rejections, worst
+    spread 0.33 deg (5.8 GHz). Updated deg_0/1/2 in phase_correct_hopping_0 and
+    the phase_table_deg.txt / phase_table_rad.cfg exports to match.
+    
+    guru.grc's large diff here is mostly GRC/PyYAML re-serializing coordinate
+    fields from block style to flow style on save -- cosmetic, not functional;
+    the file was verified to regenerate and run correctly after each edit this
+    session.
+    
+    Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>
+
+ guru/guru.grc            | 759 ++++++++++++++---------------------------------
+ guru/guru.py             |  14 +-
+ guru/phase_table_deg.txt |   6 +-
+ guru/phase_table_rad.cfg |   6 +-
+ 4 files changed, 241 insertions(+), 544 deletions(-)
+
+commit b3d8cce9c90f3c49625f6009f65efbe0bab2535e
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-25 11:31:55 +0530
+
+    guru: recalibrate phase table after hardware restart
+    
+    Confirmed the drift memory predicted: after the host rebooted and the X310
+    came back up, the offsets had moved by up to 3.44 degrees (5.8 GHz ch3),
+    enough to put two channels outside the 1 degree bar. The LO dividers relock
+    to a new phase on every power cycle, so any table from a previous session
+    is only a starting point, not a fixed calibration.
+    
+    Re-measured all three bands (6 cycles, 0 rejections, worst spread 0.18 deg)
+    and replaced the table:
+    
+      band       old ch1/ch2/ch3              new ch1/ch2/ch3
+      2.4 GHz    173.60 / -90.55 / -173.83    173.34 / -90.18 / -173.78
+      5.2 GHz    103.59 /  53.47 /  16.28     103.36 /  52.41 /  14.61
+      5.8 GHz     83.95 / 143.47 / 159.83      83.53 / 142.79 / 156.39
+    
+    Verified on hardware after reload: residuals -0.04 / 0.19 / 0.09 degrees on
+    2.4 GHz, all four channels overlapping on the plot.
+    
+    Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>
+
+ guru/guru.grc |  6 +++---
+ guru/guru.py  | 12 ++++++------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
+
+commit cbf60fa76cfbed2f6443ccd929deb785bade7fb8
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-24 18:22:23 +0530
+
+    guru: never show a healthy stream state that was not actually read
+    
+    The STREAM label fell back to "receiving" when it could not ask the block --
+    claiming the radio is sending on the strength of a failed check. That is the
+    one thing this label exists to prevent, because a frozen reading looks exactly
+    like a stable measurement. It now shows UNKNOWN and prints why, once.
+    
+    Same shape in the transmitter's watchdog: a failed rate read skipped the
+    check and left the watchdog quietly not watching, so a stalled HackRF would
+    have read as a band with no tone and the receiver would have taken the blame.
+    It now says it can no longer catch a stall.
+    
+    The teardown paths in chain_check.py and phase_table_measure.py swallowed a
+    failed stop_hopping(), which is what wedges the X310's control plane. Both
+    report it now.
+    
+    Verified on the hardware afterwards, all four channels still in phase:
+    ch1 0.016, ch2 0.098, ch3 0.159 degrees, with no new warnings -- every check
+    succeeded on its own terms rather than being assumed to.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru/chain_check.py         |  8 ++++--
+ guru/guru.grc               | 63 ++++++++++++++++++++++++---------------------
+ guru/guru.py                | 18 +++++++++----
+ guru/phase_table_measure.py |  6 +++--
+ hackrf_tone_source.py       | 15 ++++++++---
+ 5 files changed, 69 insertions(+), 41 deletions(-)
+
+commit 395162df61c6b46f22b0e480621b35592c29d295
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-24 17:44:22 +0530
+
+    run_hop.sh: add --restart
+    
+    Stops the receiver and transmitter, waits for them to release the radio,
+    then starts both. A plain TERM, never KILL: the receiver has to run its own
+    shutdown so the hop thread stops before the flowgraph tears down. Killed
+    mid-teardown it leaves the X310's control plane wedged, and only a power
+    cycle clears that. If something will not stop within ten seconds it says so
+    and exits rather than forcing it -- ten seconds is cheaper than a power
+    cycle.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ run_hop.sh | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
+
+commit 67ee0166d282ab9a83d487cfc491bf311ffedb8e
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-24 17:43:58 +0530
+
+    guru: correct the channel permutation feeding the phase correction
+    
+    The four channels are permuted by block name before the correction sees them:
+    source ch3 goes to dcblock_1/bp_1, ch1 to bp_2, ch2 to bp_3. So ch1's
+    correction was being applied to ch3's samples. The table, the arithmetic and
+    the band switching were all right; the wrong signal was arriving on each port.
+    
+    Every readout was wrong by a different amount -- 87, 50, 83 degrees -- which
+    looks like a broken calibration rather than a wiring fault, and sent this
+    chase a long way in the wrong direction.
+    
+    Each bp_N now feeds the correction port for the channel it actually carries,
+    and each corrected output goes back to the display path that expects it.
+    Port N is channel N through the correction and into ph_est, so the readouts
+    name what they show without a compensating scramble further down.
+    
+    Two mistakes of mine are undone here. The original ph_est wiring looked
+    scrambled and was in fact correct -- it compensated for this permutation --
+    and I "fixed" it, which made things worse. And chain_check.py wired channel N
+    to port N directly, so it never reproduced the permutation: it kept reporting
+    0.27 degrees while the flowgraph showed 87. A test that does not share the
+    real wiring cannot catch a wiring fault.
+    
+    The rad-to-degree constants stay negated. twinrx_phase_offset_est computes
+    angle(ch0 * conj(chN)) = ch0 - chN, while the labels, the table and every
+    measurement here are chN - ch0.
+    
+    Measured on the hardware after the fix, all four channels in phase:
+    
+        ch1 - ch0   0.019 deg
+        ch2 - ch0   0.099 deg
+        ch3 - ch0   0.167 deg
+    
+    against 84 to 174 degrees uncorrected.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru/guru.grc | 727 +++++++++++++++++++++++++++++++++++++++++-----------------
+ guru/guru.py  |  33 ++-
+ 2 files changed, 545 insertions(+), 215 deletions(-)
+
+commit 8c5049f08f15887f70f33a7e59202489b31f230d
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-24 17:16:39 +0530
+
+    guru: per-band phase correction, and two bugs in the readouts
+    
+    The four channels sat 84 to 174 degrees apart depending on the band. They now
+    read within 0.27 degrees of each other on all three, measured through the real
+    chain.
+    
+    phase_correct_hopping goes in after the band-pass, so the time plot and the
+    phase readouts are both corrected from one block, and it is told the band on
+    every hop rather than keeping its own clock.
+    
+    Two faults in the readouts, both inherited from the old phase_correct_hier
+    wiring and both silent:
+    
+      - ph_est was fed out of order (ch1 to port 4, ch2 to port 2, ch3 to port 3),
+        so every display named a channel other than the one it showed. Harmless
+        while everything reads zero and thoroughly misleading the moment one does
+        not.
+    
+      - twinrx_phase_offset_est computes angle(ch0 * conj(chN)), which is
+        ch0 - chN. The labels, the calibration table and every measurement in this
+        project are chN - ch0, so the screen showed the negative of the measured
+        number. The four rad-to-degree constants are negated.
+    
+    The table took two passes. The first was measured straight off the radio and
+    left up to 0.77 degrees; the flowgraph puts a DC blocker and a band-pass ahead
+    of the correction, and those add a small per-channel phase the first
+    measurement never saw. Re-measuring through the real chain and adding the
+    residual brought the worst case to 0.27. That is a fixed property of the
+    filter chain rather than drift, so it converges instead of needing repeated
+    passes.
+    
+    Measured residuals, three passes per band: 2.4 GHz 0.18, 5.2 GHz 0.10,
+    5.8 GHz 0.27 degrees worst.
+    
+    The table belongs to this power session and to these gains. The LO dividers
+    relock to new phases on every power cycle of the X310, and RX gain shifts
+    phase on this hardware, so 46/60/69 dB with gain_trim (0, -13.3, 1.5, -1.7)
+    is part of the calibration. Re-measure with phase_table_measure.py after
+    either changes.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru/chain_check.py         |  122 ++++
+ guru/ddc_fifo_test.py       |   85 +++
+ guru/guru.grc               | 1471 +++++++++++++++++--------------------------
+ guru/guru.py                |   51 +-
+ guru/phase_table_deg.txt    |    9 +
+ guru/phase_table_measure.py |  317 ++++++++++
+ guru/phase_table_rad.cfg    |    6 +
+ 7 files changed, 1168 insertions(+), 893 deletions(-)
+
+commit 4c4d332278fe1b31fdf576847fff367bee8b5f74
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-24 14:51:16 +0530
+
+    run_hop.sh: transmit from the HackRF One
+    
+    The B210 is coming out of the bench, so the HackRF is the calibration
+    source rather than the fallback and is checked for first.
+    
+    Its tone offsets were still mapped for 5.1 GHz, a band dropped a while ago
+    when it turned out UHD picks an LO1 there that never locks. Remapped to the
+    bands actually in use, 2.4 / 5.2 / 5.8.
+    
+    The rate stays at 2e6 -- at 1 Msps this radio's SoapySDR stream produces
+    continuous timeouts -- and the per-band drive stays, because its output
+    falls off enough above 5 GHz that a single gain either clips 2.4 or buries
+    the other two.
+    
+    The warning about its stream stalling under repeated retuning is kept and
+    made visible at startup. That was measured, not inherited: it is why the
+    B210 was preferred before, and it reads as a band with no tone rather than
+    as an error.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ run_hop.sh | 27 +++++++++++++++++----------
+ 1 file changed, 17 insertions(+), 10 deletions(-)
+
+commit 58d0d9a0f02086888f0e6a8734fe4e59a81b92fb
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-24 12:58:10 +0530
+
+    guru: tell drift apart from a restart shift, and keep a copy of the blocks
+    
+    phase_restart_test.py called a monotonic sequence "MOVES ON RESTART",
+    which is wrong: a trend that runs the same direction through every run is
+    drift with time or temperature and would appear without restarting at all.
+    It now reports the first-to-last trend alongside the spread and only says
+    a restart moved something when the spread is not a trend.
+    
+    Measured with it, no power cycle in between:
+    
+      2.4 GHz  ch1-ch0 0.17  ch2-ch0 0.52  ch3-ch0 0.70 deg spread, all three
+               monotonic -- drift, taken while the radio was still settling
+      5.8 GHz  ch1-ch0 0.09  ch2-ch0 0.36  ch3-ch0 0.09 deg over 1.2 minutes
+    
+    So restarting the software does not re-randomise the offsets. The reported
+    2-3 degrees is not reproduced here and is still unexplained; a power cycle
+    in between would account for it, and so would comparing a run whose stream
+    had stalled and been restarted.
+    
+    guru/oot holds the blocks the flowgraph needs (gr-doa 8cd55d9), as guru4
+    does, so guru stands on its own if that tree is lost.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru/oot/twinrx_hopping_source.block.yml | 338 ++++++++++++++
+ guru/oot/twinrx_hopping_source.py        | 725 +++++++++++++++++++++++++++++++
+ guru/oot/twinrx_usrp_source.py           | 270 ++++++++++++
+ guru/phase_restart_test.py               |  45 +-
+ 4 files changed, 1364 insertions(+), 14 deletions(-)
+
+commit 626c6d2c1963a858b7fd598ae0a13a7f4266cf17
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-24 12:50:39 +0530
+
+    guru: cut the display interpolator's cost 8x, and fix a Qt threading bug
+    
+    Root cause of the stream stall, from a run that reproduced it at 14m38s
+    with logging on. The first failure is not an overflow:
+    
+      [hop] TUNE TO 2.4 GHz FAILED: [0/DDC_0] sr_write() failed:
+            Block ctrl (CE_03_Port_60) no response packet
+    
+    An RFNoC control ack times out, the tune fails, the radio stops sending,
+    and only then come the overflow and "failed to time-align packets". After
+    the first one every subsequent tune fails the same way.
+    
+    The host is starved when it happens: load average 16 on 12 cores, the
+    process at 527% CPU, and 18-29 MB backed up in the RX socket buffers with
+    no NIC or socket drops anywhere. The arithmetic says where it goes. The
+    four display interpolators ran an anti-imaging filter with a 50 kHz
+    transition at 20 Msps: 963 taps, 3.85 GMAC/s across four channels, purely
+    to draw a smooth line. That is 527% CPU accounted for almost exactly.
+    
+    50 kHz was eight times tighter than the signal needs. The stream reaches
+    disp_bw and its first image starts at samp_rate - disp_bw, so the band
+    between them is transition and narrowing it buys nothing. Expressed that
+    way it is 121 taps and 0.48 GMAC/s, with the stopband still starting
+    exactly at the first image, so the picture is unchanged.
+    
+    Separately, the band-follow loop ran in a Python thread and called
+    qtgui_freq_sink_x_0.set_frequency_range(), reaching into a widget from the
+    wrong thread -- 47 logged violations in nine minutes, one per hop. Qt's
+    documented outcomes include a frozen event loop, which is the "not
+    responding" dialog seen earlier. It is a QTimer owned by the GUI thread
+    now.
+    
+    phase_restart_test.py measures whether an offset survives a restart, by
+    separating within-run spread from between-run spread. Written, not yet
+    run: it needs the radio to itself.
+    
+    Neither fix is proven. The measurements above were taken while the bench
+    was already in the failure loop, so they describe the failed state; a
+    healthy-state baseline is the next thing to take.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru/guru.grc              | 117 +++++++++++++++++++++++++----------
+ guru/guru.py               | 133 +++++++++++++++++++++++++--------------
+ guru/phase_restart_test.py | 151 +++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 320 insertions(+), 81 deletions(-)
+
+commit 2afd04c78347f69d0d852ce1094c75199c87a6e8
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-24 12:25:37 +0530
+
+    guru: take over the stream-stall work; guru4 goes back to being a backup
+    
+    guru4 is the frozen known-good snapshot, so active work belongs in guru.
+    Moves across what was developed there and restores guru4 to commit e972ded
+    exactly.
+    
+    In guru.grc/guru.py: a STREAM label that reads 'receiving', or says the
+    radio is not sending and that nothing below it is a reading, plus a count
+    of recoveries so far. A frozen plot with a frozen phase number is the worst
+    failure this bench has -- it looks exactly like a stable measurement -- so
+    the display has to say which one it is showing.
+    
+    In run_hop.sh: tee the receiver to /tmp/guru_rx.log and set UHD_LOG_FILE,
+    which UHD 3.15 honours. The block's watchdog reports what it did about a
+    stall but not what caused one; UHD's own overflow, time-align and late
+    command messages are what say that, and only if they were written down at
+    the time.
+    
+    stall_watch.py moves to guru as well. It measures the NIC counter from
+    outside the process, so it can confirm the block's own watchdog rather than
+    share its assumptions.
+    
+    Note guru4 is frozen only in its own files. It loads twinrx_hopping_source
+    from ~/gnuradio-3.8, so it picks up the installed block like guru does;
+    guru4/oot holds the copy from snapshot time for rebuilding.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru/guru.grc                  | 37 +++++++++++++++++++++++++++++++++++++
+ guru/guru.py                   | 40 +++++++++++++++++++++++++++++++++++++++-
+ {guru4 => guru}/stall_watch.py |  0
+ guru4/run_hop.sh               | 17 ++---------------
+ run_hop.sh                     | 11 ++++++++++-
+ 5 files changed, 88 insertions(+), 17 deletions(-)
+
+commit d72c18c57546458002b264dba7343474c9fe73f5
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-24 12:09:38 +0530
+
+    guru4: record when the sample stream stops
+    
+    A 21-minute run ended with the X310 no longer sending: zero bytes on
+    enp3s0, no NIC errors, transmitter still answering, flowgraph still alive
+    and spinning on a stream that had stopped. Nothing in the flowgraph
+    noticed -- the plot just went flat and the phase readouts froze on their
+    last value, which reads as a measurement rather than as an absence of one.
+    
+    stall_watch.py samples the NIC counter once a second and timestamps the
+    moment the stream drops, reading only /sys so it never touches the radio.
+    run_hop.sh starts it alongside and tees the receiver's output, so the next
+    occurrence leaves both a time and the UHD messages around it.
+    
+    This records the failure; it does not yet explain or recover from it.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru4/run_hop.sh     | 17 ++++++++++--
+ guru4/stall_watch.py | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 88 insertions(+), 2 deletions(-)
+
+commit e972ded0b63ba216a5312807d7a80ae7e34d34c1
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 19:41:00 +0530
+
+    guru4: preserve the working hopping bench as a snapshot
+    
+    A copy of guru/ as it stands with 2.4 / 5.2 / 5.8 GHz hopping verified on
+    the hardware: SNR 76.1 / 73.3 / 73.1 dB, tone at centre + 200 kHz in every
+    band, and all nine inter-channel phase pairs constant within 0.04-0.18 deg.
+    
+    Self-contained, so it stays runnable if guru/ moves on:
+      - run_hop.sh resolves its own directory instead of $HOME/radar2, and
+        starts the tone source and receiver from here
+      - hackrf_tone_source.py copied in, since the receiver commands it on
+        every hop and will not start without it
+      - oot/ holds the exact twinrx_hopping_source files installed into
+        ~/gnuradio-3.8 at snapshot time (gr-doa 65d8bb4), which guru4.grc needs
+        and which stock gr-doa does not carry
+    
+    The scratch .bak_*/.saved_*/.with_gaincal files are left behind. README
+    records the measured numbers and why lo_export_direction, the LO fallback
+    and the gain trim are set the way they are.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru4/BLOCK_DIAGRAM.md                    |   58 +
+ guru4/GURU_BLOCK_DIAGRAM.png              |  Bin 0 -> 282051 bytes
+ guru4/HOP_RESULT.png                      |  Bin 0 -> 472280 bytes
+ guru4/HOP_SEQUENCE.png                    |  Bin 0 -> 175149 bytes
+ guru4/HOP_TEST_PLAN.png                   |  Bin 0 -> 364435 bytes
+ guru4/HOW_IT_WORKS.png                    |  Bin 0 -> 369160 bytes
+ guru4/README.md                           |  101 ++
+ guru4/STABILITY_PLAN.png                  |  Bin 0 -> 344489 bytes
+ guru4/SWITCHING_LOOP.png                  |  Bin 0 -> 117800 bytes
+ guru4/b210_tone_source.py                 |  282 ++++
+ guru4/calibrate_phase_vs_gain.py          |  170 ++
+ guru4/guru4.grc                           | 2543 +++++++++++++++++++++++++++++
+ guru4/guru4.py                            |  799 +++++++++
+ guru4/hackrf_tone_source.py               |  445 +++++
+ guru4/oot/twinrx_hopping_source.block.yml |  315 ++++
+ guru4/oot/twinrx_hopping_source.py        |  491 ++++++
+ guru4/oot/twinrx_usrp_source.py           |  270 +++
+ guru4/run_guru4.sh                        |   23 +
+ guru4/run_hop.sh                          |  143 ++
+ guru4/twinrx_gain_phase_cal.py            |  112 ++
+ guru4/twinrx_hop_test.py                  |  467 ++++++
+ guru4/twinrx_lo_cal.json                  |  110 ++
+ guru4/twinrx_lo_check.py                  |  783 +++++++++
+ guru4/twinrx_phase_offsets.cfg            |    3 +
+ guru4/twinrx_phase_vs_gain.cfg            |   32 +
+ guru4/twinrx_session_zero.cfg             |    8 +
+ 26 files changed, 7155 insertions(+)
+
+commit b8be969b00836340d9cb33bf70899d863aace670
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 19:38:58 +0530
+
+    guru: regenerate guru.py from guru.grc
+    
+    No functional change -- GRC emits the phase-estimator connections in a
+    different order. Committed so the tree is clean before snapshotting.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru/guru.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit b2797dbb88eff479c92dcb50037a9ae271896f03
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 19:11:02 +0530
+
+    guru: hop 2.4 / 5.2 / 5.8 GHz, and switch the LO fallback off
+    
+    5.2 GHz uses a low-side LO natively, so none of the three bands needs the
+    fallback now. That removes the forced LO re-lock, the mirrored spectrum and
+    the 180 degree step that came with it.
+    
+    Measured over five cycles: every pair on every band repeats within
+    0.04-0.18 degrees, where 5.1 GHz previously left ch2-ch0 stepping a full
+    180. The tone lands at +203.8 / +208.2 / +209.1 kHz with SNR 73-76 dB.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      | 39 +++++++++++----------------------------
+ guru.py       |  4 ++--
+ guru/guru.grc | 39 +++++++++++----------------------------
+ guru/guru.py  |  4 ++--
+ 4 files changed, 26 insertions(+), 60 deletions(-)
+
+commit 388ccc9a644b7370f9372b835681ae288e3f7985
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 18:27:09 +0530
+
+    run_hop.sh: drop the per-band tone offsets
+    
+    The receiver now mirrors back the bands its LO fallback inverts, so every
+    band is plainly centre + 200 kHz and the transmitter needs no special case.
+    Leaving the offsets in would have inverted 5.1 GHz twice.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ run_hop.sh | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
+
+commit 31435aeaa9c282053905653a7a178f8e3f96377a
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 18:26:52 +0530
+
+    tone source: report the radio actually in use, not always the HackRF
+    
+    With --radio b210 the banner still said HackRF One, called the gain a TX
+    VGA, claimed an 8-bit DAC and a +/-20 ppm crystal, and computed the output
+    level with the HackRF's gain range. At gain 55 that put the estimate 30 dB
+    too high -- it warned the TwinRX front end would compress when the real
+    level at each port is about -35 dBm, which our own measurements confirm.
+    
+    Output power, gain range, DAC width and reference accuracy are now per
+    radio.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ hackrf_tone_source.py | 43 ++++++++++++++++++++++++++++++-------------
+ 1 file changed, 30 insertions(+), 13 deletions(-)
+
+commit 0dc77c430d29a2b0320b69900220dbf3dd7f46d3
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 18:13:12 +0530
+
+    guru: actually stop the hop thread on shutdown
+    
+    The stop snippet set _hop_run on the top block, but the hop thread lives
+    inside the source block and checks that block's own flag -- different
+    object, different attribute -- so stop_hopping() was never called at all.
+    
+    The thread therefore survived tb.stop() and kept issuing timed tune commands
+    while the USRP object was being destroyed. That is what wedged the X310's
+    RFNoC control plane after every run today, including shutdowns that looked
+    clean: the next start would fail with "Block ctrl no response packet" and
+    only a power cycle recovered it.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      | 18 +++++++++++++++---
+ guru.py       | 14 ++++++++++++--
+ guru/guru.grc | 18 +++++++++++++++---
+ guru/guru.py  | 14 ++++++++++++--
+ 4 files changed, 54 insertions(+), 10 deletions(-)
+
+commit bd6119779d55435f901589ba79d997536f9a7685
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 18:11:32 +0530
+
+    run_hop.sh: refuse to start a second receiver, and correct the header
+    
+    Two receivers cannot share the X310; the second just fails with a confusing
+    "No devices found". It now says so and stops.
+    
+    The header still described the HackRF and a 2 s dwell. The B210 is preferred
+    now, and the bands, gains and dwell live in guru.grc rather than here.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ run_hop.sh | 24 ++++++++++++++++++------
+ 1 file changed, 18 insertions(+), 6 deletions(-)
+
+commit 678fd27509f2d237c44ebd3bc5c350fe506e1817
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 18:09:18 +0530
+
+    guru: diagram of how the bench runs
+    
+    Startup, the hop loop and the signal path side by side, with the reasons
+    behind the less obvious choices -- the LO export direction, commanding the
+    transmitter before tuning to a band, measuring phase ahead of the display
+    gate, and the inverted tone at 5.1 GHz.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru/HOW_IT_WORKS.png | Bin 0 -> 369160 bytes
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+commit cdd9c4a7aba8acf52556ac013e46d276d50dac35
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 17:36:22 +0530
+
+    guru: add a 4-channel spectrum to the Spectra tab
+    
+    The tab existed but was empty. The spectrum is taken from the DC blockers,
+    before the display band-pass, so it shows the whole 1 MHz span -- the tone,
+    whatever LO leakage survives the DC blocker, and the noise floor -- rather
+    than just the slice around the tone.
+    
+    Its four inputs follow the same source-to-trace order as the time sink, and
+    four more gates blank it during the settle window so both plots go quiet
+    together.
+    
+    Wiring verified in the generated code. Not yet confirmed on hardware: the
+    X310's RFNoC control endpoint is wedged again and needs a power cycle.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      | 208 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ guru.py       |  64 +++++++++++++++++-
+ guru/guru.grc | 208 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ guru/guru.py  |  64 +++++++++++++++++-
+ 4 files changed, 538 insertions(+), 6 deletions(-)
+
+commit c0b2110425b46109104a0eafa8370f4515312780
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 17:10:58 +0530
+
+    guru: export the LO from Rx B again -- 'A' leaves ch2 and ch3 with no LO
+    
+    The flowgraph had lo_export_direction set to "A". On this unit the A->B MMCX
+    jumpers pass no LO, measured twice on the hardware, which is why B is the
+    default in the block. With "A" the export goes the dead way: ch2 and ch3 are
+    put on 'external' with no oscillator reaching them, so they receive nothing
+    while ch0 and ch1 carry on normally. Two flat traces, everything else fine.
+    
+    lo_locked gives no warning here -- it read True on all four, because on an
+    external channel it reports a synthesiser that channel does not use.
+    
+    Found by tapping the source, the band-pass output and the sink input inside
+    the running flowgraph: the traces were faithfully drawing what the radio
+    gave them, which for ch2/ch3 was the noise floor and nothing else. A
+    standalone harness with the same block never reproduced it, because it used
+    the default direction.
+    
+    Source levels for ch2/ch3 go from 0.0002 (noise) to 0.013-0.020, and their
+    traces from 0.0013 to 0.23-0.36, on all three bands.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      | 9 ++++++++-
+ guru.py       | 4 ++--
+ guru/guru.grc | 9 ++++++++-
+ guru/guru.py  | 4 ++--
+ 4 files changed, 20 insertions(+), 6 deletions(-)
+
+commit db3e653467f3fa1146c53918ce6a7dfdce432711
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 16:47:36 +0530
+
+    guru: trim the four channels to comparable level, and check the transmitter first
+    
+    ch2 and ch3 looked flat, but nothing was wrong at the radio: measured
+    per-channel SNR was 71-86 dB on every channel of every band. The four RF
+    paths are just not equally sensitive -- ch1 ran 12-15 dB hotter than ch0 --
+    so on a single gain it dominated the fixed +/-0.6 axis and squashed the
+    rest into what looked like flat lines.
+    
+    gain_trim (0, -13.3, +1.5, -1.7) dB levels them at the radio rather than
+    rescaling the picture afterwards. Trace amplitudes are now 0.21-0.42 across
+    all four channels on all three bands, against 0.16-0.44 before, with the
+    worst case (5.8 GHz ch2) coming up from 0.165 to 0.267.
+    
+    The trim shifts the phase offsets, so a calibration now belongs to this trim
+    as well as to the band and the gain. Re-measure if it changes.
+    
+    Also: the block now pings the transmitter during construction and refuses to
+    start if nothing answers, instead of running the whole schedule and
+    reporting every band unusable one hop at a time. run_hop.sh passes the
+    per-band tone offsets.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      | 10 +++++++++-
+ guru.py       |  4 ++--
+ guru/guru.grc | 10 +++++++++-
+ guru/guru.py  |  4 ++--
+ 4 files changed, 22 insertions(+), 6 deletions(-)
+
+commit 5c2a4b0b4445b6507c9359b64a5f1ad6db4c641f
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 16:40:01 +0530
+
+    guru: trim per-channel gain so all four traces fit on the plot
+    
+    Two channels looked almost flat. Measuring each one separately showed none
+    of them was dead -- every channel had 71-86 dB SNR on every band -- but the
+    four RF paths are not equally sensitive. ch1 ran 9-15 dB hotter than the
+    rest, reaching 1.84 against a +/-0.6 axis, so it clipped and dominated,
+    while any gain low enough to fit it pushed ch0 and ch2 down to about 0.1.
+    One gain cannot serve four channels that far apart.
+    
+    Trimmed at the radio rather than rescaling the picture: gain_trim adds
+    0 / -13.1 / -2.4 / -5.0 dB per channel on top of the band gain, with band
+    gains raised to 46 / 69 / 60 dB to compensate. Spread across the four traces
+    drops from 14.8 dB to 5.6 dB at worst, everything lands between 0.21 and
+    0.55, and nothing clips. SNR stays at 71-80 dB.
+    
+    The trim shifts per-channel phase, so a phase calibration now belongs to a
+    given trim as well as a given band and gain.
+    
+    Also: the source block refuses to start when it is told to command a
+    transmitter that is not answering, instead of running blind and reporting
+    every band unusable once under way. run_hop.sh passes the per-band tone
+    offsets.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      |  7 ++++---
+ guru.py       |  7 ++++---
+ guru/guru.grc |  7 ++++---
+ guru/guru.py  |  7 ++++---
+ run_hop.sh    | 10 ++++++++--
+ 5 files changed, 24 insertions(+), 14 deletions(-)
+
+commit 4f90cf6bf4f4a16f0c3f1ebf3146485bb66e1829
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 16:28:39 +0530
+
+    Pre-compensate the inverted band at the transmitter, not in the filter
+    
+    All three bands work again, with the workaround moved to where the problem
+    actually is.
+    
+    The low-side LO that rescues 5.00-5.14 GHz inverts the spectrum, so a tone
+    sent at +200 kHz arrived at -200 kHz. That was handled by widening the
+    display filter to pass both sides -- 3 dB of noise bandwidth spent papering
+    over it. The transmitter now sends that band a -200 kHz tone instead
+    (--offset-map), so it arrives at +192 kHz like every other band, and the
+    filter goes back to one-sided.
+    
+    lo_lock_fallback is switched on deliberately in guru.grc, with a comment
+    saying why, and it announces itself on every hop. The hop test gets a
+    matching --lo-fallback, off by default.
+    
+    Measured: 2.40 GHz 77.0 dB, 5.80 GHz 73.2 dB, 5.10 GHz 71.8 dB, traces
+    0.338 / 0.294 / 0.300. Repeatability 0.06-0.21 deg on eight of nine pairs.
+    ch2-ch0 at 5.1 GHz still steps 180 deg -- that is the forced LO re-lock and
+    no transmitter-side change touches it.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc                | 401 +++++++++++++++++++++++++-----------------------
+ guru.py                 |  16 +-
+ guru/guru.grc           | 401 +++++++++++++++++++++++++-----------------------
+ guru/guru.py            |  16 +-
+ guru/twinrx_hop_test.py |  12 +-
+ hackrf_tone_source.py   |  35 ++++-
+ 6 files changed, 469 insertions(+), 412 deletions(-)
+
+commit 61246865d700d4e694072e1d1f68161c66d68bc0
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 15:50:07 +0530
+
+    guru: regenerate with the block's new switches
+    
+    Picks up lo_lock_fallback=False, so 5.1 GHz now reports that its LO will not
+    lock and stays blank instead of being quietly rescued onto a low-side LO.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.py      | 3 ++-
+ guru/guru.py | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+commit d5b5cacb9e216b1772028c2b4bd8cf3deb8d8400
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 15:48:48 +0530
+
+    twinrx_hop_test: drop the synthetic source
+    
+    SimSource and --sim generated four channels of fabricated signal with known
+    phase offsets. It was opt-in and never used for a hardware result, but a
+    tool that reports measurements should not carry a switch that makes them up.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru/twinrx_hop_test.py | 78 +++++--------------------------------------------
+ 1 file changed, 7 insertions(+), 71 deletions(-)
+
+commit 188f8c6bd777224e060764a504be193c13a3f050
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 15:44:36 +0530
+
+    guru: blank only the plot while settling, not the measurement
+    
+    Muting the source outputs blanked the graph as intended but also fed zeros
+    to the phase estimator, which then reported a clean +0.00 deg at SNR 0.0 --
+    a perfectly steady number derived from no signal, which is precisely the
+    reading this bench exists to avoid. It has produced false PASS results here
+    before.
+    
+    The gate moves to the display path only: bp_N now feeds both a
+    multiply_const_cc on the way to the time sink and the phase estimator
+    directly. The follower thread opens and closes those gates from the block's
+    is_settled().
+    
+    Measured across a hop: plot rms is 0.000000 for the settle window while
+    ch1-ch0 holds +67.87 deg at 67.4 dB SNR throughout.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      | 133 ++++++++++++++++++++++++++++++++++++++++++++++++++++------
+ guru.py       |  45 ++++++++++++++------
+ guru/guru.grc | 133 ++++++++++++++++++++++++++++++++++++++++++++++++++++------
+ guru/guru.py  |  45 ++++++++++++++------
+ 4 files changed, 304 insertions(+), 52 deletions(-)
+
+commit d0939c2da0650a065c173851b3d06f06b986f45f
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 15:39:38 +0530
+
+    guru: blank the display during the 2 s settle window
+    
+    The plot was drawing the retune transition as if it were signal. The source
+    block now mutes its outputs until settling finishes.
+    
+    Verified on hardware: output rms is exactly 0.000000 for the 2 s after each
+    hop, then jumps to 0.0138 at 2.4 GHz and 0.0113 at 5.8 GHz for the dwell.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      | 1 +
+ guru.py       | 1 +
+ guru/guru.grc | 1 +
+ guru/guru.py  | 1 +
+ 4 files changed, 4 insertions(+)
+
+commit 94fb5e09a44bc42628a5695fe04d020559c80bbb
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 15:35:30 +0530
+
+    run_hop.sh: prefer the B210, fall back to the HackRF
+    
+    Picks whichever transmitter is on USB, preferring the B210 -- the HackRF's
+    SoapySDR stream stalls under repeated retuning and never recovers, which is
+    what made a band read as noise at random. Each radio gets the gain settings
+    measured for it.
+    
+    The wait for the control socket goes from 20 s to 60 s: a cold B210 loads
+    firmware and an FPGA image first, which takes well over the old timeout.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ run_hop.sh | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
+
+commit 3f146d573f94b8b4406f47ae70a1a60f785d0613
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 15:31:59 +0530
+
+    Switch the calibration source back to the B210
+    
+    The HackRF's SoapySDR stream kept stalling under repeated retuning, which
+    is what made a band read as noise at random. The B210 ran the same hop
+    schedule with zero stream errors, so it goes back in as the transmitter;
+    --radio keeps the HackRF available.
+    
+    Also fixes the gain check, which still enforced the HackRF's 47 dB ceiling
+    and refused the B210's higher range.
+    
+    Per-band RX gain remeasured for the B210: 45 / 67 / 58 dB for 2.4 / 5.8 /
+    5.1 GHz, giving trace amplitudes 0.353 / 0.292 / 0.316 and SNR 77.3 / 73.3 /
+    71.5 dB. Only 2.4 GHz needed changing -- the B210 is considerably stronger
+    there than the HackRF was.
+    
+    Repeatability is unchanged by the swap, which confirms where the remaining
+    fault lives: every pair repeats within 0.05-0.27 degrees except ch2-ch0 at
+    5.1 GHz, which still steps on each forced LO re-lock. That is receiver-side
+    and independent of the transmitter.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc              |   2 +-
+ guru.py               |   2 +-
+ guru/HOP_RESULT.png   | Bin 483486 -> 472280 bytes
+ guru/guru.grc         |   2 +-
+ guru/guru.py          |   2 +-
+ hackrf_tone_source.py |   5 +++--
+ 6 files changed, 7 insertions(+), 6 deletions(-)
+
+commit 933dfbb1ddddcdbd960cb81e05f2396d8bc3c3fa
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 15:20:18 +0530
+
+    tone source: add a --radio b210 path alongside the HackRF
+    
+    Lets the B210 be swapped back in without giving up the control socket or the
+    stall watchdog, which only existed on the HackRF side. It goes through
+    osmosdr's UHD backend, so it necessarily loads libuhd -- unavoidable for a
+    UHD device, and the reason the HackRF path deliberately does not.
+    
+    Gain limits differ: the B210 runs 0..89.8 dB against the HackRF VGA's 47, so
+    set_vga clamps per radio.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ hackrf_tone_source.py | 34 +++++++++++++++++++++++++++++++---
+ 1 file changed, 31 insertions(+), 3 deletions(-)
+
+commit 08ca9fc9645ba7060a95d939dfc35bfc3b6861b2
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 15:18:51 +0530
+
+    hackrf: restart the transmit stream when it stalls
+    
+    The HackRF's SoapySDR stream dies after a few minutes of repeated retuning:
+    the sink fills the log with TIMEOUT and never recovers, so the tone vanishes
+    while the process still looks healthy and still answers control commands.
+    One run logged 1059 TIMEOUTs and produced nothing; the band being measured
+    at the time looked broken when the receiver was fine.
+    
+    Asking the sink proves nothing, so detection goes the other way: a probe_rate
+    on the signal path. When the sink stops consuming, back-pressure halts the
+    source and that rate collapses. Four seconds below a quarter of the expected
+    rate and the watchdog rebuilds the flowgraph and returns it to the band it
+    was on. Everything now reaches the flowgraph through a holder so a restart
+    swaps it out transparently.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ hackrf_tone_source.py | 79 +++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 74 insertions(+), 5 deletions(-)
+
+commit c8fec9daf5ea0d895458b51697b673019684d5bf
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 15:11:52 +0530
+
+    guru: hop in the order 2.4, 5.8, 5.1 GHz
+    
+    Each band keeps the gain measured for it (52/67/58 dB), so the reorder is
+    just the sequence.
+    
+    Checked on hardware afterwards: all three still visible and level -- SNR
+    75.0/71.1/73.4 dB, trace amplitude 0.354/0.366/0.338 -- and repeatability is
+    unchanged, 0.11-0.28 degrees on every pair except ch2-ch0 at 5.1 GHz. That
+    one still steps 180 degrees per re-lock, so approaching 5.1 GHz from 5.8
+    rather than from 2.4 makes no difference to it; the ambiguity comes from the
+    forced LO re-lock, not from where the tune arrives from.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      | 8 ++++----
+ guru.py       | 4 ++--
+ guru/guru.grc | 8 ++++----
+ guru/guru.py  | 4 ++--
+ 4 files changed, 12 insertions(+), 12 deletions(-)
+
+commit 5b7c3e9e62b0918a4ac79ed9d9d6a8861ca78e83
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 15:08:05 +0530
+
+    guru: make all three bands display, not just 2.4 GHz
+    
+    Two independent faults, both downstream of a receiver that was working.
+    Raw captures had signal on every band (80/56/45 dB SNR), so the trouble was
+    in the display chain:
+    
+    - The band-pass was one-sided, passing +50..+350 kHz only. Where the driver
+      falls back to a low-side LO to get a lock, the spectrum is inverted and the
+      tone arrives at -181 kHz, so the filter threw it away: 20 dB of rejection
+      and a flat trace at 5.1 GHz. It now passes both sides of DC, which costs
+      3 dB of noise bandwidth and recovers the band completely.
+    
+    - Level fell off badly with frequency. At one gain for all bands the traces
+      were 2.0, 0.003 and 0.009 against a +/-0.6 axis: 2.4 GHz off-scale, the
+      other two invisible. The HackRF's output collapses above 4 GHz, so TX gain
+      is now mapped per band (14/47/47) and RX gain per band (52/58/67).
+    
+    Measured after: trace amplitude 0.356 / 0.340 / 0.365 and SNR 75.1 / 73.4 /
+    71.1 dB across 2.4 / 5.1 / 5.8 GHz -- all three visible and level.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc            |  20 ++++++++++++++------
+ guru.py             |  17 +++++++++--------
+ guru/HOP_RESULT.png | Bin 0 -> 483486 bytes
+ guru/guru.grc       |  20 ++++++++++++++------
+ guru/guru.py        |  17 +++++++++--------
+ 5 files changed, 46 insertions(+), 28 deletions(-)
+
+commit 627582719535fe8176e689d4be5ecc887e9a75e4
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 14:55:42 +0530
+
+    guru: use the hopping source block instead of driving the hop from a snippet
+    
+    Swaps twinrx_usrp_source for twinrx_hopping_source and moves the schedule
+    into the block: three bands at 2.4 / 5.1 / 5.8 GHz, 10 s dwell each, 2 s
+    settle. The hop variables the flowgraph used to carry (hop_freqs, hop_dwell,
+    hop_settle, hop_enable) are gone -- the block holds them, and each band now
+    has its own gain and dwell rather than one value shared by all.
+    
+    Two consequences worth noting. The centre-frequency slider becomes a plain
+    variable: the block owns tuning, so a GUI control there would only fight it.
+    And the snippet no longer hops -- it just polls get_current_band() so the
+    CURRENT BAND label keeps following, since the label derives from
+    center_freq and nothing else updates that any more.
+    
+    5.1 GHz rather than 5.2 as asked. It works through the low-side LO fallback,
+    but ch2-ch0 still steps 180 degrees on each re-lock there; ch1 and ch3 repeat
+    to about 0.2 degrees. 5.2 GHz needs no fallback and is clean on all three
+    pairs if that matters more than the exact frequency.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      | 224 ++++++++++++++++++++--------------------------------------
+ guru.py       | 137 +++++++++++------------------------
+ guru/guru.grc | 224 ++++++++++++++++++++--------------------------------------
+ guru/guru.py  | 137 +++++++++++------------------------
+ 4 files changed, 232 insertions(+), 490 deletions(-)
+
+commit 3ad0a721fd93ab6f5597d58d8383f45d8813e034
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 12:44:41 +0530
+
+    run_hop.sh: build the system GNU Radio environment itself
+    
+    The script called gr310, which is a shell function in ~/.bashrc. Functions
+    are not inherited by scripts, and the GRSYS_* variables it reads only exist
+    once bashrc has run interactively, so sourcing bashrc from a script did not
+    help either -- it returns early when not interactive. The transmitter never
+    started and the script sat waiting for a control socket that was never
+    going to answer.
+    
+    It now rebuilds the environment directly: from the GRSYS_* variables when
+    they were inherited, otherwise by filtering the 3.8 tree out of the paths.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ run_hop.sh | 35 ++++++++++++++++++++++++++++++++---
+ 1 file changed, 32 insertions(+), 3 deletions(-)
+
+commit ac5fc2f189f9122eacf708a95c9642dc80eaa835
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 12:36:00 +0530
+
+    Recover 5.1 GHz by falling back to low-side LO1, and default RX gain to 60
+    
+    Root cause of the dead band: retuning into roughly 5.00-5.14 GHz makes UHD
+    ask for a high-side LO1 (RF + 1.25 GHz, so 6.35 GHz at 5.1 GHz) and the
+    synthesiser never locks -- lo_locked stays False and no channel sees
+    anything, while the tune reports success and actual_rf equals the request.
+    Low-side, RF - 1.25 GHz, locks immediately; the synthesiser covers
+    2.0-6.8 GHz so this is a band-planning choice, not a hardware limit. A
+    fresh flowgraph tuned straight there works because the LO is set during
+    init rather than retuned into place.
+    
+    twinrx_usrp_source now checks lo_locked after each tune and falls back to
+    low-side when it is clear. Two details that took measuring: the tunes are
+    timed commands 10 ms ahead, so the fallback has to wait or it is simply
+    overwritten; and LO1 must be forced on the exporting channel only, since
+    forcing it on all four lets each board lock independently and showed up as
+    90 degree jumps in the offsets.
+    
+    The two LO sides invert the spectrum relative to each other, so a tone sent
+    at +200 kHz arrives at -169 kHz. analyse() now searches both sides of DC.
+    
+    5.1 GHz went from no signal at all to 57.6 dB, with ch1-ch0 and ch3-ch0
+    repeating to 0.16 and 0.20 degrees. ch2-ch0 still steps by 180 degrees on
+    each re-lock; ch2 is the channel whose LO1 is being forced, and
+    re-asserting the export afterwards does not settle it.
+    
+    RX gain defaults to 60 dB, measured across all three bands: it maximises
+    SNR on the weak ones while leaving 2.4 GHz about 4.8 dB of headroom. At
+    70 dB the 2.4 GHz band clips and its SNR falls from 81 to 69 dB.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc                |  7 ++++++-
+ guru/guru.grc           |  7 ++++++-
+ guru/twinrx_hop_test.py | 21 ++++++++++++++++++---
+ 3 files changed, 30 insertions(+), 5 deletions(-)
+
+commit 15ed6781ec13423441ace01603c77c87d915a40b
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 12:23:37 +0530
+
+    Hop to 5.2 GHz instead of 5.1: the radio cannot retune into 5.0-5.1 GHz
+    
+    One band came back as noise while hopping, though each band was fine when
+    tuned to on its own. Measuring rather than guessing found a narrow hole:
+    
+      4.60 / 4.80 GHz   4/4 ch, 68-74 dB
+      5.00 / 5.05 / 5.10 GHz   0-1/4 ch, 13-26 dB
+      5.15 / 5.20 / 5.40 / 5.60 / 5.80 GHz   4/4 ch, 64-74 dB
+    
+    It is the retune that fails, not the band. A fresh flowgraph tuned
+    straight to 5.1 GHz receives it at 66 dB on all four channels; retuning
+    there mid-session yields nothing anywhere in the 1 MHz band, only LO
+    leakage at DC. UHD reports a clean tune throughout -- actual_rf equals the
+    request with zero error -- so the driver believes it succeeded.
+    
+    Ruled out: the transmitter (with the receiver parked at 5.1 GHz the tone
+    returns within a second of the HackRF retuning back), settling time (15 s
+    does not help), approaching via 5.15 GHz, tuning the LO master first,
+    re-applying the LO configuration, and LO sharing itself (the failure
+    persists with every channel on its own LO). It looks like a TwinRX retune
+    fault in UHD 3.15 over that range.
+    
+    With 5.2 GHz the three-band hop holds constant offsets on every pair:
+    2.4 GHz within 0.16 deg, 5.2 GHz within 0.43 deg, 5.8 GHz within 0.67 deg,
+    15 of 15 samples passing the SNR gate.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      | 11 +++++++++--
+ guru.py       |  4 ++--
+ guru/guru.grc | 11 +++++++++--
+ guru/guru.py  |  4 ++--
+ 4 files changed, 22 insertions(+), 8 deletions(-)
+
+commit 05316be7528e66fe5590b20b8e4338f53b68b1e7
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 12:01:33 +0530
+
+    Hold each band for 10 s, and show which band is running
+    
+    hop_dwell goes to 10 s and a separate hop_settle (2 s) covers the switch,
+    so each frequency occupies 12 s and a full cycle is 36 s. Measured
+    settling is 25-40 ms, so 2 s is generous -- it is there to keep the
+    displayed sweep well clear of the transition, not because the hardware
+    needs it.
+    
+    A CURRENT BAND label sits directly above the time plot. It is a QT GUI
+    Label whose value derives from center_freq, so GRC refreshes it from
+    set_center_freq() on every hop; the time sink itself exposes no runtime
+    setters under 3.8, so its title cannot be changed instead.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      | 63 +++++++++++++++++++++++++++++++++++++++++++++-------
+ guru.py       | 71 ++++++++++++++++++++++++++++++++++++++++++++++-------------
+ guru/guru.grc | 63 +++++++++++++++++++++++++++++++++++++++++++++-------
+ guru/guru.py  | 71 ++++++++++++++++++++++++++++++++++++++++++++++-------------
+ 4 files changed, 222 insertions(+), 46 deletions(-)
+
+commit 04f105fe8994423f81d23e711fa862d6761cd483
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 11:56:37 +0530
+
+    Fix the hop snippet's scope, and drop the B210 launcher
+    
+    Two faults stopped the first real run:
+    
+    - GRC renders snippets as module-level functions taking the top_block as
+      an argument, so flowgraph variables are attributes on it rather than
+      names in scope. Reading hop_enable directly raised NameError the moment
+      the snippet fired. All four hop variables now go through self.
+    - The startup snippet still shelled out to b210_tone_source.py. The
+      calibration source is a HackRF started outside the flowgraph, and it
+      cannot be launched from here anyway: it needs the system GNU Radio 3.10
+      while this runs under 3.8.
+    
+    Verified on hardware: 19 hops across 2.4 / 5.1 / 5.8 GHz with the receiver
+    commanding the transmitter each time, no errors on either side and no
+    stream timeouts.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      | 272 ++++++++++++++++++++++++++++------------------------------
+ guru.py       |  64 ++++++--------
+ guru/guru.grc | 272 ++++++++++++++++++++++++++++------------------------------
+ guru/guru.py  |  64 ++++++--------
+ 4 files changed, 316 insertions(+), 356 deletions(-)
+
+commit 5864d3260c88b46af20c0e0309a8caf998412511
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 11:53:23 +0530
+
+    Drive the HackRF through gr-soapy, keeping libuhd out of that process
+    
+    gr-osmosdr links libuhd 4.1 even when the target is a HackRF, which is
+    awkward here: the X310 runs an FPGA image built for UHD 3.15 and sits on a
+    reachable network, so a stray UHD 4.1 discovery from the transmitter is a
+    plausible way to upset it. SoapySDR and its HackRF module link only
+    libhackrf -- verified, zero libuhd references -- so that path is now the
+    default, with osmosdr still selectable via --backend.
+    
+    The default sample rate goes to 2 Msps. At 1 Msps the SoapySDR stream
+    throws continuous TIMEOUTs; at 2 Msps a retune across 2.4/5.1/5.8 GHz runs
+    with none. The transmit rate does not have to match the receiver, since
+    the tone sits at centre+offset either way.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ hackrf_tone_source.py | 80 ++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 67 insertions(+), 13 deletions(-)
+
+commit cc6a6dd4d999026042d2dd0dd4a017ccb156c205
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 11:48:40 +0530
+
+    Add run_hop.sh, and point the HackRF script at the gr310 wrapper
+    
+    This shell defaults to GNU Radio 3.8 for the TwinRX, so running the HackRF
+    source directly fails on the missing gr-osmosdr. The error now says to use
+    the gr310 wrapper instead of just "use the system python3", and a hackrf()
+    shortcut sits alongside the existing b210() one in ~/.bashrc.
+    
+    run_hop.sh starts both halves in the right order: it checks the X310
+    answers, starts the transmitter under the system GNU Radio, waits for its
+    control socket to actually reply rather than sleeping and hoping, then
+    starts guru.py under 3.8 and stops the transmitter on the way out.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ hackrf_tone_source.py | 14 +++++---
+ run_hop.sh            | 88 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 98 insertions(+), 4 deletions(-)
+
+commit 3d368ae958c52573eda850ed5dbdad89b68827a1
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-23 11:41:38 +0530
+
+    Hop the centre frequency from inside guru.grc, with a HackRF source
+    
+    The transmitter is now a HackRF One instead of the B210. It needs system
+    gr-osmosdr while the TwinRX needs GR 3.8, so the two cannot share a
+    process; hackrf_tone_source.py therefore takes retune commands on a UDP
+    socket and the receiver commands it on every hop. Moving the transmitter
+    first means it is already in place when the receiver arrives, rather than
+    both ends guessing from a wall clock.
+    
+    Two bugs found while wiring this up:
+    
+    - The flowgraph hardcoded the source block's centre frequency instead of
+      referencing the centre-freq variable, so the GUI slider only ever
+      updated a Python attribute and never reached the hardware. Nothing
+      could have retuned it.
+    - The installed block YAML generated set_center_freq(freq) while the
+      function takes (freq, sources), so the callback would have raised
+      TypeError the moment it did fire.
+    
+    disp_bw goes 20 kHz -> 300 kHz. The HackRF's stock crystal is ~+/-20 ppm
+    against the B210's ~1.6 ppm, which is ~116 kHz of offset error at
+    5.8 GHz -- the old window would have rejected the tone outright. The
+    error is common mode across channels, so it does not affect phase.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc                | 850 +++++++++++++++++++++++++++++++++++-------------
+ guru.py                 |  76 ++++-
+ guru/guru.grc           | 850 +++++++++++++++++++++++++++++++++++-------------
+ guru/guru.py            |  76 ++++-
+ guru/twinrx_hop_test.py |  73 ++++-
+ hackrf_tone_source.py   | 237 ++++++++++++++
+ 6 files changed, 1686 insertions(+), 476 deletions(-)
+
+commit d3033fb05bf76a458713baee4907784a6da9ba85
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-22 19:48:29 +0530
+
+    guru: make the hop stability test complete and self-verifying
+    
+    Adds the pieces the plan called for:
+    
+    - SNR gate. A sample is kept only when every channel actually sees the
+      tone. A channel receiving nothing reports a perfectly steady phase, and
+      skipping this check has produced false PASS results on this rig before.
+    - Real settling measurement. The previous number was buffer-fill time
+      (65.5 ms floor); short probes after the tune now measure the hardware,
+      which lands around 25-40 ms.
+    - Wrap-safe statistics. Circular mean and peak-to-peak spread about it, so
+      offsets near +/-180 do not produce nonsense.
+    - Per-hop CSV log, a per-frequency plot, and a verdict against thresholds.
+    - A --sim source, so the whole path can be exercised with no radio.
+    
+    Verified in simulation: measured offsets match injected truth to 0.32 deg,
+    the gate discards every sample when the threshold is raised above the
+    available SNR, and a measure/apply calibration round trip pulls residuals
+    from +/-180 deg down to within 0.6 deg of zero at all three frequencies.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru/twinrx_hop_test.py | 455 ++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 329 insertions(+), 126 deletions(-)
+
+commit 15edda1392756cf2382efcebfab8cd1ab4f02725
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-22 19:42:42 +0530
+
+    guru: add a minimal switching-loop diagram
+    
+    Just the hop states and the four steps per dwell, without the hardware and
+    analysis detail of the fuller plan diagram.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru/SWITCHING_LOOP.png | Bin 0 -> 117800 bytes
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+commit df04655f59881ce29c04e037d8795157616694e0
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-22 19:38:38 +0530
+
+    guru: add the phase-offset stability plan diagram
+    
+    Measurement only -- hop the receiver through 2.4/5.1/5.8 GHz and check
+    whether each frequency returns the same offset on every visit. Correction
+    is deliberately deferred until the offsets are known to be repeatable.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru/STABILITY_PLAN.png | Bin 0 -> 344489 bytes
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+commit ee06c8014a9f8be0d77e7d67b1a160b321468270
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-22 19:24:31 +0530
+
+    guru: add frequency-hopping test with per-frequency phase calibration
+    
+    Hops the receiver through a frequency list, dwelling at each, and records
+    per-channel tone SNR alongside the inter-channel phase offsets. Repeated
+    cycles give the spread at each frequency, which is what decides whether a
+    stored calibration survives hopping or has to be remeasured every visit.
+    
+    The offsets differ per frequency, so the correction has to switch with the
+    centre frequency. doa.phase_correct_hier cannot: it reads its .cfg once in
+    __init__. The same rotation is applied with multiply_const_cc instead,
+    whose set_k() is a runtime callback, so tuning and calibration change
+    together on each hop.
+    
+    --cal-out measures the table (circular mean, so the +/-180 deg wrap is
+    handled); --cal-in applies it and reports residuals. Sign convention
+    verified against synthetic signals including at the wrap boundary.
+    
+    Same-frequency retune already reproduces the offsets to 0.05-0.08 deg; the
+    cross-band case is still unmeasured.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru/HOP_SEQUENCE.png   | Bin 0 -> 175149 bytes
+ guru/HOP_TEST_PLAN.png  | Bin 0 -> 364435 bytes
+ guru/twinrx_hop_test.py | 242 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 242 insertions(+)
+
+commit 3df66a9b305f35fb7a882631ff5a481d69a74917
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-22 18:12:31 +0530
+
+    guru: measure phase offsets on the filtered tone, add per-session calibration
+    
+    Tap the phase estimator off the band-pass filtered streams (bp_0..bp_3)
+    instead of the raw USRP source. Restricting the estimate to the 20 kHz
+    tone band cuts out-of-band noise and drops the estimator variance, which
+    is what makes the inter-channel offsets read steady.
+    
+    Also add the gr-doa phase_correct_hier calibration file. The constants
+    are only valid for one power session: the board-A-to-board-B LO phase
+    re-locks to a different value on every power cycle, so these must be
+    re-measured after each power-up.
+    
+    Measured drift scales with RF frequency, confirming cable path length as
+    the dominant error term: ~1 deg at 2.4 GHz, ~2 deg at 5.1 GHz, ~4 deg at
+    5.8 GHz. Intra-board pairs (ch1 vs ch0) stay tight because the shared LO
+    cable is common-mode; pairs crossing the cable (ch2/ch3 vs ch0) carry its
+    drift differentially.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc                      | 2100 +++++++++++++++++++++--------------------
+ guru.py                       |   87 +-
+ guru/guru.grc                 |  258 +++--
+ guru/guru.py                  |   87 +-
+ guru/twinrx_phase_offsets.cfg |    3 +
+ 5 files changed, 1384 insertions(+), 1151 deletions(-)
+
+commit ecddf5ba8edcf6408ff703826f4fbc46a434d42e
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 19:21:47 +0530
+
+    Restore the Rx B LO direction in the gr-doa TwinRX source block
+    
+    All four channels are cabled and twinrx_lo_check.py measured +49..+50 dB
+    of tone on every one, yet guru showed ch2/ch3 flat.  Probing each chain
+    found them arriving 70x down, already weak at the DC blocker.
+    
+    Cause: upstream's twinrx_usrp_source hard-codes Rx A as the exporter --
+    ch0 internal + export, ch1 companion, ch2/ch3 external.  On this
+    USRP-2945 the A->B MMCX jumpers pass no LO (measured twice today), so
+    ch2/ch3 had no oscillator at all.
+    
+    This was a regression I introduced.  guru had been using a copy under
+    ~/.local that someone had already customised to Rx B.  When gr-doa was
+    built properly into ~/gnuradio-3.8 and the sys.path workaround dropped,
+    it started using the upstream file and flipped back to Rx A.
+    
+    The block now takes lo_export_direction, defaulting to "B":
+    
+        B : ch0/ch1 external, ch2 internal + export, ch3 companion
+        A : the upstream arrangement
+    
+    Exports are cleared before being re-asserted, since UHD refuses a state
+    where two channels export at once.  Also added the per-channel
+    set_antenna the upstream block omits entirely -- it left every channel
+    on whatever UHD defaults to.
+    
+    Verified: readback is ch0/ch1 external, ch2 internal export=True,
+    ch3 companion.  Signal into the chains went from 1.3e-4 to 1.35e-2 on
+    ch2/ch3, and all four traces are on screen.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru/guru.grc | 1942 +++++++++++++++++++++++++++------------------------------
+ guru/guru.py  |    2 +-
+ 2 files changed, 916 insertions(+), 1028 deletions(-)
+
+commit 5a755df28882bdd2d4f047e950ed7c979c9af8ac
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 19:09:13 +0530
+
+    guru: drop findmax_and_save -- it was halting the flowgraph
+    
+    doa.findmax_and_save ends its work() with "return -1", which stops the
+    whole flowgraph once it has written the config file.  That is correct
+    for a one-shot measurement but fatal here: guru wrote the file after a
+    couple of thousand samples and then halted, so the scope never drew and
+    every phase readout stayed at 0.
+    
+    Removed it, along with ph_cfg_file and ph_findmax_n which only fed it.
+    The live chain stays:
+    
+        twinrx_phase_offset_est -> x180/pi -> moving average -> decimate -> number sink
+    
+    Verified on hardware: waveforms present and the readouts update, with
+    ch1-ch0 at +44.49 deg.
+    
+    Writing the offsets to a file remains a separate one-shot run; it cannot
+    share a flowgraph with a live display.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      | 58 ----------------------------------------------------------
+ guru.py       | 20 +-------------------
+ guru/guru.grc | 58 ----------------------------------------------------------
+ guru/guru.py  | 20 +-------------------
+ 4 files changed, 2 insertions(+), 154 deletions(-)
+
+commit d358db43169b50ba9ac8f840d8181918a601dac9
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 19:02:13 +0530
+
+    guru: measure inter-channel phase offsets alongside the time plot
+    
+    The phase work now lives in guru.grc itself rather than a separate
+    flowgraph.  Purely additive -- the time sink, its four traces, the
+    labels and the -0.6..0.6 axis are byte-identical, and all 20
+    per-channel connections are untouched.
+    
+    Added:
+    
+        twinrx_usrp_source (raw, 4 ch)
+            -> doa.twinrx_phase_offset_est(4, ph_skip)
+                 |-> x 180/pi -> moving average -> decimate -> number sink
+                 `-> doa.findmax_and_save -> ph_cfg_file
+    
+    Three live readouts sit under the sliders on the Control & Phase tab,
+    so the offsets can be watched while the waveforms are on screen.
+    
+    The estimator taps the RAW channels, ahead of DC blocking and
+    filtering, matching gr-doa's own
+    estimate_X310_TwinRX_constant_phase_offsets_and_save.grc.  Its output
+    is radians, so each line is scaled by 180/pi, written as a literal
+    because GRC's evaluator has no math module.
+    
+    Measured on hardware just now:
+    
+        ch1 - ch0  +0.842 rad   +48.24 deg
+        ch2 - ch0  +3.142 rad  +180.00 deg
+        ch3 - ch0  +3.139 rad  +179.83 deg
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      | 752 ++++++++++++++++++++++++++++++++++++++++++++++++++++------
+ guru.py       | 169 +++++++++++++
+ guru/guru.grc | 752 ++++++++++++++++++++++++++++++++++++++++++++++++++++------
+ guru/guru.py  | 169 +++++++++++++
+ 4 files changed, 1684 insertions(+), 158 deletions(-)
+
+commit eb2eddf817ca05a697a00a6a09d4799c4844ca3a
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 19:00:35 +0530
+
+    guru_phase: drop findmax_and_save so the live display keeps running
+    
+    findmax_and_save ends its work() with "return -1", which stops the whole
+    flowgraph once it has written its file.  In a one-shot calibration script
+    that is the point, but here it killed the time-domain display.  The three
+    number sinks already show the offsets continuously, which is what this
+    flowgraph is for, so the saver has no place in it.
+    
+    Also fixed a Python 2 leftover in the block itself, in ~/REPO/gr-doa:
+    
+        if file.write(str(max)+"\n") != None:
+            sys.stderr.write("Writing file failed\n"); sys.exit(1)
+    
+    py2 file.write() returned None; py3 returns the character count, so the
+    check fired on every SUCCESSFUL write and sys.exit(1) aborted the loop
+    after the first value.  That is why the .cfg came out with one number
+    instead of three.  Now wrapped in try/except.
+    
+    Measured live at 2.4 GHz, zero overflows:
+        ch1 - ch0  = +43.94 deg
+        ch2 - ch0  =  -1.05 deg
+        ch3 - ch0  =  +0.07 deg
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru_phase/guru_phase.grc         |  34 +++-------------------------------
+ guru_phase/guru_phase.py          |   6 +-----
+ guru_phase/phase_offsets_live.png | Bin 0 -> 49579 bytes
+ 3 files changed, 4 insertions(+), 36 deletions(-)
+
+commit 67c0369db2d901bc611a0de9693620a731e32411
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 18:57:01 +0530
+
+    Regenerate all .py from their .grc so the flowgraph files are authoritative
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru_phase/guru_phase.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+commit a34bf893b6a1f7a28fb7ca1124aa205d20d85c69
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 18:51:14 +0530
+
+    Add guru_phase: measure inter-channel phase offsets with the gr-doa blocks
+    
+    guru.grc plus gr-doa's phase-offset chain, using the custom blocks from
+    EttusResearch/gr-doa @ 7f982b7 now that they build under 3.8:
+    
+        twinrx_usrp_source (raw, all 4 ch)
+            -> doa.twinrx_phase_offset_est(4, ph_skip)
+                 |-> x 180/pi -> moving average -> decimate -> number sink   (live, degrees)
+                 `-> doa.findmax_and_save(...)                               (writes a .cfg)
+    
+    Wiring follows gr-doa's own
+    estimate_X310_TwinRX_constant_phase_offsets_and_save.grc: the estimator
+    takes the RAW channels, ahead of any DC blocking or filtering, and puts
+    out num_inputs-1 phases -- ch1, ch2 and ch3 each relative to ch0.
+    
+    Its output is in RADIANS (it ends in complex_to_arg), so each line is
+    scaled by 180/pi.  The literal is spelled out because GRC's expression
+    evaluator has no math module.
+    
+    n_skip_ahead = 2**13 discards the start-up transient before measuring.
+    
+    A third tab shows the three offsets live.  This is the measurement the
+    hardcoded rotations removed in 071a1a2 should have been coming from, and
+    what twinrx_lo_cal.json was meant to hold.
+    
+    Compiles clean; not yet run against the radio -- the X310 Ethernet is
+    unplugged (carrier 0).
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru_phase/guru_phase.grc | 1875 +++++++++++++++++++++++++++++++++++++++++++++
+ guru_phase/guru_phase.py  |  648 ++++++++++++++++
+ 2 files changed, 2523 insertions(+)
+
+commit fb175e0c52d361ed814a8d3581169149a5c69dc2
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 18:36:23 +0530
+
+    Add a block diagram for guru.grc
+    
+    Traces the actual signal path from the .grc rather than from memory:
+    B210 -> pad/splitter -> TwinRX USRP Source -> four identical chains
+    (DC Blocker, band-pass, resampler, Complex to Real) -> time sink.
+    
+    Two things worth recording that are not obvious from the canvas:
+    
+    The source-to-chain wiring is crossed -- ch1 feeds dcblock_2, ch2 feeds
+    dcblock_3, ch3 feeds dcblock_1 -- but the sink connections are crossed
+    the same way, so every channel still lands on its matching trace.  Easy
+    to "fix" this by mistake and scramble the display.
+    
+    And a list of what is now dead in the file: the disabled
+    uhd_usrp_source_0, the lo_sources/lo_export_chan variables the TwinRX
+    block ignores, the dead gain variable and RX Gain slider (the live one
+    is gainn), and several unused taps variables.  The frequency sink and
+    the four level meters were lost in the TwinRX swap; guru2/ still has
+    them.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru/BLOCK_DIAGRAM.md       |  58 ++++++++++++++++++++++++++++++++++++++++++++
+ guru/GURU_BLOCK_DIAGRAM.png | Bin 0 -> 282051 bytes
+ 2 files changed, 58 insertions(+)
+
+commit 9a14259a587a0bd75f30cd645ed1ad0414e3e130
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 18:34:24 +0530
+
+    Add guru_doa: guru plus the gr-doa MUSIC direction-finding chain
+    
+    The four cleaned channels now also feed
+    
+        autocorrelate -> MUSIC_lin_array -> find_local_max -> compass
+                                         -> vector sink (pseudo-spectrum)
+    
+    which is the same wiring as gr-doa's run_MUSIC_lin_array_X310_TwinRX.grc,
+    with its parameter values: 4 elements, 0.5 normalised spacing, 1 target,
+    snapshot 2**11, overlap 2**9, pseudo-spectrum 2**10 over 0..180 deg.
+    
+    A third tab holds the compass and the spectrum.  guru.grc is untouched;
+    this is a separate flowgraph built from it.
+    
+    Also drops the sys.path workaround from the TwinRX block YAML.  It
+    existed because doa/__init__.py pulled in gnuradio.doa, which only
+    existed in the 3.10 tree.  gr-doa is now built and installed into
+    ~/gnuradio-3.8, so a plain "import doa" resolves correctly and the
+    block uses the 3.8 build rather than the 3.10 one.
+    
+    Compiles clean.  Not yet run against the radio: the X310 Ethernet is
+    currently unplugged (carrier 0), so only the B210 enumerates.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.py               |    6 +-
+ guru/guru.py          |    6 +-
+ guru_doa/guru_doa.grc | 1690 +++++++++++++++++++++++++++++++++++++++++++++++++
+ guru_doa/guru_doa.py  |  582 +++++++++++++++++
+ 4 files changed, 2276 insertions(+), 8 deletions(-)
+
+commit c152ff5c771e2920e5a460b8f3e99e26174e0ef4
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 17:40:20 +0530
+
+    Add guru3: copy of guru using the TwinRX USRP Source block
+    
+    Same layout and procedure as guru/ and guru2/, names carried over to
+    guru3: guru3.grc, guru3.py, run_guru3.sh, plus the same support files.
+    
+    Taken from guru/ at 0b9cb4b, so it is the TwinRX-block variant: 43
+    blocks, no level meters, single timed tune.  guru2/ remains the
+    uhd_usrp_source variant with the meters and the double-tune, so the two
+    bundles are now genuinely different flowgraphs rather than copies.
+    
+    Run it the same way:
+        cd ~/radar2/guru3 && ./run_guru3.sh
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru3/README.md           |   56 ++
+ guru3/b210_tone_source.py |  282 +++++++++
+ guru3/guru3.grc           | 1424 +++++++++++++++++++++++++++++++++++++++++++++
+ guru3/guru3.py            |  476 +++++++++++++++
+ guru3/run_guru3.sh        |   23 +
+ guru3/twinrx_lo_cal.json  |  110 ++++
+ guru3/twinrx_lo_check.py  |  783 +++++++++++++++++++++++++
+ 7 files changed, 3154 insertions(+)
+
+commit 0b9cb4b39b82dd7de53a5acad3ebc0d4c7d7f99d
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 17:39:53 +0530
+
+    guru: switch to the gr-doa TwinRX USRP Source block
+    
+    Replaces uhd_usrp_source with twinrx_usrp_source, which does its own LO
+    routing and timed tune, so the LO section of the after-init snippet was
+    stripped down to just launching the B210.  The snippet keeps a hardware
+    LO readback, since the block itself prints nothing.
+    
+    The installed block needed one fix to run under 3.8: doa/__init__.py does
+    "from gnuradio.doa import *", which only exists in the 3.10 tree.  The
+    block is pure Python (gr + uhd only), so the YAML at
+    ~/.local/share/gnuradio/grc/blocks/twinrx_usrp_source.block.yml now
+    imports the module file directly.  Original kept as *.bak.
+    
+    Two things this loses, noted so the choice is deliberate:
+      - the four live dB level meters (65 blocks -> 43)
+      - the double-tune that works around the 16-deep X310 command FIFO;
+        the block does a single timed burst
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      | 1750 +++++++++++++++------------------------------------------
+ guru.py       |  459 ++-------------
+ guru/guru.grc | 1750 +++++++++++++++------------------------------------------
+ guru/guru.py  |  459 ++-------------
+ 4 files changed, 1024 insertions(+), 3394 deletions(-)
+
+commit e80d5e39ebd2d9a3b244b561e8e7d4a160ae44b3
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 17:32:20 +0530
+
+    Add HANDOFF.md so another session can pick this up cold
+    
+    Covers the two environment traps that cost the most time (GRC 3.10 turning
+    every taps block red and corrupting files on save; the B210 needing the
+    system UHD), the LO routing and why only the B->A direction works here,
+    and the connector pinout with the output-to-output damage risk.
+    
+    Records what was measured rather than assumed: 0.11 deg phase coherence
+    across three retunes, the 15.4 dB RF A imbalance against 0.6 dB on RF B
+    that localises the fault to the board, the ~4 kHz B210/X310 clock offset
+    that made a narrow band-pass display pure noise, the DC blocker numbers,
+    why the AGC was removed, and the TX amplitude sweep behind 0.8.
+    
+    Section 9 lists four conclusions reached during the session and later
+    disproved -- including "ch0 is a dead port" -- so the next session does
+    not spend hours re-deriving them.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ HANDOFF.md | 344 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 344 insertions(+)
+
+commit 27c3cd46af83fc8b350e0f2468fa184df27dfd6d
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 14:28:24 +0530
+
+    Add live per-channel level meters; delete the disabled block graveyard
+    
+    Two changes.
+    
+    Live meters: each channel now has
+      band-pass -> |x|^2 -> moving average -> 10*log10 -> decimate -> number sink
+    so the tone level in dB is readable straight off the GUI.  This exists
+    because chasing the ch0/ch1 amplitude imbalance meant stopping the
+    flowgraph every time a number was needed.  Decimation is 100000:1, so
+    the readout costs effectively nothing.
+    
+    Removed all 66 disabled blocks and the 81 connections that referenced
+    them: the old phase-measurement chain (freq xlating filters, mag^2,
+    nlog10, moving averages, conjugate multiplies, arg, number sinks), a
+    spare time sink, and the never-used B210 uhd_usrp_sink.
+    
+    Checked before deleting: the only variables among them were ref_offset
+    and tx_gain, and no enabled block referenced either.  All four USRP
+    source ports remain connected (freq sink + dcblock each), so nothing is
+    left dangling.
+    
+    131 blocks -> 65, all of them now enabled.  Compiles clean.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      | 3866 +++++++++++++++++----------------------------------------
+ guru.py       |  184 ++-
+ guru/guru.grc | 3866 +++++++++++++++++----------------------------------------
+ guru/guru.py  |  184 ++-
+ 4 files changed, 2574 insertions(+), 5526 deletions(-)
+
+commit 99ca1272d5b67750723290ff8d7e55c3549e7c25
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 13:52:58 +0530
+
+    Give ch0/ch1 the same clean chain as ch2/ch3
+    
+    Every channel now runs  USRP -> DC Blocker -> band-pass -> resampler
+    -> scope, with the same disp_gain.  Previously only ch2/ch3 were
+    filtered; ch0/ch1 went straight into the resampler with stale
+    hand-tuned gains of 140 and 35, so they displayed raw and unscaled.
+    Whichever pair is cabled now shows correctly with no special-casing.
+    
+    Y axis widened to -0.6..0.6: with uniform gain ch1 peaks at 0.55 and
+    was being clipped by the old +/-0.3 range.
+    
+    Measured with RF A cabled (2-way splitter, RF B disconnected):
+      ch0  +0.1015 / -0.1016   mean -0.000000
+      ch1  +0.5528 / -0.5531   mean -0.000001
+    Zero overflows.  Both centred on zero, so the DC blocking works on
+    these channels too.
+    
+    Also dropped "(dead port)" from the ch0 label.  ch0 reads 29 dB and
+    tracks a 10 dB TX step by -11 dB, so it is receiving real signal --
+    the earlier fault was the feed to that port, not the port itself.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      | 126 +++++++++++++++++++++++++++++++++++++++++++++++++++-------
+ guru.py       |  40 +++++++++++++------
+ guru/guru.grc | 126 +++++++++++++++++++++++++++++++++++++++++++++++++++-------
+ guru/guru.py  |  40 +++++++++++++------
+ 4 files changed, 278 insertions(+), 54 deletions(-)
+
+commit 31452881460b33cc05f1a4184011a1a077e567c0
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 13:37:40 +0530
+
+    Refresh guru2 from the current verified guru
+    
+    guru2 had drifted several changes behind: it still carried the AGC,
+    the hardcoded phase rotations, and a disabled frequency sink with
+    fc=0.  A stale copy kept as a safety copy is worse than none -- run it
+    by mistake and you get old behaviour with nothing to indicate why.
+    
+    Now byte-identical to guru apart from id, title and filenames.  Both
+    sides verified equal on: no AGC, no phase rotation, frequency sink
+    enabled with fc=center_freq, disp_bw=20e3, disp_gain=25.
+    
+    The previous guru2 state is still recoverable from history (4db33f7)
+    if the older behaviour is ever needed for comparison.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru2/guru2.grc | 755 +++++++++++++++++++++++++++-----------------------------
+ guru2/guru2.py  | 116 +++++++--
+ 2 files changed, 453 insertions(+), 418 deletions(-)
+
+commit 2abd5e7a82ea42074ba5b6f56487f22a65551626
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 12:55:48 +0530
+
+    Restore the hardware DC-offset correction lost to a GRC overwrite
+    
+    set_auto_dc_offset(True) on all four channels had been added to the LO
+    snippet earlier, then silently reverted when an open GRC window wrote
+    its stale copy back to disk.  Nothing failed visibly, because the DC
+    Blocker blocks were still doing the heavy lifting.
+    
+    Measured contribution of each layer on the DC spike:
+    
+      hardware correction only   ch2  58.8 -> 58.4 dB   (barely anything)
+                                 ch3  53.8 -> 38.3 dB
+      + DC Blocker               ch2  58.4 -> -34.1 dB  (92 dB)
+                                 ch3  38.3 -> -67.5 dB
+    
+    So the block is what actually removes it; the hardware call is a cheap
+    first layer worth keeping but never sufficient alone.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      | 6 +++++-
+ guru.py       | 8 ++++++++
+ guru/guru.grc | 6 +++++-
+ guru/guru.py  | 8 ++++++++
+ 4 files changed, 26 insertions(+), 2 deletions(-)
+
+commit 6dede3fb5533096549239b9d39e3028aab9ba325
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 12:44:59 +0530
+
+    Enable the per-channel frequency sink on the Spectra tab
+    
+    The freq sink already existed, wired to all four raw USRP outputs, but
+    was left disabled.  Turned on, with labels matching the LO naming used
+    on the time sink and a -120..0 dB scale.
+    
+    It is worth having visible: it shows the tone landing at ~+204 kHz
+    rather than the nominal +200 kHz, which is the B210/X310 clock offset
+    that has caused trouble twice now.  Seeing it on screen beats
+    rediscovering it from a 52% ripple figure.
+    
+    It taps the RAW source outputs, ahead of the DC blocker and band-pass,
+    so it also shows the DC/LO leakage spike those blocks remove.
+    
+    Verified live: zero overflows.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      | 36 ++++++++++++++++++------------------
+ guru.py       | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ guru/guru.grc | 36 ++++++++++++++++++------------------
+ guru/guru.py  | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 128 insertions(+), 36 deletions(-)
+
+commit 544e619a58c9bcf34693439c4a74c4bbaaa24b37
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 12:35:36 +0530
+
+    Label each trace with its LO source; restore after a GRC overwrite
+    
+    Legend now names the routing directly:
+      Ch1 RF A/RX2 - LO external
+      Ch0 RF A/RX1 - LO external (dead port)
+      Ch2 RF B/RX1 - LO internal (MASTER, exports)
+      Ch3 RF B/RX2 - LO companion
+    
+    Dropped "(Ref)" from ch1: it meant phase reference, and the phase
+    alignment has been removed, so nothing is referenced to it any more.
+    ch1 is still the scope trigger channel, which is a separate thing.
+    
+    This also restores 071a1a2.  An open GRC window held a copy of the
+    flowgraph from before that commit and wrote it back to disk, undoing
+    the phase-rotation removal in both guru.grc and guru.py.  Restored
+    from HEAD and regenerated so the .grc and .py agree.
+    
+    Note the labels are static text: change lo_sources or lo_export_chan
+    and they will silently disagree with the hardware.  The readback the
+    snippet prints at start-up stays the truthful source.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      | 8 ++++----
+ guru.py       | 2 +-
+ guru/guru.grc | 8 ++++----
+ guru/guru.py  | 2 +-
+ 4 files changed, 10 insertions(+), 10 deletions(-)
+
+commit 071a1a28c27c2e55fe9db6fc2ffa21efb7d9265b
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 12:16:21 +0530
+
+    Remove the hardcoded phase alignment from the resamplers
+    
+    The resampler taps carried a complex constant per channel that rotated
+    the phase:
+    
+      ch0  -39.59 deg      ch2  -118.08 deg      ch3  +46.27 deg
+    
+    Two reasons they had to go.
+    
+    They were stale.  twinrx_lo_cal.json now reads [0, 15.234, -98.405,
+    63.127], which re-referenced to ch1 calls for +15.23 / +113.64 /
+    -47.89 -- nothing close to the frozen literals.  guru.py never opens
+    that file, so the numbers could only ever drift apart.  And they drift
+    by design: the TwinRX LO divider comes up in a random quadrant on every
+    power cycle, so any fixed correction is wrong after the next restart.
+    
+    They were also only valid at 2.4 GHz.  Moving the Center Freq slider
+    retunes the hardware but leaves the rotation untouched, so the
+    correction silently stops matching.
+    
+    Every channel now gets identical real-valued taps, so the scope shows
+    the TRUE relative phase instead of a stale correction.  Magnitude of
+    every removed constant was exactly 1.0, so amplitude is unaffected.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      | 11 ++++-------
+ guru.py       | 24 ++++++++++++------------
+ guru/guru.grc | 11 ++++-------
+ guru/guru.py  | 24 ++++++++++++------------
+ 4 files changed, 32 insertions(+), 38 deletions(-)
+
+commit 73d1c2a0e85449bd1b76fae2cedd6794634fbf5f
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 11:48:14 +0530
+
+    Sync the duplicated b210_tone_source.py copies
+    
+    guru/ and guru2/ still carried amplitude default 0.5 while the root
+    copy had moved to 0.8.  run_guru.sh spawns the root copy by absolute
+    path so the flowgraph was unaffected, but running the bundle copy by
+    hand gave the old level with no indication anything was different.
+    
+    This is the hazard of keeping three copies of the same file; they
+    drift silently.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru/b210_tone_source.py  | 10 +++++++---
+ guru2/b210_tone_source.py | 10 +++++++---
+ 2 files changed, 14 insertions(+), 6 deletions(-)
+
+commit 6ddf3931bf2cdb1c0f49d3b466fa3e08e4ae6516
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 11:44:08 +0530
+
+    Drop the AGC on ch2/ch3; a fixed gain is better here
+    
+    The AGC was never what made the amplitude steady -- it only set the
+    level.  Measured at RX gain 60 with TX amplitude 0.8, envelope ripple
+    after dc_blocker + band-pass:
+    
+      with AGC      ch2 1.0%   ch3 0.9%
+      without AGC   ch2 0.65%  ch3 0.54%
+    
+    The tone is already steady on its own, and the AGC slightly WORSENED
+    it by reacting to the instantaneous envelope.
+    
+    A fixed disp_gain of 25 replaces it.  That also keeps the true relative
+    amplitude between the channels: ch3 really is ~31% stronger than ch2
+    (0.00469 vs 0.00357 raw), which a per-channel AGC flattened away.  And
+    there is no start-up transient to trip the axis any more.
+    
+    Verified live: ch2 +0.0917/-0.0916, ch3 +0.1199/-0.1198, mean -1e-06,
+    asymmetry 1e-04, zero overflows.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru.grc      |   72 +--
+ guru.py       |   33 +-
+ guru/guru.grc | 1556 +++++++++++++++++++++++++++++++++++++--------------------
+ guru/guru.py  |   54 +-
+ 4 files changed, 1090 insertions(+), 625 deletions(-)
+
+commit 2a9b8dbfb7177e682b186f08811a35a877cd4630
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 11:37:56 +0530
+
+    Raise the default TX amplitude to 0.8
+    
+    Measured on this rig at 2.4 GHz, gain 55, 30 dB pad (ch2 / ch3,
+    tone above floor and worst spur in dBc):
+    
+      amplitude 0.5   +43.5 / +44.9 dB    -29.3 / -20.7 dBc
+      amplitude 0.7   +45.9 / +47.2 dB    -31.3 / -23.9 dBc
+      amplitude 0.8   +47.1 / +48.5 dB    -34.7 / -25.1 dBc
+      amplitude 1.0   +50.1 / +51.4 dB    -36.3 / -26.6 dBc
+    
+    Spurs FALL in dBc as amplitude rises, the opposite of what the old
+    help text warned.  The worst spur sits at a fixed +5.9 kHz from the
+    tone -- not at the IQ image (-204 kHz) or a harmonic (408 kHz), both
+    of which were inside the search window and came out lower.  It is a
+    fixed-level artifact, so a stronger tone just pushes it further down.
+    
+    So digital headroom, not spurs, is what limits the amplitude.  0.8
+    takes +3.6 dB of SNR over the old 0.5 while keeping ~2 dB of headroom,
+    so a DC offset or a waveform change cannot clip the DAC.
+    
+    At 0.8 the level at each RX port is -63.7 dBm, still 74 dB below the
+    TwinRX +10 dBm damage threshold; the 30 dB pad keeps that margin even
+    if TX gain slips to maximum.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ b210_tone_source.py | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+commit 4db33f76fbddb664dec0718af028222bcc6ebe9e
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 11:20:59 +0530
+
+    Add guru2: a copy of the working guru bundle
+    
+    Same layout and same procedure as guru/, with every name carried over
+    to guru2: guru2.grc, guru2.py, run_guru2.sh, plus the same
+    b210_tone_source.py, twinrx_lo_check.py, twinrx_lo_cal.json and README.
+    
+    Taken from guru/ after the ch2/ch3 display fixes, so it starts from a
+    state verified on hardware: ch2 0.1000 +/- 0.0010, ch3 0.1000 +/-
+    0.0009, zero overflows.
+    
+    Run it the same way:
+        cd ~/radar2/guru2 && ./run_guru2.sh
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ guru2/README.md           |   56 +
+ guru2/b210_tone_source.py |  278 ++++
+ guru2/guru2.grc           | 3699 +++++++++++++++++++++++++++++++++++++++++++++
+ guru2/guru2.py            |  573 +++++++
+ guru2/run_guru2.sh        |   23 +
+ guru2/twinrx_lo_cal.json  |  110 ++
+ guru2/twinrx_lo_check.py  |  783 ++++++++++
+ 7 files changed, 5522 insertions(+)
+
+commit 78562ba4b352b78bedf8b66cff528612fe7b1a4d
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 11:20:22 +0530
+
+    Clean up the ch2/ch3 display: DC removed, amplitude held steady
+    
+    Per channel on ch2/ch3:  USRP -> DC Blocker -> band-pass -> AGC2 ->
+    resampler -> scope.  The resampler taps now carry ONLY the calibrated
+    phase rotation; the hand-tuned 100x/125x amplitude gains are gone,
+    because they fought the AGC for control of the level.
+    
+    Three faults found on hardware, in order:
+    
+    1. The band-pass was centred on tone_offset (200 kHz) with a 4 kHz
+       width, but the tone arrives at ~203.9 kHz -- the B210 and X310 run
+       on independent clock references and are not frequency-locked.  The
+       filter rejected the tone outright, so the scope showed pure noise.
+       Confirmed by the ripple sitting at exactly 52.0%, the Rayleigh
+       envelope signature, and pre-AGC level being 195x too low.
+       disp_bw is now 20e3 so the offset and its drift stay in band.
+    
+    2. The AGC rates (10e-3 / 1e-3) never converged -- gain stayed near
+       its initial value and the level was wrong by 2x either way.
+       attack=decay=0.5 locks to the reference.
+    
+    3. Autoscale latched onto the AGC start-up transient and pinned the
+       Y axis at +/-5, flattening real +/-0.1 signals into a line at zero.
+       Fixed axis -0.3..0.3, and max_gain capped at 1e4.
+    
+    Measured after the fix: ch2 0.1000 +/- 0.0010 (1.0% ripple),
+    ch3 0.1000 +/- 0.0009 (0.9%), zero overflows.  Before: 52%.
+    
+    chan23_clean.grc is the ch2/ch3-only variant; ch0/ch1 feed null sinks
+    there because bpf_*/rbpf_*/freq sink are disabled and the source ports
+    would otherwise be unconnected.
+    
+    ch0 (RF A/RX1) is dead at the port -- LO ruled out by the own-LO test,
+    cable ruled out by a physical swap.  Its readings are noise.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ .gitignore         |    3 +
+ chan23_clean.grc   | 3641 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ chan23_clean.py    |  576 +++++++++
+ guru.grc           |  356 +++--
+ guru.py            |   87 +-
+ guru/guru.grc      | 1290 +++++++------------
+ guru/guru.py       |   96 +-
+ twinrx_lo_cal.json |    8 +-
+ 8 files changed, 5126 insertions(+), 931 deletions(-)
+
+commit 72f91d58b96cfad26dec0122a16c4ca9d862e678
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-21 11:20:06 +0530
+
+    Commit the LO direction that actually works on this unit
+    
+    Rx B (ch2) exports the LO; ch0/ch1 take it as 'external'.  The A->B
+    jumpers on this 2945 pass no LO, so the previous default (Rx A exports)
+    left ch2/ch3 dead.  Verified on hardware: A-exports gives no tone on
+    ch2/ch3, B-exports passes with all channels holding 0.53 deg.
+    
+    The docs already described this direction; only the code defaults were
+    still on the old one, so a fresh clone got settings the runbook
+    contradicted.
+    
+    Also flush the b210 'transmitting ...' line so scripts can wait on it.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ b210_tone_source.py  | 2 +-
+ twinrx_band_check.py | 4 ++--
+ twinrx_lo_check.py   | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+commit e71cbc9980ea15a010b37b6ba5a1771268bc0f6b
+Author: Shankar <jattishankar67@gmail.com>
+Date:   2026-09-19 18:51:28 +0530
+
+    guru: complete working 4-channel coherent receiver suite with phase alignment
+
+ backup_working/twinrx_lo_coherence.grc | 3487 ++++++++++++++++++++++++++++++++
+ backup_working/twinrx_lo_coherence.py  |  545 +++++
+ guru.grc                               | 3487 ++++++++++++++++++++++++++++++++
+ guru.py                                |  545 +++++
+ guru/README.md                         |   56 +
+ guru/b210_tone_source.py               |  278 +++
+ guru/guru.grc                          | 3487 ++++++++++++++++++++++++++++++++
+ guru/guru.py                           |  545 +++++
+ guru/run_guru.sh                       |   23 +
+ guru/twinrx_lo_cal.json                |  110 +
+ guru/twinrx_lo_check.py                |  783 +++++++
+ run_guru.sh                            |   23 +
+ twinrx_lo_cal.json                     |   26 +-
+ twinrx_lo_coherence.grc                | 1907 +++++++++++++----
+ twinrx_lo_coherence.py                 |  549 ++---
+ 15 files changed, 15034 insertions(+), 817 deletions(-)
+
+commit d87e7657b7f5c576d29be4851e70a2742cdab31c
+Author: shankar <jattishankar67@gmail.com>
+Date:   2026-09-19 15:04:59 +0530
+
+    Add block diagrams
+    
+    BLOCK_DIAGRAM.md walks the whole setup stage by stage with the value to
+    expect at each point: the RF chain from the B210 through the pad and
+    splitters to the four ports, LO sharing inside the 2945 with Rx B as the
+    exporter, the timed double-tune, the DSP chain, and the GUI panels in
+    reading order. The commands are at the top.
+    
+    block_diagram.png is the same thing rendered, annotated with the measured
+    figures: tone per channel 13.5 / 24.2 / 10.1 / 11.4 dB, the working B->A LO
+    link and the dead A->B one, and 1.5 deg phase repeatability against 179 deg
+    with separate LOs.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ block_diagram.png | Bin 144545 -> 144425 bytes
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+commit a0d5f554bec444aff5f59dce584fbc77b60aa317
+Author: shankar <jattishankar67@gmail.com>
+Date:   2026-09-19 15:04:47 +0530
+
+    Add BLOCK_DIAGRAM.md: the chain with expected values at each stage
+    
+    Six diagrams, each annotated with what should be seen at that point:
+    
+      1 RF chain    B210 -> 30 dB pad -> 4-way splitter -> four RX ports,
+                    with levels at every node and the safety margin against
+                    the TwinRX +10 dBm damage and -20 dBm full-scale limits
+      2 LO sharing  Rx B exporting to Rx A over the MMCX jumpers, the LO plan
+                    (LO1 3650 MHz, LO2 1400 MHz at 2400 MHz RF), and the note
+                    that readback and lo_locked prove nothing about whether
+                    LO physically arrives
+      3 Tuning      the timed double burst and why the second pass is needed
+      4 DSP         the flowgraph's blocks including the off-tone reference
+                    branch that answers "is this channel receiving"
+      5 GUI panels  top to bottom, with the value expected in each
+      6 Verdict     a passing run, and how to read resid
+    
+    Plus a failure-signature table keyed to the faults hit while building
+    this, including the one that matters most: two channels of one board dead
+    at every frequency, on both connectors, with no response to RX gain, is
+    the LO jumpers rather than RF.
+    
+    Level figures were checked against b210_tone_source.level_budget and the
+    flowgraph constants against the generated Python; all agree.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ BLOCK_DIAGRAM.md   | 251 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ TWINRX_LO_NOTES.md |   1 +
+ block_diagram.png  | Bin 0 -> 144545 bytes
+ 3 files changed, 252 insertions(+)
+
+commit 4534bd51aeaa5a0ca20cffd9892ff21437212900
+Author: shankar <jattishankar67@gmail.com>
+Date:   2026-09-19 15:00:53 +0530
+
+    Add RUNBOOK.md; correct the notes to the LO direction that works
+    
+    RUNBOOK.md is the copy-paste command reference: device check, starting the
+    B210 source, reception check, the main verification, the GUI, the
+    diagnostics for each failure mode, and the switch table. Every path and
+    every switch in it was verified against the installed tools.
+    
+    Notes section 3 still presented Rx A as the exporter as "the configuration
+    this project uses". On this unit the A->B jumpers pass no LO, so that
+    configuration does not work and the file now leads with Rx B exporting,
+    with the textbook mirror image kept underneath for when those cables are
+    repaired. Also fixed the slave-board wording, which named the wrong board
+    once the direction flipped.
+    
+    Softened the divider explanation in section 2. The switch topology is from
+    the driver source and stands, but the quadrant re-roll was never confirmed
+    here -- that evidence came from the broken estimator and from DC-leakage
+    data. It is now described as a risk to watch for rather than observed
+    behaviour.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ RUNBOOK.md         | 199 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ TWINRX_LO_NOTES.md |  38 ++++++----
+ 2 files changed, 225 insertions(+), 12 deletions(-)
+
+commit e053b99cced9a9aa1609b9a80a26545a5428bedc
+Author: shankar <jattishankar67@gmail.com>
+Date:   2026-09-19 14:19:26 +0530
+
+    Add SESSION_LOG.md: how this was built and where it misled
+    
+    TWINRX_LO_NOTES.md is the technical reference. This is the record of the
+    work itself, written mainly so the wrong turns are not repeated.
+    
+    It records the validated configuration and health, and in detail: three
+    PASS results reported on channels receiving nothing (crosstalk is coherent,
+    so stability alone proves nothing); a broken FFT phase estimator whose
+    conclusions are withdrawn; four failed attempts at a tone-presence metric
+    and why each failed; a port scan that engaged the TwinRX internal divider
+    and so measured the wrong thing; a GUI label that showed noise power on a
+    dead channel and read as reception; and a cal file destroyed by a
+    non-atomic write.
+    
+    Also the expensive one: ch2/ch3 dead at every frequency on both connectors
+    with no response to gain was diagnosed as broken RF cabling and cost two
+    rounds of reseating plus a full hardware rebuild. The fault was the LO
+    jumpers. A channel on 'external' has no LO of its own, so a dead LO link is
+    indistinguishable from a dead RF path unless you test for it.
+    
+    The notes file index now lists every file in the project.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ SESSION_LOG.md         | 251 +++++++++++++++++++++++++++++++++++++++++++++++++
+ TWINRX_LO_NOTES.md     |   6 +-
+ twinrx_lo_cal.json     |   8 +-
+ twinrx_lo_coherence.py |   2 +-
+ 4 files changed, 261 insertions(+), 6 deletions(-)
+
+commit c6ccb5db11455217d0cacdecd86a3b9c736237b9
+Author: shankar <jattishankar67@gmail.com>
+Date:   2026-09-19 14:12:26 +0530
+
+    Switch to the LO direction that actually works; test reimport
+    
+    Four-channel coherence achieved and verified against a real CW source:
+    
+        B internal+export -> A external
+            ch0 13.5  ch1 24.2  ch2 10.1  ch3 11.4 dB of tone
+            phase repeats to 1.5 deg over retunes
+    
+    Against 179.4 deg with each board on its own LO, which is the control.
+    
+    The A->B jumpers pass no LO while B->A works, so the flowgraph now
+    defaults to Rx B as exporter: lo_sources ['external','external',
+    'internal','companion'], lo_export_chan 2.
+    
+    reimport was tested at the user's request and fails on this unit, for a
+    reason that confirms the fault independently. It makes the exporting
+    channel take its LO back through its own LO IN, which needs a splitter;
+    with plain crisscross wiring that port is fed by the other board. With B
+    on reimport ch2 dies, because its LO IN comes from A, while ch3 keeps
+    working since companion taps ch2's synthesiser directly rather than any
+    cable.
+    
+    Health at this commit: X310 31082D8, master clock 200 MHz, both TwinRX Rev
+    B present (3104B3C, 31050CD), ref_locked True, zero stream errors across
+    the whole run. Note lo_locked reads True even on channels demonstrably
+    receiving no LO, so it is not evidence of sharing.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ TWINRX_LO_NOTES.md      |   62 ++
+ twinrx_lo_cal.json      |   16 +-
+ twinrx_lo_coherence.grc | 2421 +++++++++++++++++++++++++++--------------------
+ twinrx_lo_coherence.py  |   18 +-
+ 4 files changed, 1457 insertions(+), 1060 deletions(-)
+
+commit 9d3ab0ab587e4b99467fa7d8a1fa3ff22e6e4e29
+Author: shankar <jattishankar67@gmail.com>
+Date:   2026-09-19 13:51:15 +0530
+
+    Check the LO before blaming the RF path
+    
+    A channel on 'external' LO has no LO of its own. If the MMCX cables
+    between the two TwinRX modules are loose, its mixers produce nothing
+    whatever RF arrives: dead at every frequency, dead on both antenna ports,
+    and a noise floor that cannot respond to RF gain. That is
+    indistinguishable from a broken RF path unless you test for it.
+    
+    On this rig ch2/ch3 read -0.1 and -0.0 dB of tone on external LO, and
+    +10.8 and +12.8 dB the moment each board was given its own internal LO,
+    with nothing touched on the bench. The RF cabling was never at fault. Two
+    rounds of reseating connectors and a full hardware rebuild were spent on
+    the wrong half of the system.
+    
+    The no-tone message now says to test the LO first and gives the command:
+    
+        --lo-sources internal,companion,internal,companion
+    
+    Receiving that way means the RF side is fine and the LO cables are the
+    fault; still dead means it really is the RF path.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ twinrx_lo_check.py | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
+
+commit f8a55ad12a45b09c2118c5791aaa1df681340e0d
+Author: shankar <jattishankar67@gmail.com>
+Date:   2026-09-19 13:33:19 +0530
+
+    Stop the GUI implying a dead channel is receiving
+    
+    The flowgraph showed "Tone power per channel (dB) - all four should be
+    close", fed from the band-pass output power. On a channel with no signal
+    that power is almost entirely noise, but it still displays a number only
+    about 8 dB below a live channel:
+    
+        ch0  -73.8 dBFS  tone +24.3 dB   receiving
+        ch1  -67.4 dBFS  tone +37.7 dB   receiving
+        ch2  -76.6 dBFS  tone  -0.1 dB   NOT receiving
+        ch3  -75.6 dBFS  tone  -0.0 dB   NOT receiving
+    
+    Reading that meter, ch2/ch3 look like they are getting signal. They are
+    not, and the display invited exactly that conclusion.
+    
+    So: rename it to "Band power (dB) - this is mostly NOISE unless the meter
+    above reads high", and move the tone-vs-reference meter from the bottom of
+    the layout to directly under the controls, retitled "IS THIS CHANNEL
+    RECEIVING? above 6 dB = YES. near 0 dB = NO". It had been below the fold
+    and was not visible without scrolling, which is why the misleading meter
+    was the one being read.
+    
+    Layout order on the Control_Phase tab is now: controls, is-it-receiving,
+    phase plot, steady-state phase, band power.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ twinrx_band_check.py    |  46 ++++
+ twinrx_lo_coherence.grc | 578 +++++++++++++++++++++++++++++++++++++++++++++++-
+ twinrx_lo_coherence.py  | 154 +++++++++++--
+ 3 files changed, 751 insertions(+), 27 deletions(-)
+
+commit 582e2f1c31e1acfddcc94ba17a8e3d92050a6b14
+Author: shankar <jattishankar67@gmail.com>
+Date:   2026-09-19 13:20:21 +0530
+
+    Add twinrx_band_check.py: sweep both radios to localise a dead channel
+    
+    Answers the question a single-frequency test cannot: is a channel dead
+    everywhere, or only out of band? It drives the B210 and the 2945 together
+    across a frequency list and reports tone reception per channel.
+    
+    The B210 is launched as a subprocess with the isolated 3.15 paths stripped
+    from PATH/PYTHONPATH/LD_LIBRARY_PATH, so it picks up the system UHD where
+    the b2xx images live, while the parent keeps 3.15 for the X310. That is the
+    first piece of tooling here that drives both radios in one run.
+    
+    Result on this rig, 100 MHz to 2.4 GHz:
+    
+         frequency        ch0      ch1      ch2      ch3
+         100.000 MHz     -0.7       7.5*     -0.6      -0.2
+         300.000 MHz      0.7      22.8*      0.1       0.4
+         700.000 MHz      6.0      25.1*      0.3       0.6
+        1200.000 MHz     23.9*     35.2*      0.3      -1.4
+        1800.000 MHz     13.4*     32.3*     -1.4      -1.3
+        2400.000 MHz     27.4*     42.5*      0.2      -1.6
+    
+    ch2 and ch3 are dead at every frequency, which rules out an out-of-band
+    splitter -- such a part would still pass 100 MHz. Those paths are open.
+    
+    ch0 receives nothing below 700 MHz then rises with frequency, which is the
+    signature of coupling between the two channels of a TwinRX rather than a
+    cable. So only one connection is live: DB-A RX2, feeding ch1. That also
+    explains why ch2/ch3 held a steady phase on nothing, and why a 10 dB source
+    change moved ch0/ch1 but not them.
+    
+    The summary now names that coupling pattern instead of calling it an
+    out-of-band part.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ twinrx_band_check.py | 187 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 187 insertions(+)
+
+commit 3b78afdd9fdf725b1ae00b631699c3b73fac418d
+Author: shankar <jattishankar67@gmail.com>
+Date:   2026-09-19 13:15:09 +0530
+
+    Gate the verdict on tone presence, not phase stability alone
+    
+    A channel with no antenna signal can still show a rock-steady phase, by
+    correlating against the reference channel through internal crosstalk.
+    Crosstalk is coherent with the reference, so it looks perfect. On this rig
+    ch2/ch3 held 0.19 deg while receiving nothing, and the tool called it
+    
+        PASS  channels hold 0.37 deg against each other. LO is shared.
+    
+    Now each trial reports per-channel tone presence and the verdict refuses to
+    pass when any channel lacks a tone.
+    
+    Getting that metric right took four attempts; the dead ends are recorded in
+    the code so they are not repeated:
+    
+      1. peak-pick each channel's own 8192-bin FFT -- far less sensitive than
+         the real measurement, cried NO SIGNAL on channels tracking to 2 deg
+      2. mix to f_tone and average the whole capture -- a few Hz of residual
+         rotates a 100 ms mean to zero, so a 41 dB tone read as nothing. The
+         phase measurement escapes this only because its cross-product against
+         ch0 cancels the common error
+      3. coherent block power over TOTAL power -- LO self-mixing leakage at DC
+         inflates the total, so a weak tone on big leakage reads BELOW the
+         noise floor. Offline that case gives -35 dB
+      4. coherent power at the tone over an off-tone reference frequency --
+         immune to both, gives +26 dB on that same case and ~0 dB on a
+         genuinely empty channel
+    
+    The port scan had a further flaw of its own: it put all four channels on
+    one connector, which on TwinRX engages an internal resistive divider
+    between the two channels of a board. That measures the divider, not the
+    cabling. It now compares native (ch0->RX1, ch1->RX2) against swapped, both
+    divider-free.
+    
+    Current hardware state: ch0 +26.8 dB and ch1 +41.5 dB have the tone;
+    ch2 and ch3 sit at ~0 dB on both connectors and are not receiving.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ twinrx_lo_cal.json |   8 ++--
+ twinrx_lo_check.py | 136 +++++++++++++++++++++++++++++++++++++++++------------
+ 2 files changed, 111 insertions(+), 33 deletions(-)
+
+commit 4fd7c0d811cf7b3d3690786095263f7d7b022b04
+Author: shankar <jattishankar67@gmail.com>
+Date:   2026-09-19 13:01:27 +0530
+
+    Add --port-scan; raise GUI averaging to match the CLI
+    
+    Two separate problems were making ch2/ch3 look unstable in the flowgraph
+    while ch1 sat perfectly flat.
+    
+    1. The GUI averaged far less than the CLI for the same signal:
+    
+           twinrx_lo_check.py : 100,000 samples = 100 ms, mixed to the tone
+           flowgraph          : avg_len 4096    =   4 ms, +/-25 kHz band-pass
+    
+       24x less integration through 50 kHz of noise bandwidth, worth roughly
+       14 dB of phase-estimate SNR. avg_len 4096 -> 65536, tone_bw 25k -> 10k,
+       max_iter raised to suit. Also adds a per-channel tone power display,
+       since "is the signal even reaching this port" turned out to be the
+       question that mattered.
+    
+    2. The real fault was RF, and --port-scan localises it. For each channel
+       it measures tone SNR on RX1 and then RX2. A channel weak on both has no
+       cable; a channel much stronger on the other port is plugged in wrong.
+       On this rig:
+    
+           ch0  RX1  22.4  RX2  36.9   fed on RX2, +14 dB better
+           ch1  RX1  25.5  RX2  37.5   fed on RX2, +12 dB better
+           ch2  RX1   4.1  RX2   4.5   NO SIGNAL on either port
+           ch3  RX1   4.3  RX2   4.3   NO SIGNAL on either port
+    
+       Three of four splitter arms were dead; only DB-A RX2 was live, with
+       ch0 hearing it through the board's internal divider 14 dB down. Not a
+       software fault, not the LO, not port selection -- the same connections
+       had passed at 0.57 deg earlier in the session and worked loose.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ twinrx_lo_check.py      |  51 ++++++
+ twinrx_lo_coherence.grc | 412 +++++++++++++++++++++++++++++++++++++++++++++++-
+ twinrx_lo_coherence.py  |  94 ++++++++++-
+ 3 files changed, 542 insertions(+), 15 deletions(-)
+
+commit a3534a985156f2490068745a98378af05c6a8947
+Author: shankar <jattishankar67@gmail.com>
+Date:   2026-09-19 12:50:55 +0530
+
+    Refuse to diff against incomparable calibration entries
+    
+    Section (B) compared this run's offsets against whatever was in the cal
+    file, regardless of how that baseline was measured. After the first good
+    tone-based run it duly reported
+    
+        ch2  +158.46  ->   -3.07   delta -161.53  <-- quadrant re-roll (~180 deg)
+        ch3   -89.94  ->  +93.22   delta -176.84  <-- quadrant re-roll (~180 deg)
+    
+    which is meaningless: the baseline was a broadband-legacy entry measured on
+    DC leakage before the estimator was fixed, and RF cables had been reseated
+    in between. The giveaway is ch1 moving 14.58 deg -- ch1 is on 'companion'
+    and has no divider that could re-roll.
+    
+    Now (B) skips an entry whose method differs from this run's, and skips one
+    recorded at a different RX gain, since TwinRX gain is switched attenuators
+    and each state carries its own phase. Both cases say why and note that the
+    current run becomes the baseline.
+    
+    Hardware state at this commit, with all four splitter arms reseated and the
+    B210 at 2400.2039 MHz, tone 40.3 dB over the floor:
+    
+        ch0  mean    +0.00   raw spread 0.00   resid 0.26   <-- reference
+        ch1  mean    -4.74   raw spread 0.46   resid 0.22
+        ch2  mean    -3.07   raw spread 0.42   resid 0.17
+        ch3  mean   +93.22   raw spread 0.33   resid 0.57
+    
+        PASS  channels hold 0.57 deg against each other. LO is shared.
+    
+    That is the first fully valid measurement: real tone on all four ports,
+    tone-selective estimator, sub-degree across three retunes.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ twinrx_lo_cal.json  |  10 +++++-----
+ twinrx_lo_check.py  |  35 +++++++++++++++++++++++++++++++++--
+ twinrx_waveform.png | Bin 0 -> 460784 bytes
+ 3 files changed, 38 insertions(+), 7 deletions(-)
+
+commit 820cb744f917485fdb013f83e998ab0c9c372e8b
+Author: shankar <jattishankar67@gmail.com>
+Date:   2026-09-19 12:38:41 +0530
+
+    Fix the phase estimator; verified end to end on hardware
+    
+    Running the B210 as a CW source into the 2945 exposed a bug in my own
+    measurement, not in the radio. The FFT cross-spectrum accumulator
+    disagreed with itself by tens to hundreds of degrees between back-to-back
+    captures of an unchanged signal, while a plain mix-to-DC average of the
+    same data held to under a degree:
+    
+        cap    FFT: ch1    ch2     ch3   |  mix: ch1   ch2     ch3
+         0        +71.2  +93.7   -75.7   |      +7.2  -2.6  +117.6
+         3        +81.3 -169.1  -155.2   |      +6.1  -3.2  +116.8
+         5        +73.3 +105.9  -161.5   |      +5.8  -3.3  +116.7
+    
+    Bin location was never the problem -- the FFT found +203.9 kHz at 21 dB on
+    every capture -- so keep the FFT for locating the tone, add parabolic
+    interpolation to refine it off-bin, then mix that frequency to DC and
+    average. Phase extraction from the accumulated cross-spectra is gone.
+    
+    Also add --no-retune, which repeats the measurement without reprogramming
+    the LO. That is what separated "the divider re-rolls on every tune" from
+    "the estimator is lying", and it is worth keeping for future triage.
+    
+    b210_tone_source.py no longer requires the isolated 3.15 environment. The
+    B210 loads firmware over USB at every open and is not tied to a UHD
+    version, so it runs under the system UHD which already has b2xx images.
+    The X310 rule is unchanged and still strict.
+    
+    Verified on hardware with the B210 transmitting at 2.4002 GHz, tone 25 dB
+    above the floor:
+    
+        no retune, 5 captures : ch1 -4.3, ch2 -5.1, ch3 +98.9, spread ~1 deg
+        5 retunes             : PASS, channels hold 4.64 deg against each other
+    
+    Earlier conclusions drawn from the broken estimator are withdrawn. In
+    particular the claim that the slave board's two channels re-roll together
+    came from DC-leakage data and did not survive a real signal.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ b210_tone_source.py | 68 ++++++++++++++++++++++++++++++++++++++--------
+ twinrx_lo_check.py  | 77 ++++++++++++++++++++++++++++++++++-------------------
+ 2 files changed, 106 insertions(+), 39 deletions(-)
+
+commit 9409de35d5ec93955eb4d2838fdf602e5574f808
+Author: shankar <jattishankar67@gmail.com>
+Date:   2026-09-19 12:26:23 +0530
+
+    Do not blame the LO when there is simply no tone
+    
+    With the DC guard active and no signal on the antenna ports, the tone
+    detector locks onto a different random noise bin every trial and the phase
+    numbers are meaningless. The verdict was reporting that as
+    
+        FAIL  differential spread 152.40 deg. The channels are moving
+              independently, so they are on separate synthesisers.
+              Check: LO cables J1<->J2 and J3<->J4 crisscrossed ...
+    
+    which sends the user to re-cable hardware that is working fine. When the
+    tone is weak, print MEASUREMENT INVALID instead, say the spread was
+    measured on noise, and point at the calibration source.
+    
+    Confirmed on hardware: X310 enumerates, LO routing reads back correctly on
+    all four channels, and the run now reports INVALID rather than FAIL.
+    
+    Also worth recording: with DC excluded, nothing correlated remains on the
+    four ports. Earlier runs that looked coherent were measuring LO
+    self-mixing leakage, exactly as suspected.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ twinrx_lo_check.py     | 24 ++++++++++++++++++++++--
+ twinrx_lo_coherence.py |  4 ++--
+ 2 files changed, 24 insertions(+), 4 deletions(-)
+
+commit 251dec0560d10691100751264073b851e85d037c
+Author: shankar <jattishankar67@gmail.com>
+Date:   2026-09-18 19:30:45 +0530
+
+    Make the GRC flowgraph's phase measurement match the CLI
+    
+    The flowgraph correlated the raw channels over the whole 1 MHz band, so
+    the DC term -- LO self-mixing leakage, present at every tuned frequency
+    whether or not a signal is connected -- contributed to the phase estimate.
+    Simulated against a tone at a true 30 deg offset with leakage at 150 deg:
+    
+        DC/tone    reported    error
+          0.0x      +30.01     +0.01
+          0.5x      +43.90    +13.90
+          1.0x      +89.99    +59.99
+          2.0x     +136.10   +106.10
+    
+    Insert a freq_xlating_fir_filter_ccc per channel ahead of the cross
+    correlation, centred on tone_offset (200 kHz, matching
+    b210_tone_source.py) with a tone_bw=25 kHz low-pass prototype. That shifts
+    the tone to DC and rejects everything else, including the original DC
+    term. Re-running the same test through the actual GNU Radio blocks now
+    gives +30.00 with 0.00 error at every DC level.
+    
+    The QT frequency sink stays on the raw channels on purpose -- seeing the
+    tone and the DC leakage side by side is how you confirm the source is
+    actually reaching all four ports.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ twinrx_lo_coherence.grc | 158 ++++++++++++++++++++++++++++++++++++++++++++++--
+ twinrx_lo_coherence.py  |  76 +++++++++++++++++------
+ 2 files changed, 210 insertions(+), 24 deletions(-)
+
+commit c2ecdd4049d10f4d9f33882e49c88361432188db
+Author: shankar <jattishankar67@gmail.com>
+Date:   2026-09-18 19:27:04 +0530
+
+    Add B210 CW calibration source, and atomic cal-file writes
+    
+    b210_tone_source.py
+      Drives a B210 as the calibration signal for the 2945's four RX channels.
+      The tone is offset from centre (default +200 kHz) so it lands outside
+      twinrx_lo_check.py's DC guard -- a tone at DC is indistinguishable from
+      LO self-mixing leakage, so --offset 0 is refused.
+    
+      Safety: prints the level budget against the TwinRX's +10 dBm damage
+      threshold and -20 dBm full-scale-at-min-gain point, warns when the
+      declared pad is too small, and refuses to start above --max-gain
+      (default 60 dB) so a mistyped gain cannot reach the front ends.
+    
+      The buffer holds a whole number of tone cycles so it loops without a
+      phase discontinuity -- verified at 155+ dB peak-to-rest.
+    
+    twinrx_lo_check.py
+      save_cal() now serialises fully, writes a sibling .tmp, fsyncs and
+      renames. The previous version opened the real file with "w", which
+      truncated the existing calibration before writing a byte; a Ctrl-C part
+      way through json.dump left a corrupt file and lost the old data. That
+      had already happened once.
+    
+    twinrx_lo_cal.json
+      Rebuilt from the measured sweep after the corruption. Entries tagged
+      method=broadband-legacy and gain_db=30: taken before the tone-selective
+      estimator existed, so they demonstrate LO sharing but are not a trusted
+      RF calibration.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ TWINRX_LO_NOTES.md  |  51 ++++++++++++
+ b210_tone_source.py | 232 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 283 insertions(+)
+
+commit 2d804e5d5726dafaf1628b5d2bcf6c2e3eee85a9
+Author: shankar <jattishankar67@gmail.com>
+Date:   2026-09-18 19:11:59 +0530
+
+    USRP-2945 TwinRX LO sharing: config, coherent tuning, verification
+    
+    Tooling to put all four channels of a USRP-2945 (X310 + 2x TwinRX) on a
+    single synthesiser and prove they stay phase-locked. Targets the isolated
+    GNU Radio 3.8.5 + UHD 3.15.0 install, not the system GR 3.10 / UHD 4.10.
+    
+    twinrx_lo_check.py
+      Pure-UHD verifier. Enumerates LO capability, programs the routing in the
+      order UHD requires (clear exports -> set sources -> enable the one
+      exporter), tunes all channels inside a timed command issued twice, then
+      measures per-channel phase.
+      - Tone-selective measurement with a DC guard, so LO self-mixing leakage
+        at 0 Hz cannot masquerade as a signal.
+      - Verdict separates differential spread (real decoherence) from motion
+        of the reference channel, which is a measurement artefact.
+      - Cross-session diff against twinrx_lo_cal.json detects the external-LO
+        quadrant re-roll.
+      - Refuses to run against the system UHD 4.x, which would demand an FPGA
+        reflash that breaks the working 3.15 setup.
+    
+    twinrx_lo_coherence.grc / .py
+      GRC flowgraph, live phase display. LO controls are hidden on the UHD
+      Source block on purpose: GRC emits set_center_freq() before
+      set_lo_source(), which is backwards, and its dropdown omits reimport and
+      disabled. All LO work happens in Python Snippets instead.
+    
+    TWINRX_LO_NOTES.md
+      Hardware cabling, the five LO source values and the switch tree they
+      select, why companion is phase-stable and external is not, the micro-step
+      runbook, and what a measured offset is actually made of.
+    
+    twinrx_lo_cal.json
+      Measured offsets, 1-5 GHz and 2.4 GHz. Marked broadband-legacy: taken
+      before the tone-selective estimator existed, so they prove LO sharing but
+      are not yet a trusted RF calibration.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ .gitignore              |   6 +
+ TWINRX_LO_NOTES.md      | 477 ++++++++++++++++++++++++
+ twinrx_lo_cal.json      | 110 ++++++
+ twinrx_lo_check.py      | 564 +++++++++++++++++++++++++++++
+ twinrx_lo_coherence.grc | 943 ++++++++++++++++++++++++++++++++++++++++++++++++
+ twinrx_lo_coherence.py  | 566 +++++++++++++++++++++++++++++
+ 6 files changed, 2666 insertions(+)

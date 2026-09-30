@@ -1,0 +1,57 @@
+id: hop_band_select
+label: Hop Band Select
+category: '[DOA]'
+
+parameters:
+- id: num_channels
+  label: Num Channels
+  dtype: int
+  default: '4'
+- id: band_freq
+  label: Band (Hz)
+  dtype: real
+  default: '2.4e9'
+- id: frame_tag
+  label: Window-start tag key ('' = none)
+  dtype: string
+  default: ''
+- id: frame_offset
+  label: Tag this many samples into each window
+  dtype: int
+  default: '100'
+
+- id: remove_dc
+  label: Remove 0 Hz per window
+  dtype: bool
+  default: 'False'
+- id: narrow_hz
+  label: Display filter +/- (Hz around the tone, 0 = off)
+  dtype: real
+  default: '0'
+- id: samp_rate
+  label: Sample rate
+  dtype: real
+  default: samp_rate
+
+inputs:
+- domain: stream
+  dtype: complex
+  multiplicity: ${num_channels}
+
+outputs:
+- domain: stream
+  dtype: complex
+  multiplicity: ${num_channels}
+
+templates:
+  imports: import doa
+  make: doa.hop_band_select(${num_channels}, ${band_freq}, ${frame_tag}, ${frame_offset}, ${remove_dc}, ${narrow_hz}, ${samp_rate})
+  callbacks:
+  - set_band_freq(${band_freq})
+
+documentation: |-
+  Passes only the dwell samples of one band, as marked by the hopping
+  source's hop_on / hop_off tags on input 0. Switching samples and every other
+  band are dropped, so the output is shorter than the input.
+
+file_format: 1

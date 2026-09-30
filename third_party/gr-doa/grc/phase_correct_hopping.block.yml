@@ -1,0 +1,252 @@
+# Per-band phase correction for a hopping receiver.
+# phase_correct_hier corrects one set of offsets, read once at startup. That is
+# right for a fixed frequency and wrong for a hopping one, because the offset
+# belongs to the band. This holds a row per band and switches with it.
+# phase_correct_hier itself is not modified.
+id: phase_correct_hopping
+label: "Phase Correct\n   Hopping"
+category: DoA
+
+parameters:
+- id: num_channels
+  label: Num Channels
+  dtype: int
+  default: '4'
+- id: num_bands
+  label: Number of Bands
+  dtype: int
+  default: '3'
+- id: follow_source
+  label: Band comes from
+  dtype: enum
+  options: ['True', 'False']
+  option_labels: ['the radio (set_band_freq)', 'its own dwell schedule']
+  default: 'True'
+- id: settle
+  label: Settle after switch (s)
+  dtype: real
+  default: '1.0'
+  hide: ${ 'part' if follow_source == 'True' else 'none' }
+- id: start_delay
+  label: Start delay (s)
+  dtype: real
+  default: '2.0'
+  hide: ${ 'all' if follow_source == 'True' else 'none' }
+- id: cal_file
+  label: Calibration file (radians, optional)
+  dtype: file_open
+  default: ''
+  hide: ${ 'part' if not cal_file else 'none' }
+- id: freq_tol
+  label: Band match tolerance (Hz)
+  dtype: real
+  default: '1000000'
+  hide: part
+- id: freq_0
+  label: '  band 0  |  freq (Hz)'
+  dtype: real
+  default: '2400000000'
+  hide: ${ 'none' if num_bands > 0 else 'all' }
+- id: deg_0
+  label: '  band 0  |  offsets ch1..chN-1 (deg)'
+  dtype: raw
+  default: '(0.0, 0.0, 0.0)'
+  hide: ${ 'none' if num_bands > 0 else 'all' }
+- id: dwell_0
+  label: '  band 0  |  dwell (s)'
+  dtype: real
+  default: '10.0'
+  hide: ${ 'none' if num_bands > 0 and follow_source == 'False' else 'all' }
+- id: freq_1
+  label: '  band 1  |  freq (Hz)'
+  dtype: real
+  default: '5200000000'
+  hide: ${ 'none' if num_bands > 1 else 'all' }
+- id: deg_1
+  label: '  band 1  |  offsets ch1..chN-1 (deg)'
+  dtype: raw
+  default: '(0.0, 0.0, 0.0)'
+  hide: ${ 'none' if num_bands > 1 else 'all' }
+- id: dwell_1
+  label: '  band 1  |  dwell (s)'
+  dtype: real
+  default: '10.0'
+  hide: ${ 'none' if num_bands > 1 and follow_source == 'False' else 'all' }
+- id: freq_2
+  label: '  band 2  |  freq (Hz)'
+  dtype: real
+  default: '5800000000'
+  hide: ${ 'none' if num_bands > 2 else 'all' }
+- id: deg_2
+  label: '  band 2  |  offsets ch1..chN-1 (deg)'
+  dtype: raw
+  default: '(0.0, 0.0, 0.0)'
+  hide: ${ 'none' if num_bands > 2 else 'all' }
+- id: dwell_2
+  label: '  band 2  |  dwell (s)'
+  dtype: real
+  default: '10.0'
+  hide: ${ 'none' if num_bands > 2 and follow_source == 'False' else 'all' }
+- id: freq_3
+  label: '  band 3  |  freq (Hz)'
+  dtype: real
+  default: '0'
+  hide: ${ 'none' if num_bands > 3 else 'all' }
+- id: deg_3
+  label: '  band 3  |  offsets ch1..chN-1 (deg)'
+  dtype: raw
+  default: '(0.0, 0.0, 0.0)'
+  hide: ${ 'none' if num_bands > 3 else 'all' }
+- id: dwell_3
+  label: '  band 3  |  dwell (s)'
+  dtype: real
+  default: '10.0'
+  hide: ${ 'none' if num_bands > 3 and follow_source == 'False' else 'all' }
+- id: freq_4
+  label: '  band 4  |  freq (Hz)'
+  dtype: real
+  default: '0'
+  hide: ${ 'none' if num_bands > 4 else 'all' }
+- id: deg_4
+  label: '  band 4  |  offsets ch1..chN-1 (deg)'
+  dtype: raw
+  default: '(0.0, 0.0, 0.0)'
+  hide: ${ 'none' if num_bands > 4 else 'all' }
+- id: dwell_4
+  label: '  band 4  |  dwell (s)'
+  dtype: real
+  default: '10.0'
+  hide: ${ 'none' if num_bands > 4 and follow_source == 'False' else 'all' }
+- id: freq_5
+  label: '  band 5  |  freq (Hz)'
+  dtype: real
+  default: '0'
+  hide: ${ 'none' if num_bands > 5 else 'all' }
+- id: deg_5
+  label: '  band 5  |  offsets ch1..chN-1 (deg)'
+  dtype: raw
+  default: '(0.0, 0.0, 0.0)'
+  hide: ${ 'none' if num_bands > 5 else 'all' }
+- id: dwell_5
+  label: '  band 5  |  dwell (s)'
+  dtype: real
+  default: '10.0'
+  hide: ${ 'none' if num_bands > 5 and follow_source == 'False' else 'all' }
+- id: freq_6
+  label: '  band 6  |  freq (Hz)'
+  dtype: real
+  default: '0'
+  hide: ${ 'none' if num_bands > 6 else 'all' }
+- id: deg_6
+  label: '  band 6  |  offsets ch1..chN-1 (deg)'
+  dtype: raw
+  default: '(0.0, 0.0, 0.0)'
+  hide: ${ 'none' if num_bands > 6 else 'all' }
+- id: dwell_6
+  label: '  band 6  |  dwell (s)'
+  dtype: real
+  default: '10.0'
+  hide: ${ 'none' if num_bands > 6 and follow_source == 'False' else 'all' }
+- id: freq_7
+  label: '  band 7  |  freq (Hz)'
+  dtype: real
+  default: '0'
+  hide: ${ 'none' if num_bands > 7 else 'all' }
+- id: deg_7
+  label: '  band 7  |  offsets ch1..chN-1 (deg)'
+  dtype: raw
+  default: '(0.0, 0.0, 0.0)'
+  hide: ${ 'none' if num_bands > 7 else 'all' }
+- id: dwell_7
+  label: '  band 7  |  dwell (s)'
+  dtype: real
+  default: '10.0'
+  hide: ${ 'none' if num_bands > 7 and follow_source == 'False' else 'all' }
+
+asserts:
+- ${ num_channels >= 2 }
+- ${ num_bands >= 1 }
+
+inputs:
+- domain: stream
+  dtype: complex
+  multiplicity: ${num_channels}
+
+outputs:
+- domain: stream
+  dtype: complex
+  multiplicity: ${num_channels}
+
+templates:
+  imports: import doa
+  make: |-
+    doa.phase_correct_hopping(
+        num_channels=${num_channels},
+        bands=[
+    % if int(num_bands) > 0:
+            (${freq_0}, ${deg_0}, ${dwell_0}),
+    % endif
+    % if int(num_bands) > 1:
+            (${freq_1}, ${deg_1}, ${dwell_1}),
+    % endif
+    % if int(num_bands) > 2:
+            (${freq_2}, ${deg_2}, ${dwell_2}),
+    % endif
+    % if int(num_bands) > 3:
+            (${freq_3}, ${deg_3}, ${dwell_3}),
+    % endif
+    % if int(num_bands) > 4:
+            (${freq_4}, ${deg_4}, ${dwell_4}),
+    % endif
+    % if int(num_bands) > 5:
+            (${freq_5}, ${deg_5}, ${dwell_5}),
+    % endif
+    % if int(num_bands) > 6:
+            (${freq_6}, ${deg_6}, ${dwell_6}),
+    % endif
+    % if int(num_bands) > 7:
+            (${freq_7}, ${deg_7}, ${dwell_7}),
+    % endif
+        ],
+        cal_file=${cal_file},
+        follow_source=${follow_source},
+        settle=${settle},
+        start_delay=${start_delay},
+        freq_tol=${freq_tol},
+    )
+  callbacks:
+  - set_band_freq(${freq_0})
+
+documentation: |-
+  Rotates each channel by its band's measured phase offset, switching rows
+  when the band changes.
+
+    Num Channels      ch0 is the reference and passes straight through;
+                      ch1..chN-1 are rotated.
+    Number of Bands   how many of the rows below are used (1..8)
+    band i            centre frequency, and the MEASURED offsets in DEGREES
+                      (angle_chN - angle_ch0) as the readouts show them. The
+                      block negates them, so a correct table drives the
+                      residuals to zero. Conversion to radians happens inside.
+    Band comes from   "the radio" is the default and the safe one: call
+                      set_band_freq(hz) or set_band_index(i) from whatever
+                      already follows the radio, and this cannot drift out of
+                      step with it. "its own dwell schedule" keeps time
+                      separately, which is only for running it standalone --
+                      two clocks beside one radio eventually disagree, and a
+                      correction applied to the wrong band reads as a clean,
+                      stable, wrong phase.
+    Calibration file  optional, and it overrides the typed values. Radians,
+                      "freq_hz, ch1_rad, ch2_rad, ..." per line, which is what
+                      twinrx_hop_test.py --cal-out writes.
+
+  A frequency with no row gets NO correction and says so. Reusing the nearest
+  row instead would be worse than doing nothing: measured on this unit, the
+  2.4 GHz table used at 5.8 GHz is wrong by 90, 127 and 29 degrees, and the
+  result still looks steady.
+
+  The offsets re-randomise on every power cycle of the radio, so a table is
+  valid for the session it was measured in. get_unknown_bands() should stay 0
+  and get_applied_deg() reports what is actually being applied.
+
+file_format: 1

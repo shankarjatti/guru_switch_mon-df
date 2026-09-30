@@ -1,0 +1,6 @@
+guru            Release guru
+guru10ms        run_hop.sh: run guru_fast.py and the tone script from the script's own folder
+guru57          last CALIBRATE table (measurement)
+known-good-2026-09-21 Verified working: LO shared (ch2 master), DC removed, fixed gain, no AGC, no phase rotation, freq sink on real RF axis. guru and guru2 in sync.
+working-2026-09-28 Verified: phase correction working, 10 s dwell, stream 16.6 MB/s
+working-fast-2026-09-28 guru_fast final

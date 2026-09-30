@@ -1,0 +1,2543 @@
+options:
+  parameters:
+    author: shankar
+    category: '[GRC Hier Blocks]'
+    cmake_opt: ''
+    comment: |-
+      USRP-2945 (X310 + 2x TwinRX) LO configuration and phase-coherence test.
+      GNU Radio 3.8 / UHD 3.15.
+      All four channels are driven from ONE synthesiser, tuned with timed commands.
+    copyright: ''
+    description: TwinRX LO sharing / phase coherence test bench
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: qt_gui
+    hier_block_src_path: '.:'
+    id: guru
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    qt_qss_theme: ''
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: prompt
+    sizing_mode: fixed
+    thread_safe_setters: ''
+    title: 'Guru: USRP-2945 4-Channel Coherent Receiver & Phase Alignment'
+    window_size: 1400,900
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 8
+    - 8
+    rotation: 0
+    state: enabled
+blocks:
+- name: avg_len
+  id: variable
+  parameters:
+    comment: |-
+      Coherent averaging length for the phase estimate.
+      65536 samples = 65 ms at 1 Msps, comparable to what
+      twinrx_lo_check.py integrates. The old 4096 averaged 24x
+      less and made the GUI look far noisier than the CLI for
+      the same signal.
+    value: '65536'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 344
+    - 116.0
+    rotation: 0
+    state: enabled
+- name: band
+  id: variable_qtgui_label
+  parameters:
+    comment: |-
+      Shows which band the receiver is on right now.
+      It depends on center_freq, so GRC refreshes it from
+      set_center_freq() -- i.e. on every hop.
+    formatter: None
+    gui_hint: tabs@0:5,0,1,2
+    label: CURRENT BAND
+    type: string
+    value: '''%.4f GHz'' % (center_freq/1e9)'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1128
+    - 492.0
+    rotation: 0
+    state: enabled
+- name: center_freq
+  id: variable
+  parameters:
+    comment: |-
+      Reported by the hopping block, not a control any more.
+      The band list lives in the TwinRX Hopping USRP Source block.
+    value: 2.4e9
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 944
+    - 124.0
+    rotation: 0
+    state: enabled
+- name: cmd_lead
+  id: variable
+  parameters:
+    comment: |-
+      How far ahead of "now" the timed tune is scheduled.
+      Must exceed the host->FPGA latency. 0.1 s is safe.
+    value: '0.1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 168
+    - 284.0
+    rotation: 0
+    state: enabled
+- name: disp_bw
+  id: variable
+  parameters:
+    comment: |-
+      Wide enough to keep the tone when the transmitter's crystal is off
+      frequency. The HackRF is ~+/-20 ppm, which is ~116 kHz at 5.8 GHz,
+      so the old 20 kHz window would have rejected it entirely.
+    value: 300e3
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1000
+    - 8
+    rotation: 0
+    state: enabled
+- name: disp_gain
+  id: variable
+  parameters:
+    comment: |-
+      Fixed display gain for ch2/ch3.
+      Replaces the AGC: the tone is already steady to ~0.6%, so no
+      automatic gain is needed.  A fixed gain keeps the true relative
+      amplitude between channels and has no start-up transient.
+    value: '25'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1240
+    - 8
+    rotation: 0
+    state: enabled
+- name: disp_taps_bp
+  id: variable
+  parameters:
+    comment: |-
+      One-sided: the tone always arrives on the positive side.
+      Bands whose receive chain inverts the spectrum are pre-compensated at
+      the transmitter -- 5.1 GHz is sent a -200 kHz tone so it still lands at
+      +200 kHz (see --offset-map). Widening the filter to cover both sides
+      would work too, but costs 3 dB of noise bandwidth to paper over
+      something better fixed at the source.
+    value: firdes.complex_band_pass(1.0, samp_rate, tone_offset - disp_bw/2, tone_offset + disp_bw/2,
+      disp_bw/4, firdes.WIN_HAMMING)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1120
+    - 8
+    rotation: 0
+    state: enabled
+- name: dsp_manual
+  id: variable
+  parameters:
+    comment: |-
+      True  -> force every DDC to 0 Hz so the digital
+      down-conversion adds no per-channel phase.
+      Set False if you need exact requested centre freq.
+    value: 'True'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 168
+    - 356.0
+    rotation: 0
+    state: enabled
+- name: gain
+  id: variable_qtgui_range
+  parameters:
+    comment: |-
+      TwinRX gain range is 0 .. 93 dB.
+      60 dB is the best single setting for all three bands: it gives the most
+      SNR on the weak ones (5.8 GHz reaches 45.7 dB) while 2.4 GHz still has
+      about 4.8 dB of headroom. At 70 dB the 2.4 GHz band clips -- peak sample
+      1.18 -- and its SNR drops from 81 to 69 dB through compression.
+    gui_hint: tabs@0:1,0,1,2
+    label: RX Gain (dB)
+    min_len: '100'
+    orient: Qt.Horizontal
+    rangeType: float
+    start: '0'
+    step: '1'
+    stop: '93'
+    value: '60'
+    widget: counter_slider
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 800
+    - 20.0
+    rotation: 0
+    state: enabled
+- name: lo_export_chan
+  id: variable
+  parameters:
+    comment: |-
+      Channel whose synthesiser feeds everything else.
+      0 = DB-A ch0 exports (cables A->B)  -- NOT WORKING on this unit
+      2 = DB-B ch0 exports (cables B->A)  -- verified working
+    value: '2'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 168
+    - 116.0
+    rotation: 0
+    state: enabled
+- name: lo_sources
+  id: variable
+  parameters:
+    comment: |-
+      Per-channel LO source, index = UHD channel.
+      Master board : exporter = internal (or reimport), partner = companion
+      Slave  board : BOTH channels = external
+      Valid: internal / companion / external / reimport / disabled
+      Rx B exports here, not Rx A. Measured on this unit the jumpers
+      carrying A LO-out to B LO-in pass nothing, while B to A works.
+      Swap back to [internal, companion, external, external] with
+      lo_export_chan 0 if those cables get repaired.
+    value: '[''external'', ''external'', ''internal'', ''companion'']'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 168
+    - 188.0
+    rotation: 0
+    state: enabled
+- name: ph_avg
+  id: variable
+  parameters:
+    comment: Averaging length for the displayed phase.
+    value: '16384'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 248
+    - 36.0
+    rotation: 0
+    state: enabled
+- name: ph_skip
+  id: variable
+  parameters:
+    comment: |-
+      Samples skipped before measuring, so the reading is
+      past the start-up transient.
+    value: 2**13
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 8
+    - 120
+    rotation: 0
+    state: enabled
+- name: samp_rate
+  id: variable
+  parameters:
+    comment: |-
+      Per-channel rate. 1 Msps x 4ch is easy on 10GbE
+      and plenty for a phase-coherence check.
+    value: '1000000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 16
+    - 116.0
+    rotation: 0
+    state: enabled
+- name: subdev
+  id: variable
+  parameters:
+    comment: |-
+      DB-A = TwinRX #1 (ch0, ch1)
+      DB-B = TwinRX #2 (ch2, ch3)
+    value: '"A:0 A:1 B:0 B:1"'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 16
+    - 180.0
+    rotation: 0
+    state: enabled
+- name: time_interp
+  id: variable
+  parameters:
+    comment: Interpolation factor for time domain block
+    value: '20'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 500
+    - 116.0
+    rotation: 0
+    state: enabled
+- name: time_srate
+  id: variable
+  parameters:
+    comment: Sampling rate specifically for time domain block (20 Msps)
+    value: samp_rate * time_interp
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 620
+    - 116.0
+    rotation: 0
+    state: enabled
+- name: tone_bw
+  id: variable
+  parameters:
+    comment: |-
+      Half-width of the band kept around the tone, Hz.
+      Narrow enough to reject DC and most of the noise, wide
+      enough to tolerate the B210/X310 reference offset, which
+      measured ~3.9 kHz at 2.4 GHz. 10 kHz halves the noise
+      power the phase estimator sees versus the old 25 kHz.
+    value: 10e3
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1872
+    - 108.0
+    rotation: 0
+    state: enabled
+- name: tone_offset
+  id: variable
+  parameters:
+    comment: |-
+      Baseband offset of the calibration tone, Hz.
+      MUST match b210_tone_source.py --offset (default +200 kHz).
+      Set 0 only if your source really is at the centre frequency,
+      which makes it indistinguishable from LO leakage.
+    value: 200e3
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1544
+    - 212.0
+    rotation: 0
+    state: enabled
+- name: tone_taps
+  id: variable
+  parameters:
+    comment: Low-pass prototype for the translating filter.
+    value: firdes.low_pass(1.0, samp_rate, tone_bw, tone_bw/2.0, firdes.WIN_HAMMING)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 960
+    - 292.0
+    rotation: 0
+    state: enabled
+- name: tx_control
+  id: variable
+  parameters:
+    comment: |-
+      hackrf_tone_source.py control socket. The transmitter is told to
+      retune first, so it is already there when we arrive.
+      Set to '' to leave the transmitter alone.
+    value: '''127.0.0.1:5123'''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1128
+    - 252.0
+    rotation: 0
+    state: enabled
+- name: tx_disp_gain
+  id: variable
+  parameters:
+    comment: |-
+      Display-only gain for the black TX reference trace.
+      The B210 TX sink in this flowgraph is DISABLED -- the real
+      transmitter is b210_tone_source.py -- so this scales the
+      on-screen trace only and cannot change radiated power.
+    value: '10'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1360
+    - 8
+    rotation: 0
+    state: enabled
+- name: view_decim
+  id: variable
+  parameters:
+    comment: Decimation before the GUI sinks.
+    value: '2048'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 344
+    - 180.0
+    rotation: 0
+    state: enabled
+- name: bp_0
+  id: fir_filter_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: Keep only the tone.
+    decim: '1'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samp_delay: '0'
+    taps: disp_taps_bp
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 648
+    - 596.0
+    rotation: 0
+    state: enabled
+- name: bp_1
+  id: fir_filter_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: Keep only the tone.
+    decim: '1'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samp_delay: '0'
+    taps: disp_taps_bp
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 600
+    - 972.0
+    rotation: 0
+    state: enabled
+- name: bp_2
+  id: fir_filter_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: Keep only the tone.
+    decim: '1'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samp_delay: '0'
+    taps: disp_taps_bp
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 608
+    - 740.0
+    rotation: 0
+    state: enabled
+- name: bp_3
+  id: fir_filter_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: Keep only the tone.
+    decim: '1'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samp_delay: '0'
+    taps: disp_taps_bp
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 592
+    - 868.0
+    rotation: 0
+    state: enabled
+- name: c2r_0
+  id: blocks_complex_to_real
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: Extract real part of Ch0 for time plot
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1560
+    - 488.0
+    rotation: 0
+    state: enabled
+- name: c2r_1
+  id: blocks_complex_to_real
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: Extract real part of Ch1 for time plot
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1600
+    - 744.0
+    rotation: 0
+    state: enabled
+- name: c2r_2
+  id: blocks_complex_to_real
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: Extract real part of Ch2 for time plot
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1584
+    - 568.0
+    rotation: 0
+    state: enabled
+- name: c2r_3
+  id: blocks_complex_to_real
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: Extract real part of Ch3 for time plot
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1576
+    - 656.0
+    rotation: 0
+    state: enabled
+- name: dcblock_0
+  id: dc_blocker_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: Remove DC / LO leakage.
+    length: '1024'
+    long_form: 'True'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: cc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 416
+    - 660.0
+    rotation: 0
+    state: enabled
+- name: dcblock_1
+  id: dc_blocker_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: Remove DC / LO leakage.
+    length: '1024'
+    long_form: 'True'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: cc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 432
+    - 1036.0
+    rotation: 0
+    state: enabled
+- name: dcblock_2
+  id: dc_blocker_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: Remove DC / LO leakage.
+    length: '1024'
+    long_form: 'True'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: cc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 440
+    - 788.0
+    rotation: 0
+    state: enabled
+- name: dcblock_3
+  id: dc_blocker_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: Remove DC / LO leakage.
+    length: '1024'
+    long_form: 'True'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: cc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 432
+    - 924.0
+    rotation: 0
+    state: enabled
+- name: disp_gate_0
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: Blanks the plot while the radio settles.
+    const: '0'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1128
+    - 572.0
+    rotation: 0
+    state: enabled
+- name: disp_gate_1
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: Blanks the plot while the radio settles.
+    const: '0'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1128
+    - 652.0
+    rotation: 0
+    state: enabled
+- name: disp_gate_2
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: Blanks the plot while the radio settles.
+    const: '0'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1128
+    - 732.0
+    rotation: 0
+    state: enabled
+- name: disp_gate_3
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: Blanks the plot while the radio settles.
+    const: '0'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1128
+    - 812.0
+    rotation: 0
+    state: enabled
+- name: ph_avg_0
+  id: blocks_moving_average_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    length: ph_avg
+    max_iter: '65536'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    scale: 1.0/ph_avg
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 2568
+    - 1148.0
+    rotation: 0
+    state: enabled
+- name: ph_avg_1
+  id: blocks_moving_average_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    length: ph_avg
+    max_iter: '65536'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    scale: 1.0/ph_avg
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 2592
+    - 1276.0
+    rotation: 0
+    state: enabled
+- name: ph_avg_2
+  id: blocks_moving_average_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    length: ph_avg
+    max_iter: '65536'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    scale: 1.0/ph_avg
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 2592
+    - 1364.0
+    rotation: 0
+    state: enabled
+- name: ph_avg_2_0
+  id: blocks_moving_average_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    length: ph_avg
+    max_iter: '65536'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    scale: 1.0/ph_avg
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 2592
+    - 1484.0
+    rotation: 0
+    state: enabled
+- name: ph_dec_0
+  id: blocks_keep_one_in_n
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    n: '50000'
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 2816
+    - 1152.0
+    rotation: 0
+    state: enabled
+- name: ph_dec_1
+  id: blocks_keep_one_in_n
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    n: '50000'
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 2784
+    - 1240.0
+    rotation: 0
+    state: enabled
+- name: ph_dec_2
+  id: blocks_keep_one_in_n
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    n: '50000'
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 2784
+    - 1344.0
+    rotation: 0
+    state: enabled
+- name: ph_dec_2_0
+  id: blocks_keep_one_in_n
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    n: '50000'
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 2800
+    - 1512.0
+    rotation: 0
+    state: enabled
+- name: ph_deg_0
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: |-
+      radians -> degrees (180/pi;
+      GRC's evaluator has no math module)
+    const: '57.29577951308232'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 2384
+    - 1140.0
+    rotation: 0
+    state: enabled
+- name: ph_deg_1
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: |-
+      radians -> degrees (180/pi;
+      GRC's evaluator has no math module)
+    const: '57.29577951308232'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 2376
+    - 1268.0
+    rotation: 0
+    state: enabled
+- name: ph_deg_2
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: |-
+      radians -> degrees (180/pi;
+      GRC's evaluator has no math module)
+    const: '57.29577951308232'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 2376
+    - 1404.0
+    rotation: 0
+    state: enabled
+- name: ph_deg_2_0
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: |-
+      radians -> degrees (180/pi;
+      GRC's evaluator has no math module)
+    const: '57.29577951308232'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 2360
+    - 1508.0
+    rotation: 0
+    state: enabled
+- name: ph_est
+  id: doa_twinrx_phase_offset_est
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: |-
+      Phase of ch1/ch2/ch3 relative to ch0, in RADIANS.
+      Raw channels, ahead of DC blocking and filtering.
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    n_skip_ahead: ph_skip
+    num_inputs: '5'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1584
+    - 1016.0
+    rotation: 0
+    state: enabled
+- name: ph_num_0
+  id: qtgui_number_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    autoscale: 'False'
+    avg: '0'
+    color1: ("black", "black")
+    color10: ("black", "black")
+    color2: ("black", "black")
+    color3: ("black", "black")
+    color4: ("black", "black")
+    color5: ("black", "black")
+    color6: ("black", "black")
+    color7: ("black", "black")
+    color8: ("black", "black")
+    color9: ("black", "black")
+    comment: ''
+    factor1: '1'
+    factor10: '1'
+    factor2: '1'
+    factor3: '1'
+    factor4: '1'
+    factor5: '1'
+    factor6: '1'
+    factor7: '1'
+    factor8: '1'
+    factor9: '1'
+    graph_type: qtgui.NUM_GRAPH_HORIZ
+    gui_hint: tabs@0:7,1,1,1
+    label1: ch0 - ch0
+    label10: ''
+    label2: ''
+    label3: ''
+    label4: ''
+    label5: ''
+    label6: ''
+    label7: ''
+    label8: ''
+    label9: ''
+    max: '180'
+    min: '-180'
+    name: '"ch0 - ch0   phase offset (deg)"'
+    nconnections: '1'
+    type: float
+    unit1: deg
+    unit10: ''
+    unit2: ''
+    unit3: ''
+    unit4: ''
+    unit5: ''
+    unit6: ''
+    unit7: ''
+    unit8: ''
+    unit9: ''
+    update_time: '0.20'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 3000
+    - 1180.0
+    rotation: 0
+    state: enabled
+- name: ph_num_1
+  id: qtgui_number_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    autoscale: 'False'
+    avg: '0'
+    color1: ("black", "black")
+    color10: ("black", "black")
+    color2: ("black", "black")
+    color3: ("black", "black")
+    color4: ("black", "black")
+    color5: ("black", "black")
+    color6: ("black", "black")
+    color7: ("black", "black")
+    color8: ("black", "black")
+    color9: ("black", "black")
+    comment: ''
+    factor1: '1'
+    factor10: '1'
+    factor2: '1'
+    factor3: '1'
+    factor4: '1'
+    factor5: '1'
+    factor6: '1'
+    factor7: '1'
+    factor8: '1'
+    factor9: '1'
+    graph_type: qtgui.NUM_GRAPH_HORIZ
+    gui_hint: tabs@0:8,1,1,1
+    label1: ch1 - ch0
+    label10: ''
+    label2: ''
+    label3: ''
+    label4: ''
+    label5: ''
+    label6: ''
+    label7: ''
+    label8: ''
+    label9: ''
+    max: '180'
+    min: '-180'
+    name: '"ch1 - ch0   phase offset (deg)"'
+    nconnections: '1'
+    type: float
+    unit1: deg
+    unit10: ''
+    unit2: ''
+    unit3: ''
+    unit4: ''
+    unit5: ''
+    unit6: ''
+    unit7: ''
+    unit8: ''
+    unit9: ''
+    update_time: '0.20'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 3024
+    - 1300.0
+    rotation: 0
+    state: enabled
+- name: ph_num_2
+  id: qtgui_number_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    autoscale: 'False'
+    avg: '0'
+    color1: ("black", "black")
+    color10: ("black", "black")
+    color2: ("black", "black")
+    color3: ("black", "black")
+    color4: ("black", "black")
+    color5: ("black", "black")
+    color6: ("black", "black")
+    color7: ("black", "black")
+    color8: ("black", "black")
+    color9: ("black", "black")
+    comment: ''
+    factor1: '1'
+    factor10: '1'
+    factor2: '1'
+    factor3: '1'
+    factor4: '1'
+    factor5: '1'
+    factor6: '1'
+    factor7: '1'
+    factor8: '1'
+    factor9: '1'
+    graph_type: qtgui.NUM_GRAPH_HORIZ
+    gui_hint: tabs@0:9,1,1,1
+    label1: ch2 - ch0
+    label10: ''
+    label2: ''
+    label3: ''
+    label4: ''
+    label5: ''
+    label6: ''
+    label7: ''
+    label8: ''
+    label9: ''
+    max: '180'
+    min: '-180'
+    name: '"ch2- ch0   phase offset (deg)"'
+    nconnections: '1'
+    type: float
+    unit1: deg
+    unit10: ''
+    unit2: ''
+    unit3: ''
+    unit4: ''
+    unit5: ''
+    unit6: ''
+    unit7: ''
+    unit8: ''
+    unit9: ''
+    update_time: '0.20'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 2960
+    - 1460.0
+    rotation: 0
+    state: enabled
+- name: ph_num_2_0
+  id: qtgui_number_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    autoscale: 'False'
+    avg: '0'
+    color1: ("black", "black")
+    color10: ("black", "black")
+    color2: ("black", "black")
+    color3: ("black", "black")
+    color4: ("black", "black")
+    color5: ("black", "black")
+    color6: ("black", "black")
+    color7: ("black", "black")
+    color8: ("black", "black")
+    color9: ("black", "black")
+    comment: ''
+    factor1: '1'
+    factor10: '1'
+    factor2: '1'
+    factor3: '1'
+    factor4: '1'
+    factor5: '1'
+    factor6: '1'
+    factor7: '1'
+    factor8: '1'
+    factor9: '1'
+    graph_type: qtgui.NUM_GRAPH_HORIZ
+    gui_hint: tabs@0:10,1,1,1
+    label1: ch3 - ch0
+    label10: ''
+    label2: ''
+    label3: ''
+    label4: ''
+    label5: ''
+    label6: ''
+    label7: ''
+    label8: ''
+    label9: ''
+    max: '180'
+    min: '-180'
+    name: '"ch3 - ch0   phase offset (deg)"'
+    nconnections: '1'
+    type: float
+    unit1: deg
+    unit10: ''
+    unit2: ''
+    unit3: ''
+    unit4: ''
+    unit5: ''
+    unit6: ''
+    unit7: ''
+    unit8: ''
+    unit9: ''
+    update_time: '0.20'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 2968
+    - 1556.0
+    rotation: 0
+    state: enabled
+- name: phase_correct_hier_0
+  id: phase_correct_hier
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'Correct fixed LO-sharing phase offsets, measured with doa_twinrx_phase_offset_est and saved
+      to twinrx_phase_offsets.cfg. Port order: ch0(ref), ch1, ch2, ch3.'
+    config_filename: /home/shankar/radar2/guru/twinrx_phase_offsets.cfg
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_ports: '4'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 864
+    - 776.0
+    rotation: 0
+    state: disabled
+- name: qtgui_time_sink_x_1
+  id: qtgui_time_sink_x
+  parameters:
+    affinity: ''
+    alias: ''
+    alpha1: '1.0'
+    alpha10: '1.0'
+    alpha2: '1.0'
+    alpha3: '1.0'
+    alpha4: '1.0'
+    alpha5: '1.0'
+    alpha6: '1.0'
+    alpha7: '1.0'
+    alpha8: '1.0'
+    alpha9: '1.0'
+    autoscale: 'False'
+    axislabels: 'True'
+    color1: red
+    color10: dark blue
+    color2: blue
+    color3: green
+    color4: magenta
+    color5: black
+    color6: cyan
+    color7: dark red
+    color8: dark green
+    color9: dark blue
+    comment: ''
+    ctrlpanel: 'True'
+    entags: 'True'
+    grid: 'True'
+    gui_hint: tabs@0:6,0,1,2
+    label1: Ch0 RF A/RX2 - LO external
+    label10: Signal10
+    label2: Ch1 RF A/RX1 - LO external
+    label3: Ch2 RF B/RX1 - LO internal (MASTER, exports)
+    label4: Ch3 RF B/RX2 - LO companion
+    label5: TX Signal (B210)
+    label6: Signal6
+    label7: Signal7
+    label8: Signal8
+    label9: Signal9
+    legend: 'True'
+    marker1: '-1'
+    marker10: '-1'
+    marker2: '-1'
+    marker3: '-1'
+    marker4: '-1'
+    marker5: '-1'
+    marker6: '-1'
+    marker7: '-1'
+    marker8: '-1'
+    marker9: '-1'
+    name: '"RF Waveforms - all 4 channels: DC removed, tone filtered, uniform gain"'
+    nconnections: '4'
+    size: '1000'
+    srate: time_srate
+    stemplot: 'False'
+    style1: '1'
+    style10: '1'
+    style2: '1'
+    style3: '1'
+    style4: '1'
+    style5: '1'
+    style6: '1'
+    style7: '1'
+    style8: '1'
+    style9: '1'
+    tr_chan: '0'
+    tr_delay: '0'
+    tr_level: '0.0'
+    tr_mode: qtgui.TRIG_MODE_AUTO
+    tr_slope: qtgui.TRIG_SLOPE_POS
+    tr_tag: '""'
+    type: float
+    update_time: '0.10'
+    width1: '2'
+    width10: '1'
+    width2: '2'
+    width3: '2'
+    width4: '2'
+    width5: '2'
+    width6: '1'
+    width7: '1'
+    width8: '1'
+    width9: '1'
+    ylabel: Amplitude
+    ymax: '0.6'
+    ymin: '-0.6'
+    yunit: '""'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1896
+    - 536.0
+    rotation: 0
+    state: enabled
+- name: snippet_hop
+  id: snippet
+  parameters:
+    alias: ''
+    code: |
+      # Follows the hopping block: keeps the CURRENT BAND label in step, and
+      # blanks the time plot while the radio settles after a hop.
+      #
+      # Only the display path is gated. Muting the samples themselves also fed
+      # zeros to the phase estimator, which then read a clean +0.00 deg -- a
+      # perfectly steady number from no signal at all, which is the one reading
+      # this bench must never produce.
+      import threading, time
+
+      self._hop_run = True
+      _gates = [self.disp_gate_0, self.disp_gate_1,
+                self.disp_gate_2, self.disp_gate_3,
+                self.spec_gate_0, self.spec_gate_1,
+                self.spec_gate_2, self.spec_gate_3]
+
+      def _follow():
+          last_band, last_open = None, None
+          while self._hop_run:
+              try:
+                  b = self.twinrx_hopping_source_0.get_current_band()
+                  settled = self.twinrx_hopping_source_0.is_settled()
+              except Exception:
+                  b, settled = None, True
+              if b is not None and b != last_band:
+                  last_band = b
+                  self.set_center_freq(b[0])
+              if settled != last_open:
+                  last_open = settled
+                  for g in _gates:
+                      g.set_k(1.0 if settled else 0.0)
+              time.sleep(0.05)
+
+      threading.Thread(target=_follow, daemon=True).start()
+    comment: |-
+      Follows the block so the CURRENT BAND label
+      tracks; the block does the hopping itself.
+    priority: '0'
+    section: main_after_start
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1128
+    - 332.0
+    rotation: 0
+    state: enabled
+- name: snippet_lo_config
+  id: snippet
+  parameters:
+    alias: ''
+    code: |
+      # LO routing and the timed tune happen INSIDE the TwinRX USRP Source
+      # block, so nothing LO-related belongs here.
+      #
+      # The calibration source is a HackRF One, started outside this flowgraph
+      # (run_hop.sh, or: hackrf --freq 2.4e9 --vga 16). It cannot be launched
+      # from here: the HackRF needs the system GNU Radio 3.10 while this runs
+      # under 3.8, and keeping libuhd 4.1 out of the transmitter's process
+      # matters because the X310's FPGA image is built for UHD 3.15.
+      print('[*] Calibration source: HackRF One (started separately).')
+    comment: The transmitter runs in its own process; see run_hop.sh.
+    priority: '0'
+    section: main_after_init
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 296
+    - 300.0
+    rotation: 0
+    state: enabled
+- name: snippet_lo_stop
+  id: snippet
+  parameters:
+    alias: ''
+    code: |
+      # Stop the block's hop thread BEFORE the flowgraph tears down.
+      #
+      # It lives inside the source block and checks that block's own flag, so
+      # setting a flag on the top block here did nothing. The thread kept
+      # issuing timed tune commands while the USRP object was being destroyed,
+      # which left the X310's RFNoC control plane wedged -- recoverable only by
+      # power cycling the radio.
+      try:
+          self.twinrx_hopping_source_0.stop_hopping()
+          print('Hop thread stopped.')
+      except Exception as e:
+          print('Could not stop the hop thread: %s' % e)
+      self._twinrx_run = False
+    comment: |-
+      Stops hopping before teardown -- otherwise the thread
+      tunes a device that is being destroyed.
+    priority: '0'
+    section: main_after_stop
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1400
+    - 4.0
+    rotation: 0
+    state: enabled
+- name: snippet_lo_watch
+  id: snippet
+  parameters:
+    alias: ''
+    code: |
+      print('TwinRX USRP Source block owns LO routing and tuning.')
+    comment: ''
+    priority: '0'
+    section: main_after_start
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 544
+    - 300.0
+    rotation: 0
+    state: enabled
+- name: tabs
+  id: qtgui_tab_widget
+  parameters:
+    alias: ''
+    comment: ''
+    gui_hint: ''
+    label0: Control & Phase
+    label1: Spectra
+    label10: Tab 10
+    label11: Tab 11
+    label12: Tab 12
+    label13: Tab 13
+    label14: Tab 14
+    label15: Tab 15
+    label16: Tab 16
+    label17: Tab 17
+    label18: Tab 18
+    label19: Tab 19
+    label2: ''
+    label3: ''
+    label4: ''
+    label5: ''
+    label6: ''
+    label7: ''
+    label8: ''
+    label9: ''
+    num_tabs: '2'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 456
+    - 12.0
+    rotation: 0
+    state: enabled
+- name: time_resamp_0
+  id: rational_resampler_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    decim: '1'
+    fbw: '0'
+    interp: time_interp
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    taps: firdes.low_pass(time_interp * disp_gain, time_srate, 300e3, 50e3, firdes.WIN_HAMMING)
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1320
+    - 516.0
+    rotation: 0
+    state: enabled
+- name: time_resamp_1
+  id: rational_resampler_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    decim: '1'
+    fbw: '0'
+    interp: time_interp
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    taps: firdes.low_pass(time_interp * disp_gain, time_srate, 300e3, 50e3, firdes.WIN_HAMMING)
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1392
+    - 828.0
+    rotation: 0
+    state: enabled
+- name: time_resamp_2
+  id: rational_resampler_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    decim: '1'
+    fbw: '0'
+    interp: time_interp
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    taps: firdes.low_pass(time_interp * disp_gain, time_srate, 300e3, 50e3, firdes.WIN_HAMMING)
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1328
+    - 620.0
+    rotation: 0
+    state: enabled
+- name: time_resamp_3
+  id: rational_resampler_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    decim: '1'
+    fbw: '0'
+    interp: time_interp
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    taps: firdes.low_pass(time_interp * disp_gain, time_srate, 300e3, 50e3, firdes.WIN_HAMMING)
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1360
+    - 724.0
+    rotation: 0
+    state: enabled
+- name: twinrx_hopping_source_0
+  id: twinrx_hopping_source
+  parameters:
+    addresses: '"type=x300"'
+    affinity: ''
+    alias: ''
+    blank_during_settle: 'False'
+    comment: |-
+      Bands 2.4 / 5.2 / 5.8 GHz. None of them needs the LO fallback: 5.2 GHz
+      uses a low-side LO natively, unlike 5.1 GHz where UHD picks a high-side
+      LO the synthesiser will not re-lock to. So no forced re-lock, no mirrored
+      spectrum, and no 180 degree step on the exporting channel.
+
+      LO must be exported by Rx B: the A->B MMCX jumpers pass no LO, so
+      direction 'A' leaves ch2/ch3 with no oscillator and two flat traces.
+    cpu_format: fc32
+    dwell_0: '10.0'
+    dwell_1: '10.0'
+    dwell_2: '10.0'
+    dwell_3: '10.0'
+    dwell_4: '10.0'
+    dwell_5: '10.0'
+    dwell_6: '10.0'
+    dwell_7: '10.0'
+    freq_0: '2400000000'
+    freq_1: '5200000000'
+    freq_2: '5800000000'
+    freq_3: '2400000000'
+    freq_4: '2400000000'
+    freq_5: '2400000000'
+    freq_6: '2400000000'
+    freq_7: '2400000000'
+    gain_0: '46'
+    gain_1: '60'
+    gain_2: '69'
+    gain_3: '60'
+    gain_4: '60'
+    gain_5: '60'
+    gain_6: '60'
+    gain_7: '60'
+    hop_enable: 'True'
+    lo_export_direction: B
+    lo_lock_fallback: 'False'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_bands: '3'
+    otw_format: ''
+    samp_rate: '1000000'
+    settle: '1.0'
+    sources: '4'
+    start_delay: '2.0'
+    tx_control: '"127.0.0.1:5123"'
+    gain_trim: (0.0, -13.3, 1.5, -1.7)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 16
+    - 684.0
+    rotation: 0
+    state: true
+- name: uhd_usrp_source_0
+  id: uhd_usrp_source
+  parameters:
+    affinity: ''
+    alias: ''
+    ant0: RX1
+    ant1: RX2
+    ant10: RX2
+    ant11: RX2
+    ant12: RX2
+    ant13: RX2
+    ant14: RX2
+    ant15: RX2
+    ant16: RX2
+    ant17: RX2
+    ant18: RX2
+    ant19: RX2
+    ant2: RX1
+    ant20: RX2
+    ant21: RX2
+    ant22: RX2
+    ant23: RX2
+    ant24: RX2
+    ant25: RX2
+    ant26: RX2
+    ant27: RX2
+    ant28: RX2
+    ant29: RX2
+    ant3: RX2
+    ant30: RX2
+    ant31: RX2
+    ant4: RX2
+    ant5: RX2
+    ant6: RX2
+    ant7: RX2
+    ant8: RX2
+    ant9: RX2
+    bw0: '0'
+    bw1: '0'
+    bw10: '0'
+    bw11: '0'
+    bw12: '0'
+    bw13: '0'
+    bw14: '0'
+    bw15: '0'
+    bw16: '0'
+    bw17: '0'
+    bw18: '0'
+    bw19: '0'
+    bw2: '0'
+    bw20: '0'
+    bw21: '0'
+    bw22: '0'
+    bw23: '0'
+    bw24: '0'
+    bw25: '0'
+    bw26: '0'
+    bw27: '0'
+    bw28: '0'
+    bw29: '0'
+    bw3: '0'
+    bw30: '0'
+    bw31: '0'
+    bw4: '0'
+    bw5: '0'
+    bw6: '0'
+    bw7: '0'
+    bw8: '0'
+    bw9: '0'
+    center_freq0: center_freq
+    center_freq1: center_freq
+    center_freq10: '0'
+    center_freq11: '0'
+    center_freq12: '0'
+    center_freq13: '0'
+    center_freq14: '0'
+    center_freq15: '0'
+    center_freq16: '0'
+    center_freq17: '0'
+    center_freq18: '0'
+    center_freq19: '0'
+    center_freq2: center_freq
+    center_freq20: '0'
+    center_freq21: '0'
+    center_freq22: '0'
+    center_freq23: '0'
+    center_freq24: '0'
+    center_freq25: '0'
+    center_freq26: '0'
+    center_freq27: '0'
+    center_freq28: '0'
+    center_freq29: '0'
+    center_freq3: center_freq
+    center_freq30: '0'
+    center_freq31: '0'
+    center_freq4: '0'
+    center_freq5: '0'
+    center_freq6: '0'
+    center_freq7: '0'
+    center_freq8: '0'
+    center_freq9: '0'
+    clock_rate: 200e6
+    clock_source0: internal
+    clock_source1: ''
+    clock_source2: ''
+    clock_source3: ''
+    clock_source4: ''
+    clock_source5: ''
+    clock_source6: ''
+    clock_source7: ''
+    comment: |-
+      TwinRX REQUIRES master_clock_rate = 200 MHz.
+      LO controls are deliberately hidden here: GRC would emit
+      set_lo_source() AFTER set_center_freq(), which is the wrong
+      order.  The Python Snippet does it properly instead.
+    dc_offs_enb0: ''
+    dc_offs_enb1: ''
+    dc_offs_enb10: ''
+    dc_offs_enb11: ''
+    dc_offs_enb12: ''
+    dc_offs_enb13: ''
+    dc_offs_enb14: ''
+    dc_offs_enb15: ''
+    dc_offs_enb16: ''
+    dc_offs_enb17: ''
+    dc_offs_enb18: ''
+    dc_offs_enb19: ''
+    dc_offs_enb2: ''
+    dc_offs_enb20: ''
+    dc_offs_enb21: ''
+    dc_offs_enb22: ''
+    dc_offs_enb23: ''
+    dc_offs_enb24: ''
+    dc_offs_enb25: ''
+    dc_offs_enb26: ''
+    dc_offs_enb27: ''
+    dc_offs_enb28: ''
+    dc_offs_enb29: ''
+    dc_offs_enb3: ''
+    dc_offs_enb30: ''
+    dc_offs_enb31: ''
+    dc_offs_enb4: ''
+    dc_offs_enb5: ''
+    dc_offs_enb6: ''
+    dc_offs_enb7: ''
+    dc_offs_enb8: ''
+    dc_offs_enb9: ''
+    dev_addr: '"type=x300"'
+    dev_args: '""'
+    gain0: gain
+    gain1: gain
+    gain10: '0'
+    gain11: '0'
+    gain12: '0'
+    gain13: '0'
+    gain14: '0'
+    gain15: '0'
+    gain16: '0'
+    gain17: '0'
+    gain18: '0'
+    gain19: '0'
+    gain2: gain
+    gain20: '0'
+    gain21: '0'
+    gain22: '0'
+    gain23: '0'
+    gain24: '0'
+    gain25: '0'
+    gain26: '0'
+    gain27: '0'
+    gain28: '0'
+    gain29: '0'
+    gain3: gain
+    gain30: '0'
+    gain31: '0'
+    gain4: '0'
+    gain5: '0'
+    gain6: '0'
+    gain7: '0'
+    gain8: '0'
+    gain9: '0'
+    iq_imbal_enb0: ''
+    iq_imbal_enb1: ''
+    iq_imbal_enb10: ''
+    iq_imbal_enb11: ''
+    iq_imbal_enb12: ''
+    iq_imbal_enb13: ''
+    iq_imbal_enb14: ''
+    iq_imbal_enb15: ''
+    iq_imbal_enb16: ''
+    iq_imbal_enb17: ''
+    iq_imbal_enb18: ''
+    iq_imbal_enb19: ''
+    iq_imbal_enb2: ''
+    iq_imbal_enb20: ''
+    iq_imbal_enb21: ''
+    iq_imbal_enb22: ''
+    iq_imbal_enb23: ''
+    iq_imbal_enb24: ''
+    iq_imbal_enb25: ''
+    iq_imbal_enb26: ''
+    iq_imbal_enb27: ''
+    iq_imbal_enb28: ''
+    iq_imbal_enb29: ''
+    iq_imbal_enb3: ''
+    iq_imbal_enb30: ''
+    iq_imbal_enb31: ''
+    iq_imbal_enb4: ''
+    iq_imbal_enb5: ''
+    iq_imbal_enb6: ''
+    iq_imbal_enb7: ''
+    iq_imbal_enb8: ''
+    iq_imbal_enb9: ''
+    lo_export0: 'False'
+    lo_export1: 'False'
+    lo_export10: 'False'
+    lo_export11: 'False'
+    lo_export12: 'False'
+    lo_export13: 'False'
+    lo_export14: 'False'
+    lo_export15: 'False'
+    lo_export16: 'False'
+    lo_export17: 'False'
+    lo_export18: 'False'
+    lo_export19: 'False'
+    lo_export2: 'False'
+    lo_export20: 'False'
+    lo_export21: 'False'
+    lo_export22: 'False'
+    lo_export23: 'False'
+    lo_export24: 'False'
+    lo_export25: 'False'
+    lo_export26: 'False'
+    lo_export27: 'False'
+    lo_export28: 'False'
+    lo_export29: 'False'
+    lo_export3: 'False'
+    lo_export30: 'False'
+    lo_export31: 'False'
+    lo_export4: 'False'
+    lo_export5: 'False'
+    lo_export6: 'False'
+    lo_export7: 'False'
+    lo_export8: 'False'
+    lo_export9: 'False'
+    lo_source0: internal
+    lo_source1: internal
+    lo_source10: internal
+    lo_source11: internal
+    lo_source12: internal
+    lo_source13: internal
+    lo_source14: internal
+    lo_source15: internal
+    lo_source16: internal
+    lo_source17: internal
+    lo_source18: internal
+    lo_source19: internal
+    lo_source2: internal
+    lo_source20: internal
+    lo_source21: internal
+    lo_source22: internal
+    lo_source23: internal
+    lo_source24: internal
+    lo_source25: internal
+    lo_source26: internal
+    lo_source27: internal
+    lo_source28: internal
+    lo_source29: internal
+    lo_source3: internal
+    lo_source30: internal
+    lo_source31: internal
+    lo_source4: internal
+    lo_source5: internal
+    lo_source6: internal
+    lo_source7: internal
+    lo_source8: internal
+    lo_source9: internal
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    nchan: '4'
+    norm_gain0: 'False'
+    norm_gain1: 'False'
+    norm_gain10: 'False'
+    norm_gain11: 'False'
+    norm_gain12: 'False'
+    norm_gain13: 'False'
+    norm_gain14: 'False'
+    norm_gain15: 'False'
+    norm_gain16: 'False'
+    norm_gain17: 'False'
+    norm_gain18: 'False'
+    norm_gain19: 'False'
+    norm_gain2: 'False'
+    norm_gain20: 'False'
+    norm_gain21: 'False'
+    norm_gain22: 'False'
+    norm_gain23: 'False'
+    norm_gain24: 'False'
+    norm_gain25: 'False'
+    norm_gain26: 'False'
+    norm_gain27: 'False'
+    norm_gain28: 'False'
+    norm_gain29: 'False'
+    norm_gain3: 'False'
+    norm_gain30: 'False'
+    norm_gain31: 'False'
+    norm_gain4: 'False'
+    norm_gain5: 'False'
+    norm_gain6: 'False'
+    norm_gain7: 'False'
+    norm_gain8: 'False'
+    norm_gain9: 'False'
+    num_mboards: '1'
+    otw: ''
+    rx_agc0: Default
+    rx_agc1: Default
+    rx_agc10: Default
+    rx_agc11: Default
+    rx_agc12: Default
+    rx_agc13: Default
+    rx_agc14: Default
+    rx_agc15: Default
+    rx_agc16: Default
+    rx_agc17: Default
+    rx_agc18: Default
+    rx_agc19: Default
+    rx_agc2: Default
+    rx_agc20: Default
+    rx_agc21: Default
+    rx_agc22: Default
+    rx_agc23: Default
+    rx_agc24: Default
+    rx_agc25: Default
+    rx_agc26: Default
+    rx_agc27: Default
+    rx_agc28: Default
+    rx_agc29: Default
+    rx_agc3: Default
+    rx_agc30: Default
+    rx_agc31: Default
+    rx_agc4: Default
+    rx_agc5: Default
+    rx_agc6: Default
+    rx_agc7: Default
+    rx_agc8: Default
+    rx_agc9: Default
+    samp_rate: samp_rate
+    sd_spec0: subdev
+    sd_spec1: ''
+    sd_spec2: ''
+    sd_spec3: ''
+    sd_spec4: ''
+    sd_spec5: ''
+    sd_spec6: ''
+    sd_spec7: ''
+    show_lo_controls: 'False'
+    start_time: '-1.0'
+    stream_args: ''
+    stream_chans: '[]'
+    sync: none
+    time_source0: internal
+    time_source1: ''
+    time_source2: ''
+    time_source3: ''
+    time_source4: ''
+    time_source5: ''
+    time_source6: ''
+    time_source7: ''
+    type: fc32
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 2224
+    - 428.0
+    rotation: 0
+    state: disabled
+- name: spec_gate_0
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: |-
+      Blanks the spectrum while the radio settles,
+      same as the time plot.
+    const: '0'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1400
+    - 572.0
+    rotation: 0
+    state: enabled
+- name: spec_gate_1
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: |-
+      Blanks the spectrum while the radio settles,
+      same as the time plot.
+    const: '0'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1400
+    - 652.0
+    rotation: 0
+    state: enabled
+- name: spec_gate_2
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: |-
+      Blanks the spectrum while the radio settles,
+      same as the time plot.
+    const: '0'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1400
+    - 732.0
+    rotation: 0
+    state: enabled
+- name: spec_gate_3
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: |-
+      Blanks the spectrum while the radio settles,
+      same as the time plot.
+    const: '0'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1400
+    - 812.0
+    rotation: 0
+    state: enabled
+- name: qtgui_freq_sink_x_0
+  id: qtgui_freq_sink_x
+  parameters:
+    affinity: ''
+    alias: ''
+    autoscale: 'False'
+    average: '0.2'
+    axislabels: 'True'
+    bw: samp_rate
+    comment: |-
+      Wideband view of what each channel actually receives: the tone,
+      any LO leakage left after the DC blocker, and the noise floor.
+      Taken before the display band-pass, so it shows the whole
+      1 MHz span rather than just the tone.
+    ctrlpanel: 'False'
+    fc: center_freq
+    fftsize: '4096'
+    freqhalf: 'False'
+    grid: 'True'
+    gui_hint: tabs@1:0,0,1,2
+    legend: 'True'
+    name: '"Spectrum - all 4 channels (DC removed)"'
+    nconnections: '4'
+    showports: 'False'
+    tr_chan: '0'
+    tr_level: '0.0'
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_tag: '""'
+    type: complex
+    units: dB
+    update_time: '0.10'
+    wintype: firdes.WIN_BLACKMAN_hARRIS
+    ymax: '-20'
+    ymin: '-140'
+    label: Relative Gain
+    label1: Ch0 RF A/RX1
+    width1: '2'
+    color1: red
+    alpha1: '1.0'
+    label2: Ch1 RF A/RX2
+    width2: '2'
+    color2: blue
+    alpha2: '1.0'
+    label3: Ch2 RF B/RX1 (LO master)
+    width3: '2'
+    color3: green
+    alpha3: '1.0'
+    label4: Ch3 RF B/RX2
+    width4: '2'
+    color4: magenta
+    alpha4: '1.0'
+    label5: ''
+    width5: '2'
+    color5: '"blue"'
+    alpha5: '1.0'
+    label6: ''
+    width6: '2'
+    color6: '"blue"'
+    alpha6: '1.0'
+    label7: ''
+    width7: '2'
+    color7: '"blue"'
+    alpha7: '1.0'
+    label8: ''
+    width8: '2'
+    color8: '"blue"'
+    alpha8: '1.0'
+    label9: ''
+    width9: '2'
+    color9: '"blue"'
+    alpha9: '1.0'
+    label10: ''
+    width10: '2'
+    color10: '"blue"'
+    alpha10: '1.0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 1650
+    - 660.0
+    rotation: 0
+    state: enabled
+connections:
+- - bp_0
+  - '0'
+  - disp_gate_0
+  - '0'
+- - bp_0
+  - '0'
+  - ph_est
+  - '0'
+- - bp_0
+  - '0'
+  - ph_est
+  - '1'
+- - bp_0
+  - '0'
+  - phase_correct_hier_0
+  - '0'
+- - bp_1
+  - '0'
+  - disp_gate_1
+  - '0'
+- - bp_1
+  - '0'
+  - ph_est
+  - '4'
+- - bp_1
+  - '0'
+  - phase_correct_hier_0
+  - '3'
+- - bp_2
+  - '0'
+  - disp_gate_2
+  - '0'
+- - bp_2
+  - '0'
+  - ph_est
+  - '2'
+- - bp_2
+  - '0'
+  - phase_correct_hier_0
+  - '1'
+- - bp_3
+  - '0'
+  - disp_gate_3
+  - '0'
+- - bp_3
+  - '0'
+  - ph_est
+  - '3'
+- - bp_3
+  - '0'
+  - phase_correct_hier_0
+  - '2'
+- - c2r_0
+  - '0'
+  - qtgui_time_sink_x_1
+  - '0'
+- - c2r_1
+  - '0'
+  - qtgui_time_sink_x_1
+  - '3'
+- - c2r_2
+  - '0'
+  - qtgui_time_sink_x_1
+  - '1'
+- - c2r_3
+  - '0'
+  - qtgui_time_sink_x_1
+  - '2'
+- - dcblock_0
+  - '0'
+  - bp_0
+  - '0'
+- - dcblock_1
+  - '0'
+  - bp_1
+  - '0'
+- - dcblock_2
+  - '0'
+  - bp_2
+  - '0'
+- - dcblock_3
+  - '0'
+  - bp_3
+  - '0'
+- - disp_gate_0
+  - '0'
+  - time_resamp_0
+  - '0'
+- - disp_gate_1
+  - '0'
+  - time_resamp_1
+  - '0'
+- - disp_gate_2
+  - '0'
+  - time_resamp_2
+  - '0'
+- - disp_gate_3
+  - '0'
+  - time_resamp_3
+  - '0'
+- - ph_avg_0
+  - '0'
+  - ph_dec_0
+  - '0'
+- - ph_avg_1
+  - '0'
+  - ph_dec_1
+  - '0'
+- - ph_avg_2
+  - '0'
+  - ph_dec_2
+  - '0'
+- - ph_avg_2_0
+  - '0'
+  - ph_dec_2_0
+  - '0'
+- - ph_dec_0
+  - '0'
+  - ph_num_0
+  - '0'
+- - ph_dec_1
+  - '0'
+  - ph_num_1
+  - '0'
+- - ph_dec_2
+  - '0'
+  - ph_num_2
+  - '0'
+- - ph_dec_2_0
+  - '0'
+  - ph_num_2_0
+  - '0'
+- - ph_deg_0
+  - '0'
+  - ph_avg_0
+  - '0'
+- - ph_deg_1
+  - '0'
+  - ph_avg_1
+  - '0'
+- - ph_deg_2
+  - '0'
+  - ph_avg_2
+  - '0'
+- - ph_deg_2_0
+  - '0'
+  - ph_avg_2_0
+  - '0'
+- - ph_est
+  - '0'
+  - ph_deg_0
+  - '0'
+- - ph_est
+  - '1'
+  - ph_deg_1
+  - '0'
+- - ph_est
+  - '2'
+  - ph_deg_2
+  - '0'
+- - ph_est
+  - '3'
+  - ph_deg_2_0
+  - '0'
+- - phase_correct_hier_0
+  - '0'
+  - ph_est
+  - '0'
+- - phase_correct_hier_0
+  - '0'
+  - ph_est
+  - '1'
+- - phase_correct_hier_0
+  - '0'
+  - time_resamp_0
+  - '0'
+- - phase_correct_hier_0
+  - '1'
+  - ph_est
+  - '2'
+- - phase_correct_hier_0
+  - '1'
+  - time_resamp_2
+  - '0'
+- - phase_correct_hier_0
+  - '2'
+  - ph_est
+  - '3'
+- - phase_correct_hier_0
+  - '2'
+  - time_resamp_3
+  - '0'
+- - phase_correct_hier_0
+  - '3'
+  - ph_est
+  - '4'
+- - phase_correct_hier_0
+  - '3'
+  - time_resamp_1
+  - '0'
+- - time_resamp_0
+  - '0'
+  - c2r_0
+  - '0'
+- - time_resamp_1
+  - '0'
+  - c2r_1
+  - '0'
+- - time_resamp_2
+  - '0'
+  - c2r_2
+  - '0'
+- - time_resamp_3
+  - '0'
+  - c2r_3
+  - '0'
+- - twinrx_hopping_source_0
+  - '0'
+  - dcblock_0
+  - '0'
+- - twinrx_hopping_source_0
+  - '1'
+  - dcblock_2
+  - '0'
+- - twinrx_hopping_source_0
+  - '2'
+  - dcblock_3
+  - '0'
+- - twinrx_hopping_source_0
+  - '3'
+  - dcblock_1
+  - '0'
+- - dcblock_0
+  - '0'
+  - spec_gate_0
+  - '0'
+- - spec_gate_0
+  - '0'
+  - qtgui_freq_sink_x_0
+  - '0'
+- - dcblock_2
+  - '0'
+  - spec_gate_2
+  - '0'
+- - spec_gate_2
+  - '0'
+  - qtgui_freq_sink_x_0
+  - '1'
+- - dcblock_3
+  - '0'
+  - spec_gate_3
+  - '0'
+- - spec_gate_3
+  - '0'
+  - qtgui_freq_sink_x_0
+  - '2'
+- - dcblock_1
+  - '0'
+  - spec_gate_1
+  - '0'
+- - spec_gate_1
+  - '0'
+  - qtgui_freq_sink_x_0
+  - '3'
+metadata:
+  file_format: 1

@@ -1,0 +1,22 @@
+ M CMakeLists.txt
+ D cmake/Modules/CMakeParseArgumentsCopy.cmake
+ D cmake/Modules/GrMiscUtils.cmake
+ D cmake/Modules/GrPlatform.cmake
+ D cmake/Modules/GrPython.cmake
+ D cmake/Modules/GrSwig.cmake
+ D cmake/Modules/GrTest.cmake
+ D cmake/Modules/UseSWIG.cmake
+ M lib/CMakeLists.txt
+ D python/build_utils.py
+ D python/build_utils_codes.py
+ M python/compass.py
+ M python/findmax_and_save.py
+ M python/phase_correct_hier.py
+ M python/qa_MUSIC_lin_array.py
+ M python/qa_autocorrelate.py
+ M python/qa_calibrate_lin_array.py
+ M python/qa_find_local_max.py
+ M python/qa_rootMUSIC_linear_array.py
+ M swig/CMakeLists.txt
+?? build/
+?? python/__pycache__/
