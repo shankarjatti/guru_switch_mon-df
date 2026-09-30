@@ -28,7 +28,15 @@
 // commanded length; the bursts go on the same continuous timeline (gaps are
 // zeros), so the block and everything after it work as in continuous mode.
 //
-// C API for ctypes; see twinrx_radio_source.py.
+// MON mode (this copy, guru_switch): one more band whose four channels each
+// run on their OWN internal LO and frequency (export off, all internal). The
+// mode is changed at a slot boundary by the scheduler: the LO routing is sent
+// TIMED at the switch slot's S, before its tune (measured 2026-09-30: timed
+// routing takes effect at S, never before; the DF phase comes back within
+// 0.16 deg; route_burst_test.py / switch_check.py). Consecutive MON slots are
+// NOT retuned: their bursts follow each other with no gap (continuous MON).
+//
+// C API for ctypes; see switch_source.py (guru_switch) / twinrx_radio_source.py.
 
 #include <uhd/usrp/multi_usrp.hpp>
 #include <uhd/types/tune_request.hpp>
@@ -38,6 +46,7 @@
 #include <sched.h>
 
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <chrono>
 #include <cmath>
@@ -61,6 +70,7 @@ constexpr int NCH = 4;
 constexpr double STEP = 0.0004;
 constexpr double SECOND_PASS = 0.003;
 constexpr size_t LO_MASTER = 2;
+const char* const DF_SRC[NCH] = {"external", "external", "internal", "companion"};
 
 double host_now() {
     return std::chrono::duration<double>(clk::now().time_since_epoch()).count();
@@ -73,6 +83,10 @@ struct Slot {
     double next;
     int valid;      // -1 unknown, 0 invalid, 1 valid
     int why;        // 0 ok, 1 skipped, 2 late, 3 unlocked, 4 burst never came
+    int mode;       // 0 DF (shared LO), 1 MON (own LO per channel)
+    int band;       // band index (DF bands 0..n_df-1, MON = n_df)
+    double pre;     // dwell starts at S + pre (settle - guard, or 0: MON not retuned)
+    int tuned;      // 1 = this slot switched/retuned the LOs at S
 };
 
 struct Engine {
@@ -92,6 +106,25 @@ struct Engine {
     // engine sees exactly what it sees in continuous mode.
     bool burst = false;
     double preroll = 0.00025;
+    // per band: every channel's own frequency, and the LO mode (0 DF shared, 1 MON own)
+    std::vector<std::array<double, NCH>> fch;
+    std::vector<int> bmode;
+    size_t n_df = 0;                   // bands 0..n_df-1 are DF; band n_df is MON (if has_mon)
+    bool has_mon = false;
+    std::atomic<int> want_mode{0};     // requested mode (set_mode); taken at the next slot
+    int routed_mode = 0;               // routing last commanded (scheduler thread only)
+    // switch record (the scheduler writes, eng_mode_info reads)
+    std::atomic<long> n_switches{0}, n_switch_bad{0};
+    std::atomic<double> last_req_dev{0}, last_sw_S{0}, last_sw_dwell{0};
+    std::atomic<int> last_sw_ok{-1}, last_sw_to{-1}, cur_mode{0};
+    std::atomic<long long> mon_dwell_samples{0}, df_dwell_samples{0};
+    std::array<double, NCH> mon_gain{{0, 0, 0, 0}};
+    // time between the end of the old mode's last dwell and the switch slot's S:
+    // the routing is sent UNTIMED in it (measured 2026-09-30: sent timed, every
+    // routing call reads the TwinRX back and that read waits behind the timed
+    // write, so the host blocked until S and the tune after it went out late)
+    double switch_gap = 0.010;
+    std::atomic<double> last_route_ms{0}, max_route_ms{0};
 
     uhd::usrp::multi_usrp::sptr u;
     uhd::rx_streamer::sptr rx;
@@ -125,7 +158,7 @@ struct Engine {
 
     // burst mode: every burst commanded, in time order (sample index of its
     // first sample on the continuous timeline, and its length)
-    struct Burst { long id; long long n0; long long len; };
+    struct Burst { long id; long long n0; long long len; long long pre; int mode; };
     std::mutex bmx;
     std::deque<Burst> expect;
     std::atomic<long> n_burst_ok{0}, n_burst_missing{0};
@@ -224,24 +257,30 @@ struct Engine {
                 note("clearing LO export on ch" + std::to_string(ch) + ": " + e.what());
             }
         }
-        const char* src[NCH] = {"external", "external", "internal", "companion"};
+        // start mode (routed_mode, set by eng_create2): DF = board B exports,
+        // MON = every channel on its own internal LO
+        const size_t b0 = routed_mode == 1 ? n_df : 0;
         for (size_t ch = 0; ch < NCH; ++ch)
-            u->set_rx_lo_source(src[ch], uhd::usrp::multi_usrp::ALL_LOS, ch);
-        u->set_rx_lo_export_enabled(true, uhd::usrp::multi_usrp::ALL_LOS, LO_MASTER);
+            u->set_rx_lo_source(routed_mode == 1 ? "internal" : DF_SRC[ch],
+                                uhd::usrp::multi_usrp::ALL_LOS, ch);
+        if (routed_mode == 0)
+            u->set_rx_lo_export_enabled(true, uhd::usrp::multi_usrp::ALL_LOS, LO_MASTER);
+        cur_mode = routed_mode;
 
-        gains.assign(freq.size(), std::vector<double>(NCH, 0));
-        for (size_t b = 0; b < freq.size(); ++b)
+        gains.assign(fch.size(), std::vector<double>(NCH, 0));
+        for (size_t b = 0; b < fch.size(); ++b)
             for (size_t ch = 0; ch < NCH; ++ch) {
                 auto r = u->get_rx_gain_range(ch);
-                gains[b][ch] = std::max(r.start(), std::min(r.stop(), gain[b] + trim[ch]));
+                const double g = bmode[b] == 1 ? mon_gain[ch] : gain[b] + trim[ch];
+                gains[b][ch] = std::max(r.start(), std::min(r.stop(), g));
             }
-        for (size_t ch = 0; ch < NCH; ++ch) u->set_rx_gain(gains[0][ch], ch);
-        uhd::tune_request_t req(freq[0]);
-        req.rf_freq = freq[0];
-        req.rf_freq_policy = uhd::tune_request_t::POLICY_MANUAL;
-        req.dsp_freq = 0.0;
-        req.dsp_freq_policy = uhd::tune_request_t::POLICY_MANUAL;
+        for (size_t ch = 0; ch < NCH; ++ch) u->set_rx_gain(gains[b0][ch], ch);
         for (size_t ch = 0; ch < NCH; ++ch) {
+            uhd::tune_request_t req(fch[b0][ch]);
+            req.rf_freq = fch[b0][ch];
+            req.rf_freq_policy = uhd::tune_request_t::POLICY_MANUAL;
+            req.dsp_freq = 0.0;
+            req.dsp_freq_policy = uhd::tune_request_t::POLICY_MANUAL;
             auto res = u->set_rx_freq(req, ch);
             if (res.actual_dsp_freq != 0.0)
                 throw std::runtime_error("DDC not at 0 Hz on ch" + std::to_string(ch));
@@ -253,19 +292,40 @@ struct Engine {
         for (auto& r : ring) r.assign(ring_n, cf(0, 0));
     }
 
+    // LO routing for mode m, UNTIMED: only called when nothing timed is waiting
+    // in the radio (after the previous dwell ended), so its read-backs return at once.
+    void route_now(int m) {
+        const double h0 = host_now();
+        for (size_t ch = 0; ch < NCH; ++ch)
+            u->set_rx_lo_export_enabled(false, uhd::usrp::multi_usrp::ALL_LOS, ch);
+        for (size_t ch = 0; ch < NCH; ++ch)
+            u->set_rx_lo_source(m == 1 ? "internal" : DF_SRC[ch], uhd::usrp::multi_usrp::ALL_LOS, ch);
+        if (m == 0) u->set_rx_lo_export_enabled(true, uhd::usrp::multi_usrp::ALL_LOS, LO_MASTER);
+        routed_mode = m;
+        const double ms = (host_now() - h0) * 1e3;
+        last_route_ms = ms;
+        if (ms > max_route_ms) max_route_ms = ms;
+    }
+
+    // Band change at radio time T: the usual phase-correct tune (the routing for
+    // this band's mode was already sent by the scheduler, see route_now).
     void band_change(size_t i, double T) {
+        if (bmode[i] != routed_mode) route_now(bmode[i]);     // not reached: the scheduler routes first
         u->set_command_time(uhd::time_spec_t(T));
         for (size_t ch = 0; ch < NCH; ++ch) u->set_rx_gain(gains[i][ch], ch);
-        uhd::tune_request_t req(freq[i]);
-        req.rf_freq = freq[i];
-        req.rf_freq_policy = uhd::tune_request_t::POLICY_MANUAL;
-        req.dsp_freq_policy = uhd::tune_request_t::POLICY_NONE;
+        uhd::tune_request_t req[NCH];
+        for (size_t ch = 0; ch < NCH; ++ch) {
+            req[ch] = uhd::tune_request_t(fch[i][ch]);
+            req[ch].rf_freq = fch[i][ch];
+            req[ch].rf_freq_policy = uhd::tune_request_t::POLICY_MANUAL;
+            req[ch].dsp_freq_policy = uhd::tune_request_t::POLICY_NONE;
+        }
         for (size_t ch = 0; ch < NCH; ++ch) {
             u->set_command_time(uhd::time_spec_t(T + ch * STEP));
-            u->set_rx_freq(req, ch);
+            u->set_rx_freq(req[ch], ch);
         }
         u->set_command_time(uhd::time_spec_t(T + SECOND_PASS));
-        for (size_t ch = 0; ch < NCH; ++ch) u->set_rx_freq(req, ch);
+        for (size_t ch = 0; ch < NCH; ++ch) u->set_rx_freq(req[ch], ch);
         u->clear_command_time();
     }
 
@@ -373,7 +433,6 @@ struct Engine {
 
     void rx_loop_burst() {
         rt_rx_ok = set_rt(rt_prio > 1 ? rt_prio - 1 : rt_prio);
-        const long long pre_n_rx = std::llround(preroll * fs);
         uhd::rx_metadata_t md;
         std::vector<cf> tmp[NCH];
         for (auto& t : tmp) t.resize(spp);
@@ -452,7 +511,7 @@ struct Engine {
             if (!ring_put(tmp, got)) continue;
             // samples of this packet that lie after the burst's pre-roll = dwell samples
             {
-                const long long pre = pre_n_rx;
+                const long long pre = cur.pre;          // 0 on a MON burst that follows MON
                 const long long before = std::max(0LL, std::min(got_in, pre));
                 const long long after = std::max(0LL, std::min(got_in + static_cast<long long>(got), pre));
                 dwell_in += static_cast<long long>(got) - (after - before);
@@ -468,6 +527,8 @@ struct Engine {
                     std::lock_guard<std::mutex> g(cmx);
                     total_dwell_samples += dwell_in;
                     ++total_dwells;
+                    if (cur.mode == 1) mon_dwell_samples += dwell_in;
+                    else df_dwell_samples += dwell_in;
                 }
                 last_burst_got = got_in;
                 last_burst_n0 = cur.n0;
@@ -502,46 +563,82 @@ struct Engine {
                     r > 0.001 ? r - 0.0005 : 0.0001));
             }
         };
-        const size_t nb = freq.size();
         // Slots are counted in whole samples from the stream start, so every
         // boundary -- switch, dwell start, next switch -- falls on an exact
         // sample and the dwell is the same number of samples on every slot.
-        std::vector<long long> slot_n(nb);
-        for (size_t i = 0; i < nb; ++i) slot_n[i] = std::llround((settle + dwell[i]) * fs);
+        //   retuned slot (every DF slot, the first MON slot after a switch):
+        //       S = switch (routing if the mode changes, then the tune),
+        //       dwell = [S + settle - guard, + dwell), next S = its end + guard
+        //   MON slot after MON: not retuned, dwell = [S, S + dwell), next S = its
+        //       end (+ guard if the next slot retunes) -- MON bursts join up
         auto t_of = [&](long long n) { return start_dev + static_cast<double>(n) / fs; };
-        long long nS = static_cast<long long>(std::ceil(
+        const long long gpre_n = std::llround(gpre * fs);
+        const long long pre_tune_n = std::llround((settle - gpre) * fs);
+        const long long pre_n = std::llround(preroll * fs);
+        std::vector<long long> dw_n(fch.size());
+        for (size_t i = 0; i < fch.size(); ++i) dw_n[i] = std::llround(dwell[i] * fs);
+        long long nS0 = static_cast<long long>(std::ceil(
             (std::max(dev_now(), start_dev) + std::max(start_delay, 0.2) - start_dev) * fs));
         long k = 0;
+        size_t df_pos = 0;
 
-        // burst mode: each burst starts pre-roll before the dwell (whose first
-        // sample is guard_pre before the end of the switching time)
-        const long long burst_off = std::llround((settle - gpre - preroll) * fs);
-        const long long pre_n = std::llround(preroll * fs);
-        struct Cur { long id; double S; size_t i; bool sent; bool late; } cur{};
+        struct Cur { long id; double S; long long nS; size_t i; bool sent; bool late;
+                     bool tuned; long long pre; int mode; bool sw; };
         double cur_lock_issue = 0, cur_lock_done = 0;
-        auto send = [&](long k, long long nS) {
-            size_t i = k % nb;
-            const double S = t_of(nS);
-            Cur c{0, S, i, false, false};
+        // what the next slot is: the requested mode, taken at this boundary
+        auto plan = [&](const Cur* prev) {
+            Cur c{};
+            const int m = has_mon ? want_mode.load() : 0;
+            c.mode = m;
+            if (m == 0) {
+                if (prev && prev->mode == 1) df_pos = 0;       // DF restarts its cycle
+                c.i = df_pos;
+                df_pos = (df_pos + 1) % n_df;
+                c.tuned = true;
+            } else {
+                c.i = n_df;
+                // not retuned only when the LOs are already in MON on these bands
+                c.tuned = !(prev && prev->mode == 1 && prev->sent && routed_mode == 1);
+            }
+            c.pre = c.tuned ? pre_tune_n : 0;
+            c.sw = prev && bmode[c.i] != routed_mode;   // this slot changes the LO routing
+            c.nS = prev ? prev->nS + prev->pre + dw_n[prev->i] + (c.tuned ? gpre_n : 0) : nS0;
+            if (c.sw) c.nS += std::llround(switch_gap * fs);
+            c.S = t_of(c.nS);
+            return c;
+        };
+        auto send = [&](Cur c, long k) {
+            const double S = c.S;
             {
                 std::lock_guard<std::mutex> g(smx);
                 c.id = next_id++;
-                slots.push_back(Slot{c.id, S, freq[i], freq[(i + 1) % nb], -1, 0});
+                slots.push_back(Slot{c.id, S, bmode[c.i] == 1 ? 0.0 : fch[c.i][0], 0.0, -1, 0,
+                                     c.mode, static_cast<int>(c.i),
+                                     static_cast<double>(c.pre) / fs, c.tuned ? 1 : 0});
+            }
+            if (c.sw) {
+                ++n_switches;
+                last_sw_S = S;
+                last_sw_dwell = t_of(c.nS + c.pre);
+                last_sw_to = c.mode;
+                last_sw_ok = -1;
             }
             const double t_start = host_now();
             if (S - dev_now() < min_slack) {
                 ++n_skipped;
+                c.sent = false;
                 return c;
             }
             double h0 = host_now();
-            band_change(i, S);
+            if (c.tuned) band_change(c.i, S);
             const double t_band = host_now();
             if (burst) {
-                const long long n0 = nS + burst_off;
-                const long long len = pre_n + std::llround(dwell[i] * fs);
+                const long long bpre = c.tuned ? pre_n : 0;
+                const long long n0 = c.nS + c.pre - bpre;
+                const long long len = bpre + dw_n[c.i];
                 {
                     std::lock_guard<std::mutex> g(bmx);
-                    expect.push_back(Burst{c.id, n0, len});
+                    expect.push_back(Burst{c.id, n0, len, bpre, c.mode});
                 }
                 uhd::stream_cmd_t sc(uhd::stream_cmd_t::STREAM_MODE_NUM_SAMPS_AND_DONE);
                 sc.num_samps = static_cast<size_t>(len);
@@ -554,16 +651,15 @@ struct Engine {
             if (ms > max_send_ms) max_send_ms = ms;
             avg_send_ms = avg_send_ms.load() == 0 ? ms : 0.98 * avg_send_ms.load() + 0.02 * ms;
             c.sent = true;
+            // a retune must be in the radio before S; a MON burst that follows
+            // MON only needs its stream command in before its first sample
             c.late = h1 + off >= S;
             if (c.late) ++n_late;
-            if (tim_on && tim.size() < 200000) {
-                // relative to the PREVIOUS slot's S (the one being checked)
-                const double P = S - (settle + dwell[(i + nb - 1) % nb]);
-                tim.push_back(Tim{k, static_cast<int>(i), cur_lock_issue, cur_lock_done,
-                                  (t_start + off - P) * 1e3, (h0 + off - P) * 1e3,
-                                  (t_band + off - P) * 1e3, (h1 + off - P) * 1e3,
+            if (tim_on && tim.size() < 200000)
+                tim.push_back(Tim{k, static_cast<int>(c.i), cur_lock_issue, cur_lock_done,
+                                  (t_start + off - S) * 1e3, (h0 + off - S) * 1e3,
+                                  (t_band + off - S) * 1e3, (h1 + off - S) * 1e3,
                                   c.late ? 1 : 0});
-            }
             return c;
         };
         auto finish = [&](const Cur& c, int valid, int why) {
@@ -572,9 +668,11 @@ struct Engine {
                 if (s.id == c.id) { s.valid = valid; s.why = why; }
         };
 
-        cur = send(k, nS);
+        Cur cur = send(plan(nullptr), k);
         while (run) {
-            sleep_until(cur.S + lock_check);
+            // lock read: a retuned slot at S + lock_check (before its first used
+            // sample); a MON slot that was not retuned 0.5 ms into its dwell
+            sleep_until(cur.S + (cur.tuned ? lock_check : std::min(0.0005, dwell[cur.i] / 2)));
             if (!run) break;
             ++n_slots;
             int why = 0;
@@ -583,15 +681,36 @@ struct Engine {
             else if (cur.late) why = 2;
             else {
                 cur_lock_issue = (host_now() + off - cur.S) * 1e3;
-                ok = u->get_rx_sensor("lo_locked", LO_MASTER).to_bool();
+                if (cur.mode == 0) {
+                    ok = u->get_rx_sensor("lo_locked", LO_MASTER).to_bool();
+                } else if (cur.tuned) {
+                    // MON after a switch: every channel's OWN synthesiser
+                    ok = true;
+                    for (size_t ch = 0; ch < NCH; ++ch)
+                        ok = u->get_rx_sensor("lo_locked", ch).to_bool() && ok;
+                } else {
+                    // MON continuing: one channel per slot, in turn
+                    ok = u->get_rx_sensor("lo_locked", static_cast<size_t>(k % NCH)).to_bool();
+                }
                 cur_lock_done = (host_now() + off - cur.S) * 1e3;
                 if (!ok) { ++n_unlocked; why = 3; }
             }
             finish(cur, ok ? 1 : 0, why);
             if (ok) ++n_valid;
-            nS += slot_n[cur.i];
+            cur_mode = cur.mode;
+            if (cur.sw) {
+                last_sw_ok = ok ? 1 : 0;
+                if (!ok) ++n_switch_bad;
+            }
             ++k;
-            cur = send(k, nS);
+            Cur nxt = plan(&cur);
+            if (nxt.sw) {
+                // the old mode's last dwell must be over before the LOs move
+                sleep_until(t_of(cur.nS + cur.pre + dw_n[cur.i]) + 0.0002);
+                if (!run) break;
+                route_now(bmode[nxt.i]);
+            }
+            cur = send(nxt, k);
         }
     }
 };
@@ -600,18 +719,38 @@ struct Engine {
 
 extern "C" {
 
-void* eng_create(const char* args, double fs, int nbands, const double* freqs,
-                 const double* gains, const double* dwells, const double* trim4,
-                 double settle, double gpre, double lock_check, double min_slack,
-                 double start_delay, int rt_prio, int burst, double preroll,
-                 char* err, int errlen) {
+// DF only (as before): nbands shared-LO bands.
+void* eng_create2(const char* args, double fs, int nbands, const double* freqs,
+                  const double* gains, const double* dwells, const double* trim4,
+                  double settle, double gpre, double lock_check, double min_slack,
+                  double start_delay, int rt_prio, int burst, double preroll,
+                  int has_mon, const double* mon_freq4, const double* mon_gain4, double mon_dwell,
+                  int start_mode, char* err, int errlen) {
     auto* e = new Engine();
     try {
         e->args = args;
         e->fs = fs;
-        e->freq.assign(freqs, freqs + nbands);
-        e->gain.assign(gains, gains + nbands);
-        e->dwell.assign(dwells, dwells + nbands);
+        e->n_df = static_cast<size_t>(nbands);
+        if (e->n_df == 0) throw std::runtime_error("no DF band");
+        for (int b = 0; b < nbands; ++b) {
+            e->freq.push_back(freqs[b]);
+            e->gain.push_back(gains[b]);
+            e->dwell.push_back(dwells[b]);
+            e->fch.push_back({{freqs[b], freqs[b], freqs[b], freqs[b]}});
+            e->bmode.push_back(0);
+        }
+        e->has_mon = has_mon != 0;
+        if (e->has_mon) {
+            if (!burst) throw std::runtime_error("MON mode needs burst mode");
+            e->freq.push_back(0.0);
+            e->gain.push_back(0.0);
+            e->dwell.push_back(mon_dwell);
+            e->fch.push_back({{mon_freq4[0], mon_freq4[1], mon_freq4[2], mon_freq4[3]}});
+            e->bmode.push_back(1);
+            for (int c = 0; c < NCH; ++c) e->mon_gain[c] = mon_gain4[c];
+        }
+        e->routed_mode = (e->has_mon && start_mode == 1) ? 1 : 0;
+        e->want_mode = e->routed_mode;
         e->trim.assign(trim4, trim4 + NCH);
         e->settle = settle;
         e->gpre = gpre;
@@ -628,6 +767,44 @@ void* eng_create(const char* args, double fs, int nbands, const double* freqs,
         delete e;
         return nullptr;
     }
+}
+
+void* eng_create(const char* args, double fs, int nbands, const double* freqs,
+                 const double* gains, const double* dwells, const double* trim4,
+                 double settle, double gpre, double lock_check, double min_slack,
+                 double start_delay, int rt_prio, int burst, double preroll,
+                 char* err, int errlen) {
+    const double z[NCH] = {0, 0, 0, 0};
+    return eng_create2(args, fs, nbands, freqs, gains, dwells, trim4, settle, gpre, lock_check,
+                       min_slack, start_delay, rt_prio, burst, preroll, 0, z, z, 0.0, 0, err, errlen);
+}
+
+void eng_set_switch_gap(void* h, double secs) {
+    static_cast<Engine*>(h)->switch_gap = secs > 0 ? secs : 0;
+}
+
+// Ask for a mode (0 DF, 1 MON); the scheduler takes it at the next slot it plans.
+int eng_set_mode(void* h, int mode) {
+    auto* e = static_cast<Engine*>(h);
+    if (mode == 1 && !e->has_mon) return -1;
+    e->last_req_dev = host_now() + e->dev_offset.load();
+    e->want_mode = mode ? 1 : 0;
+    return e->want_mode.load();
+}
+
+// want, mode of the last finished slot, switches, switches whose first slot was
+// not locked/used, last request (radio time), last switch S, its first dwell
+// sample time, its verdict (-1 pending, 0 bad, 1 ok), mode switched to,
+// MON dwell samples, DF dwell samples (both counted packet by packet)
+void eng_mode_info(void* h, double* o) {
+    auto* e = static_cast<Engine*>(h);
+    o[0] = e->want_mode.load(); o[1] = e->cur_mode.load(); o[2] = e->n_switches.load();
+    o[3] = e->n_switch_bad.load(); o[4] = e->last_req_dev.load(); o[5] = e->last_sw_S.load();
+    o[6] = e->last_sw_dwell.load(); o[7] = e->last_sw_ok.load(); o[8] = e->last_sw_to.load();
+    std::lock_guard<std::mutex> g(e->cmx);
+    o[9] = static_cast<double>(e->mon_dwell_samples.load());
+    o[10] = static_cast<double>(e->df_dwell_samples.load());
+    o[11] = e->last_route_ms.load();
 }
 
 double eng_start(void* h, int hop) {
@@ -681,8 +858,8 @@ long eng_read(void* h, void* c0, void* c1, void* c2, void* c3, long max_n, doubl
     return n;
 }
 
-// Slot records with id >= from_id: out rows of 6 doubles
-// (id, S, freq, next, valid, why). Returns the number written.
+// Slot records with id >= from_id: out rows of 10 doubles
+// (id, S, freq, next, valid, why, mode, band, pre, tuned). Returns the number written.
 int eng_slots(void* h, long from_id, double* out, int max_rows) {
     auto* e = static_cast<Engine*>(h);
     std::lock_guard<std::mutex> g(e->smx);
@@ -696,8 +873,9 @@ int eng_slots(void* h, long from_id, double* out, int max_rows) {
     for (const auto& s : e->slots) {
         if (s.id < from_id) continue;
         if (n >= max_rows) break;
-        double* o = out + 6 * n++;
+        double* o = out + 10 * n++;
         o[0] = s.id; o[1] = s.S; o[2] = s.freq; o[3] = s.next; o[4] = s.valid; o[5] = s.why;
+        o[6] = s.mode; o[7] = s.band; o[8] = s.pre; o[9] = s.tuned;
     }
     return n;
 }
