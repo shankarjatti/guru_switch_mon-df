@@ -29,6 +29,17 @@ decisions taken, and what comes next. Only measured facts; anything not verified
 
 ## 2026-09-28
 
+### 2026-09-30 evening — MON/DF switch work published: https://github.com/shankarjatti/guru_switch_mon-df (PUBLIC)
+* User gave the repo (created public) and asked for everything: MON + DF switch information, files, custom blocks,
+  theory. Pushed `~/radar2/guru_switch` (branch main, 36da0bb, 491 files in SHA256SUMS; fresh clone from GitHub:
+  all intact). New docs: `docs/switching/THEORY.md`, `ENGINE_AND_BLOCKS.md`, `DEVELOPMENT_AND_TESTS.md`,
+  `RUN_AND_HARDWARE.md`; landing README; today's logs + 30-min watch in `logs/` / `results/`.
+* Checked before push: no secrets (hits = GPL text, upstream author emails), no secureCOM / private material,
+  0 broken doc links; largest file 85 MB (GitHub warns > 50 MB, accepted).
+* Mistake on the way: the work copy's `origin` still pointed at the local frozen `guru_DF_v1` (it was cloned from
+  it), so the first push created a branch `main` there. Removed at once (`git branch -D main`, gc), guru_DF_v1
+  files verified intact (449/449); remote renamed `guru_DF_v1_local`, `origin` = GitHub.
+
 ### 2026-09-30 18:12–18:42 — 30-min run of guru_switch: PASSED (no failure)
 * User: "keep monitoring, we'll run it for 30 min; if it fails we'll check root cause". Watched every minute.
 * CALIBRATE OK 18:10:15 (worst single window 0.06°). User switched MON/DF by hand 7 times (last: MON at ~18:31).
