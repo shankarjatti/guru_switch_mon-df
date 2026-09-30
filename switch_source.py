@@ -6,8 +6,9 @@ The engine (oot/engine/twinrx_engine.cpp, built as libtwinrx_switch.so in
 this folder -- NOT the installed doa one) runs:
   DF  : the verified hopping (board B exports its LO: ch0/ch1 external, ch2
         internal + export, ch3 companion), every band on all 4 channels
-  MON : every channel on its OWN internal LO and own band, not retuned while
-        MON lasts: consecutive MON bursts join with no gap
+  MON : every channel on its OWN internal LO and own band, ONE continuous
+        stream (timed start, stopped at the switch back), a lock read every
+        mon_dwell (one channel in turn), recorded as a 20 ms MON record
 A mode request (set_mode) is taken at the next slot the scheduler plans: the
 LO routing is sent timed at that slot's S, then the usual phase-correct tune.
 
@@ -150,7 +151,7 @@ class switch_source(gr.sync_block):
         for i, (f, g, d) in enumerate(self.bands):
             print("        DF band %d: %8.4f GHz  gain %4.1f dB (+trim)  dwell %6.2f ms, %.2f ms switching"
                   % (i, f / 1e9, g, d * 1e3, self.settle * 1e3))
-        print("        MON: %s  gains %s dB, %g ms bursts back to back (own LO per channel)"
+        print("        MON: %s  gains %s dB, ONE continuous stream, lock read every %g ms (own LO per channel)"
               % ("  ".join("ch%d %.4g GHz" % (c, self.mon_freqs[c] / 1e9) for c in range(NCH)),
                  "/".join("%g" % g for g in self.mon_gains), self.mon_dwell * 1e3))
         if float(park_freq) > 0:
