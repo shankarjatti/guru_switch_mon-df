@@ -127,6 +127,10 @@ struct Engine {
     std::atomic<double> last_route_ms{0}, max_route_ms{0};
     // MON: each channel's own lo_locked as last read by the scheduler (-1 not yet)
     std::atomic<int> mon_lock[NCH] = {{-1}, {-1}, {-1}, {-1}};
+    // MON streams CONTINUOUSLY (one timed start, one stop): the receive loop
+    // puts the sample index just after the last MON sample here when the stop
+    // arrives (end of burst)
+    std::atomic<long long> mon_end_n{-1};
 
     uhd::usrp::multi_usrp::sptr u;
     uhd::rx_streamer::sptr rx;
@@ -504,7 +508,7 @@ struct Engine {
                 got_in = 0;
                 dwell_in = 0;
             }
-            if (got_in + static_cast<long long>(got) > cur.len) {
+            if (cur.len >= 0 && got_in + static_cast<long long>(got) > cur.len) {
                 lose("burst longer than commanded (" + std::to_string(got_in + got) + " > " +
                      std::to_string(cur.len) + " samples)");
                 in_burst = false;
@@ -519,6 +523,22 @@ struct Engine {
                 dwell_in += static_cast<long long>(got) - (after - before);
             }
             got_in += got;
+            if (cur.len < 0) {
+                // continuous MON: every packet counted as it comes; it ends at the stop
+                {
+                    std::lock_guard<std::mutex> g(cmx);
+                    mon_dwell_samples += static_cast<long long>(got);
+                }
+                if (md.end_of_burst) {
+                    in_burst = false;
+                    ++n_burst_ok;
+                    last_burst_got = got_in;
+                    last_burst_n0 = cur.n0;
+                    last_burst_len = got_in;
+                    mon_end_n = cur.n0 + got_in;
+                }
+                continue;
+            }
             if (got_in == cur.len) {            // complete (end-of-burst on this packet)
                 in_burst = false;
                 ++n_burst_ok;
@@ -526,11 +546,11 @@ struct Engine {
                     // this burst's dwell samples (counted packet by packet above)
                     // and +1 dwell, published together: a reading never sees a
                     // half-received burst
+                    // DF dwells (MON is continuous, counted above)
                     std::lock_guard<std::mutex> g(cmx);
                     total_dwell_samples += dwell_in;
                     ++total_dwells;
-                    if (cur.mode == 1) mon_dwell_samples += dwell_in;
-                    else df_dwell_samples += dwell_in;
+                    df_dwell_samples += dwell_in;
                 }
                 last_burst_got = got_in;
                 last_burst_n0 = cur.n0;
@@ -587,26 +607,44 @@ struct Engine {
         struct Cur { long id; double S; long long nS; size_t i; bool sent; bool late;
                      bool tuned; long long pre; int mode; bool sw; };
         double cur_lock_issue = 0, cur_lock_done = 0;
-        // what the next slot is: the requested mode, taken at this boundary
-        auto plan = [&](const Cur* prev) {
+        const long long gap_n = std::llround(switch_gap * fs);
+        // a DF slot at sample nS (sw: it changes the LO routing -- decided by the
+        // caller BEFORE the routing is sent)
+        auto plan_df = [&](const Cur* prev, long long nS, bool sw) {
             Cur c{};
-            const int m = has_mon ? want_mode.load() : 0;
-            c.mode = m;
-            if (m == 0) {
-                if (prev && prev->mode == 1) df_pos = 0;       // DF restarts its cycle
-                c.i = df_pos;
-                df_pos = (df_pos + 1) % n_df;
-                c.tuned = true;
-            } else {
-                c.i = n_df;
-                // not retuned only when the LOs are already in MON on these bands
-                c.tuned = !(prev && prev->mode == 1 && prev->sent && routed_mode == 1);
-            }
-            c.pre = c.tuned ? pre_tune_n : 0;
-            c.sw = prev && bmode[c.i] != routed_mode;   // this slot changes the LO routing
-            c.nS = prev ? prev->nS + prev->pre + dw_n[prev->i] + (c.tuned ? gpre_n : 0) : nS0;
-            if (c.sw) c.nS += std::llround(switch_gap * fs);
-            c.S = t_of(c.nS);
+            if (prev && prev->mode == 1) df_pos = 0;           // DF restarts its cycle
+            c.mode = 0;
+            c.i = df_pos;
+            df_pos = (df_pos + 1) % n_df;
+            c.tuned = true;
+            c.pre = pre_tune_n;
+            c.sw = sw;
+            c.nS = nS;
+            c.S = t_of(nS);
+            return c;
+        };
+        // the first MON slot: tune at S, then ONE continuous stream from its dwell start
+        auto plan_mon_entry = [&](long long nS, bool sw) {
+            Cur c{};
+            c.mode = 1;
+            c.i = n_df;
+            c.tuned = true;
+            c.pre = pre_tune_n;
+            c.sw = sw;
+            c.nS = nS;
+            c.S = t_of(nS);
+            return c;
+        };
+        // a MON record (every mon_dwell of the continuous stream): no radio command,
+        // only its lock read and its verdict
+        auto plan_mon_record = [&](long long nS) {
+            Cur c{};
+            c.mode = 1;
+            c.i = n_df;
+            c.tuned = false;
+            c.pre = 0;
+            c.nS = nS;
+            c.S = t_of(nS);
             return c;
         };
         auto send = [&](Cur c, long k) {
@@ -625,6 +663,11 @@ struct Engine {
                 last_sw_to = c.mode;
                 last_sw_ok = -1;
             }
+            if (!c.tuned) {                 // MON record: nothing to send
+                c.sent = true;
+                c.late = false;
+                return c;
+            }
             const double t_start = host_now();
             if (S - dev_now() < min_slack) {
                 ++n_skipped;
@@ -632,18 +675,29 @@ struct Engine {
                 return c;
             }
             double h0 = host_now();
-            if (c.tuned) band_change(c.i, S);
+            band_change(c.i, S);
             const double t_band = host_now();
-            if (burst) {
-                const long long bpre = c.tuned ? pre_n : 0;
-                const long long n0 = c.nS + c.pre - bpre;
-                const long long len = bpre + dw_n[c.i];
+            if (c.mode == 0) {
+                const long long n0 = c.nS + c.pre - pre_n;
+                const long long len = pre_n + dw_n[c.i];
                 {
                     std::lock_guard<std::mutex> g(bmx);
-                    expect.push_back(Burst{c.id, n0, len, bpre, c.mode});
+                    expect.push_back(Burst{c.id, n0, len, pre_n, 0});
                 }
                 uhd::stream_cmd_t sc(uhd::stream_cmd_t::STREAM_MODE_NUM_SAMPS_AND_DONE);
                 sc.num_samps = static_cast<size_t>(len);
+                sc.stream_now = false;
+                sc.time_spec = uhd::time_spec_t(t_of(n0));
+                rx->issue_stream_cmd(sc);
+            } else {
+                // MON: continuous from the first dwell sample until the stop
+                const long long n0 = c.nS + c.pre;
+                {
+                    std::lock_guard<std::mutex> g(bmx);
+                    expect.push_back(Burst{c.id, n0, -1, 0, 1});
+                }
+                mon_end_n = -1;
+                uhd::stream_cmd_t sc(uhd::stream_cmd_t::STREAM_MODE_START_CONTINUOUS);
                 sc.stream_now = false;
                 sc.time_spec = uhd::time_spec_t(t_of(n0));
                 rx->issue_stream_cmd(sc);
@@ -653,8 +707,6 @@ struct Engine {
             if (ms > max_send_ms) max_send_ms = ms;
             avg_send_ms = avg_send_ms.load() == 0 ? ms : 0.98 * avg_send_ms.load() + 0.02 * ms;
             c.sent = true;
-            // a retune must be in the radio before S; a MON burst that follows
-            // MON only needs its stream command in before its first sample
             c.late = h1 + off >= S;
             if (c.late) ++n_late;
             if (tim_on && tim.size() < 200000)
@@ -670,10 +722,10 @@ struct Engine {
                 if (s.id == c.id) { s.valid = valid; s.why = why; }
         };
 
-        Cur cur = send(plan(nullptr), k);
+        Cur cur = routed_mode == 1 ? send(plan_mon_entry(nS0, false), k) : send(plan_df(nullptr, nS0, false), k);
         while (run) {
-            // lock read: a retuned slot at S + lock_check (before its first used
-            // sample); a MON slot that was not retuned 0.5 ms into its dwell
+            // lock read: a tuned slot at S + lock_check (before its first used
+            // sample); a MON record 0.5 ms into its 20 ms
             sleep_until(cur.S + (cur.tuned ? lock_check : std::min(0.0005, dwell[cur.i] / 2)));
             if (!run) break;
             ++n_slots;
@@ -686,16 +738,14 @@ struct Engine {
                 if (cur.mode == 0) {
                     ok = u->get_rx_sensor("lo_locked", LO_MASTER).to_bool();
                 } else if (cur.tuned) {
-                    // MON after a switch: every channel's OWN synthesiser
-                    ok = true;
+                    ok = true;                  // MON start: every channel's OWN synthesiser
                     for (size_t ch = 0; ch < NCH; ++ch) {
                         const bool l = u->get_rx_sensor("lo_locked", ch).to_bool();
                         mon_lock[ch] = l ? 1 : 0;
                         ok = l && ok;
                     }
                 } else {
-                    // MON continuing: one channel per slot, in turn
-                    const size_t ch = static_cast<size_t>(k % NCH);
+                    const size_t ch = static_cast<size_t>(k % NCH);   // MON: one channel per record
                     ok = u->get_rx_sensor("lo_locked", ch).to_bool();
                     mon_lock[ch] = ok ? 1 : 0;
                 }
@@ -710,14 +760,45 @@ struct Engine {
                 if (!ok) ++n_switch_bad;
             }
             ++k;
-            Cur nxt = plan(&cur);
-            if (nxt.sw) {
-                // the old mode's last dwell must be over before the LOs move
-                sleep_until(t_of(cur.nS + cur.pre + dw_n[cur.i]) + 0.0002);
-                if (!run) break;
-                route_now(bmode[nxt.i]);
+            const long long end_n = cur.nS + cur.pre + dw_n[cur.i];   // end of this dwell / record
+            const int want = has_mon ? want_mode.load() : 0;
+            if (cur.mode == 0) {
+                if (want == 1) {
+                    // DF -> MON: after the last DF dwell has ended, routing (untimed), then MON
+                    sleep_until(t_of(end_n) + 0.0002);
+                    if (!run) break;
+                    route_now(1);
+                    cur = send(plan_mon_entry(end_n + gap_n + gpre_n, true), k);
+                } else {
+                    cur = send(plan_df(&cur, end_n + gpre_n, false), k);
+                }
+            } else {
+                if (want == 0) {
+                    // MON -> DF: stop the continuous stream now; it ends where it ends
+                    if (cur.sent) {
+                        rx->issue_stream_cmd(uhd::stream_cmd_t(uhd::stream_cmd_t::STREAM_MODE_STOP_CONTINUOUS));
+                        const double t_stop = host_now();
+                        while (run && mon_end_n.load() < 0 && host_now() - t_stop < 0.5)
+                            std::this_thread::sleep_for(std::chrono::microseconds(200));
+                    }
+                    if (!run) break;
+                    long long E = mon_end_n.load();
+                    if (E < 0) {
+                        lose("the MON stream did not stop within 0.5 s");
+                        E = static_cast<long long>(std::ceil((dev_now() - start_dev) * fs));
+                    }
+                    route_now(0);
+                    cur = send(plan_df(&cur, E + gap_n + gpre_n, true), k);
+                } else {
+                    cur = send(plan_mon_record(end_n), k);   // the next 20 ms, pending until its read
+                }
             }
-            cur = send(nxt, k);
+        }
+        // a MON stream still running at the end: stop it
+        if (cur.mode == 1 && cur.sent) {
+            try {
+                rx->issue_stream_cmd(uhd::stream_cmd_t(uhd::stream_cmd_t::STREAM_MODE_STOP_CONTINUOUS));
+            } catch (const std::exception&) {}
         }
     }
 };

@@ -155,6 +155,7 @@ for cyc in range(a.cycles):
              mi_df["last_switch_ok"], mi_df["last_route_ms"], len(snk.df), len(snk.mon), snk.mon_bad))
 tb.stop()
 tb.wait()
+print("band lock stats:", src.get_band_lock_stats())
 stats = src.get_schedule_stats()
 mi = src.get_mode_info()
 bi = src.get_burst_info()

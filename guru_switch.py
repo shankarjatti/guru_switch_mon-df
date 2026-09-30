@@ -995,21 +995,21 @@ class guru_switch(gr.top_block, Qt.QWidget):
         self.connect((self.ph_meter, 2), (self.ph_meter_null2, 0))
         self.connect((self.ph_meter, 3), (self.ph_meter_null3, 0))
         self.connect((self.phase_correct_hopping_0, 0), (self.met_0, 0))
-        self.connect((self.phase_correct_hopping_0, 1), (self.met_0, 1))
         self.connect((self.phase_correct_hopping_0, 2), (self.met_0, 2))
         self.connect((self.phase_correct_hopping_0, 3), (self.met_0, 3))
-        self.connect((self.phase_correct_hopping_0, 1), (self.met_1, 1))
-        self.connect((self.phase_correct_hopping_0, 2), (self.met_1, 2))
+        self.connect((self.phase_correct_hopping_0, 1), (self.met_0, 1))
         self.connect((self.phase_correct_hopping_0, 0), (self.met_1, 0))
+        self.connect((self.phase_correct_hopping_0, 1), (self.met_1, 1))
         self.connect((self.phase_correct_hopping_0, 3), (self.met_1, 3))
+        self.connect((self.phase_correct_hopping_0, 2), (self.met_1, 2))
+        self.connect((self.phase_correct_hopping_0, 1), (self.met_2, 1))
+        self.connect((self.phase_correct_hopping_0, 0), (self.met_2, 0))
         self.connect((self.phase_correct_hopping_0, 3), (self.met_2, 3))
         self.connect((self.phase_correct_hopping_0, 2), (self.met_2, 2))
-        self.connect((self.phase_correct_hopping_0, 0), (self.met_2, 0))
-        self.connect((self.phase_correct_hopping_0, 1), (self.met_2, 1))
+        self.connect((self.phase_correct_hopping_0, 2), (self.ph_meter, 2))
+        self.connect((self.phase_correct_hopping_0, 1), (self.ph_meter, 1))
         self.connect((self.phase_correct_hopping_0, 3), (self.ph_meter, 3))
         self.connect((self.phase_correct_hopping_0, 0), (self.ph_meter, 0))
-        self.connect((self.phase_correct_hopping_0, 1), (self.ph_meter, 1))
-        self.connect((self.phase_correct_hopping_0, 2), (self.ph_meter, 2))
         self.connect((self.phase_correct_hopping_0, 0), (self.sw_mag_0, 0))
         self.connect((self.phase_correct_hopping_0, 1), (self.sw_mag_1, 0))
         self.connect((self.phase_correct_hopping_0, 2), (self.sw_mag_2, 0))
@@ -1019,9 +1019,9 @@ class guru_switch(gr.top_block, Qt.QWidget):
         self.connect((self.phase_correct_hopping_0, 1), (self.wave_sel, 1))
         self.connect((self.phase_correct_hopping_0, 2), (self.wave_sel, 2))
         self.connect((self.spec_sel, 0), (self.qtgui_freq_sink_x_0, 0))
-        self.connect((self.spec_sel, 2), (self.qtgui_freq_sink_x_0, 2))
-        self.connect((self.spec_sel, 1), (self.qtgui_freq_sink_x_0, 1))
         self.connect((self.spec_sel, 3), (self.qtgui_freq_sink_x_0, 3))
+        self.connect((self.spec_sel, 1), (self.qtgui_freq_sink_x_0, 1))
+        self.connect((self.spec_sel, 2), (self.qtgui_freq_sink_x_0, 2))
         self.connect((self.sw_avg_0, 0), (self.sw_dec_0, 0))
         self.connect((self.sw_avg_1, 0), (self.sw_dec_1, 0))
         self.connect((self.sw_avg_2, 0), (self.sw_dec_2, 0))
@@ -1046,9 +1046,9 @@ class guru_switch(gr.top_block, Qt.QWidget):
         self.connect((self.twinrx_radio_source_0, 5), (self.mon_snap_s2v1, 0))
         self.connect((self.twinrx_radio_source_0, 6), (self.mon_snap_s2v2, 0))
         self.connect((self.twinrx_radio_source_0, 7), (self.mon_snap_s2v3, 0))
-        self.connect((self.twinrx_radio_source_0, 1), (self.spec_sel, 1))
         self.connect((self.twinrx_radio_source_0, 3), (self.spec_sel, 3))
         self.connect((self.twinrx_radio_source_0, 0), (self.spec_sel, 0))
+        self.connect((self.twinrx_radio_source_0, 1), (self.spec_sel, 1))
         self.connect((self.twinrx_radio_source_0, 2), (self.spec_sel, 2))
         self.connect((self.wave_c2r_0, 0), (self.wave_sink, 0))
         self.connect((self.wave_c2r_1, 0), (self.wave_sink, 1))
@@ -1588,7 +1588,7 @@ def snipfcn_snippet_lo_watch(self):
 def snipfcn_snippet_switch(self):
     # MON <-> DF: status twice a second from the engine's own counters (never a
     # radio read here: it would wait behind the timed commands), and the control
-    # API on udp://127.0.0.1:5124 ('mode df' | 'mode mon' | 'status').
+    # API on udp://:0 ('mode df' | 'mode mon' | 'status').
     import json
     import socket
     import threading
@@ -1647,11 +1647,11 @@ def snipfcn_snippet_switch(self):
     def _api():
         sk = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
-            sk.bind(("127.0.0.1", 5124))
+            sk.bind(("", 0))
         except OSError as e:
             print("[switch] control API NOT started (%s)" % e)
             return
-        print("[switch] control API on udp://127.0.0.1:5124  ('mode df' | 'mode mon' | 'status')")
+        print("[switch] control API on udp://:0  ('mode df' | 'mode mon' | 'status')")
         while True:
             data, peer = sk.recvfrom(256)
             cmd = data.decode(errors="ignore").split()
@@ -1668,7 +1668,10 @@ def snipfcn_snippet_switch(self):
                 reply = {"ok": False, "error": "%s: %s" % (type(e).__name__, e)}
             sk.sendto(json.dumps(reply, default=str).encode(), peer)
 
-    threading.Thread(target=_api, daemon=True).start()
+    if False:
+        threading.Thread(target=_api, daemon=True).start()
+    else:
+        print("[switch] no control API: the mode changes only with the MODE selector")
 
 
 def snippets_main_after_init(tb):

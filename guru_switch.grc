@@ -3766,24 +3766,24 @@ blocks:
     section: main_after_start
     priority: '5'
     code: "# MON <-> DF: status twice a second from the engine's own counters (never a\n# radio read here:\
-      \ it would wait behind the timed commands), and the control\n# API on udp://127.0.0.1:5124 ('mode\
-      \ df' | 'mode mon' | 'status').\nimport json\nimport socket\nimport threading\nimport numpy as np\n\
-      from PyQt5 import QtCore\n\n_src = self.twinrx_radio_source_0\n_FS = float(self.samp_rate)\n_MONF\
-      \ = [900000000.0, 2400000000.0, 5200000000.0, 5800000000.0]\nself._sw_api_mode = None\n\ndef _readout(x):\n\
-      \    N = len(x)\n    S = np.abs(np.fft.fft(x * np.hanning(N).astype(np.float32))) ** 2\n    F =\
-      \ np.fft.fftfreq(N, 1.0 / _FS)\n    k = int(np.argmax(np.where(np.abs(F) >= 20e3, S, 0)))\n    return\
-      \ float(F[k]), float(10 * np.log10(S[k] / (np.median(S) + 1e-30))), float(np.abs(x).max())\n\ndef\
-      \ _sw_poll():\n    mi = _src.get_mode_info()\n    last = mi[\"last_request_to_dwell_ms\"]\n    txt\
-      \ = (\"NOW %s%s | switches %d (not used %d) | last: to %s, request -> first dwell %s, %s | \"\n\
-      \           \"samples: MON %d, DF %d\" % (\n               mi[\"mode\"], \"\" if mi[\"requested\"\
-      ] == mi[\"mode\"] else \"  (switching to %s)\" % mi[\"requested\"],\n               mi[\"switches\"\
-      ], mi[\"switches_bad\"], mi[\"last_switch_to\"] or \"-\",\n               \"%.1f ms\" % last if\
-      \ last else \"-\", mi[\"last_switch_ok\"] if mi[\"switches\"] else \"-\",\n               mi[\"\
-      mon_dwell_samples\"], mi[\"df_dwell_samples\"]))\n    self.set_mode_state(txt)\n    for c in range(4):\n\
-      \        lk = mi[\"mon_lock\"][c]\n        s = \"%s | MON samples (engine) %d, MON slots used %d,\
-      \ not used %d\" % (\n            \"LOCKED\" if lk else (\"LOCK NOT READ YET\" if lk is None else\
-      \ \"NOT LOCKED\"),\n            mi[\"mon_dwell_samples\"], mi[\"mon_slots_verified\"], mi[\"mon_slots_not_used\"\
-      ])\n        if mi[\"mode\"] != \"MON\":\n            s = \"not in MON (mode %s) | last: \" % mi[\"\
+      \ it would wait behind the timed commands), and the control\n# API on udp://:0 ('mode df' | 'mode\
+      \ mon' | 'status').\nimport json\nimport socket\nimport threading\nimport numpy as np\nfrom PyQt5\
+      \ import QtCore\n\n_src = self.twinrx_radio_source_0\n_FS = float(self.samp_rate)\n_MONF = [900000000.0,\
+      \ 2400000000.0, 5200000000.0, 5800000000.0]\nself._sw_api_mode = None\n\ndef _readout(x):\n    N\
+      \ = len(x)\n    S = np.abs(np.fft.fft(x * np.hanning(N).astype(np.float32))) ** 2\n    F = np.fft.fftfreq(N,\
+      \ 1.0 / _FS)\n    k = int(np.argmax(np.where(np.abs(F) >= 20e3, S, 0)))\n    return float(F[k]),\
+      \ float(10 * np.log10(S[k] / (np.median(S) + 1e-30))), float(np.abs(x).max())\n\ndef _sw_poll():\n\
+      \    mi = _src.get_mode_info()\n    last = mi[\"last_request_to_dwell_ms\"]\n    txt = (\"NOW %s%s\
+      \ | switches %d (not used %d) | last: to %s, request -> first dwell %s, %s | \"\n           \"samples:\
+      \ MON %d, DF %d\" % (\n               mi[\"mode\"], \"\" if mi[\"requested\"] == mi[\"mode\"] else\
+      \ \"  (switching to %s)\" % mi[\"requested\"],\n               mi[\"switches\"], mi[\"switches_bad\"\
+      ], mi[\"last_switch_to\"] or \"-\",\n               \"%.1f ms\" % last if last else \"-\", mi[\"\
+      last_switch_ok\"] if mi[\"switches\"] else \"-\",\n               mi[\"mon_dwell_samples\"], mi[\"\
+      df_dwell_samples\"]))\n    self.set_mode_state(txt)\n    for c in range(4):\n        lk = mi[\"\
+      mon_lock\"][c]\n        s = \"%s | MON samples (engine) %d, MON slots used %d, not used %d\" % (\n\
+      \            \"LOCKED\" if lk else (\"LOCK NOT READ YET\" if lk is None else \"NOT LOCKED\"),\n\
+      \            mi[\"mon_dwell_samples\"], mi[\"mon_slots_verified\"], mi[\"mon_slots_not_used\"])\n\
+      \        if mi[\"mode\"] != \"MON\":\n            s = \"not in MON (mode %s) | last: \" % mi[\"\
       mode\"] + s\n        x = np.asarray(getattr(self, \"mon_probe%d\" % c).level(), dtype=np.complex64)\n\
       \        if len(x) and mi[\"mode\"] == \"MON\":\n            # a block that overlaps a switch gap\
       \ (the zeros of DF time) is no MON reading\n            if np.count_nonzero(x == 0) > 16:\n    \
@@ -3795,19 +3795,20 @@ blocks:
       \ thread)\n    if self._sw_api_mode and self._sw_api_mode != self.mode:\n        self.set_mode(self._sw_api_mode)\n\
       \    self._sw_api_mode = None\n\nself._sw_timer = QtCore.QTimer()\nself._sw_timer.timeout.connect(_sw_poll)\n\
       self._sw_timer.start(500)\n\ndef _api():\n    sk = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)\n\
-      \    try:\n        sk.bind((\"127.0.0.1\", 5124))\n    except OSError as e:\n        print(\"[switch]\
-      \ control API NOT started (%s)\" % e)\n        return\n    print(\"[switch] control API on udp://127.0.0.1:5124\
-      \  ('mode df' | 'mode mon' | 'status')\")\n    while True:\n        data, peer = sk.recvfrom(256)\n\
-      \        cmd = data.decode(errors=\"ignore\").split()\n        try:\n            if len(cmd) ==\
-      \ 2 and cmd[0] == \"mode\" and cmd[1] in (\"df\", \"mon\"):\n                _src.set_mode(cmd[1])\
-      \            # the engine takes it at the next slot\n                self._sw_api_mode = cmd[1]\
-      \       # the selector follows in the GUI thread\n                reply = {\"ok\": True, \"requested\"\
+      \    try:\n        sk.bind((\"\", 0))\n    except OSError as e:\n        print(\"[switch] control\
+      \ API NOT started (%s)\" % e)\n        return\n    print(\"[switch] control API on udp://:0  ('mode\
+      \ df' | 'mode mon' | 'status')\")\n    while True:\n        data, peer = sk.recvfrom(256)\n    \
+      \    cmd = data.decode(errors=\"ignore\").split()\n        try:\n            if len(cmd) == 2 and\
+      \ cmd[0] == \"mode\" and cmd[1] in (\"df\", \"mon\"):\n                _src.set_mode(cmd[1])   \
+      \         # the engine takes it at the next slot\n                self._sw_api_mode = cmd[1]   \
+      \    # the selector follows in the GUI thread\n                reply = {\"ok\": True, \"requested\"\
       : cmd[1]}\n            elif cmd and cmd[0] == \"status\":\n                reply = {\"ok\": True,\
       \ \"mode\": _src.get_mode_info(), \"schedule\": _src.get_schedule_stats()}\n            else:\n\
       \                reply = {\"ok\": False, \"error\": \"commands: 'mode df' | 'mode mon' | 'status'\"\
       }\n        except Exception as e:\n            reply = {\"ok\": False, \"error\": \"%s: %s\" % (type(e).__name__,\
-      \ e)}\n        sk.sendto(json.dumps(reply, default=str).encode(), peer)\n\nthreading.Thread(target=_api,\
-      \ daemon=True).start()\n"
+      \ e)}\n        sk.sendto(json.dumps(reply, default=str).encode(), peer)\n\nif False:\n    threading.Thread(target=_api,\
+      \ daemon=True).start()\nelse:\n    print(\"[switch] no control API: the mode changes only with the\
+      \ MODE selector\")\n"
     comment: ''
   states:
     alias: ''

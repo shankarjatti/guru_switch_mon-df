@@ -9,8 +9,9 @@
   * MON tab: per LO a spectrum, a time graph (real I/Q of verified MON dwells)
     and a status line (its own lock as the engine read it, MON samples counted,
     strongest line of the newest samples, ADC peak), fed from outputs 4-7
-  * control API on udp://127.0.0.1:5124: 'mode df' | 'mode mon' | 'status'
-    (JSON reply; the edge modules' DOA requests will come in here)
+  * mode changes ONLY with the MODE selector (user, 2026-09-30); an optional control
+    API (--api 127.0.0.1:5124: 'mode df' | 'mode mon' | 'status') is off by default
+  * MON is ONE continuous stream (timed start, stop at the switch back); DF is burst mode
   * LAB TONE selector gets 900 MHz (only MON ch0 can see it)
 
     python3 make_guru_switch.py && GRC_BLOCKS_PATH=$GRC_BLOCKS_PATH:$PWD/grc grcc guru_switch.grc -o .
@@ -29,7 +30,9 @@ ap.add_argument("--mon", default="900e6:60,2.4e9:46,5.2e9:60,5.8e9:69",
 ap.add_argument("--mon-dwell", type=float, default=0.020)
 ap.add_argument("--switch-gap", type=float, default=0.010)
 ap.add_argument("--start-mode", default="df", choices=["df", "mon"])
-ap.add_argument("--api", default="127.0.0.1:5124")
+ap.add_argument("--api", default="",
+                help="host:port for a control API ('mode df' / 'mode mon' / 'status'); OFF by default: "
+                     "the mode is changed only with the MODE selector (user, 2026-09-30)")
 a = ap.parse_args()
 MON = [(float(f), float(g)) for f, g in (x.split(":") for x in a.mon.split(","))]
 if len(MON) != 4:
@@ -158,7 +161,7 @@ for i, (f, gn) in enumerate(MON):
     C.append(["mon_snap_k1n%d" % i, "0", "mon_probe%d" % i, "0"])
 
 # --- snippet: mode line, MON lines, control API --------------------------------------
-HOST, PORT = a.api.split(":")
+HOST, PORT = a.api.split(":") if a.api else ("", "0")
 add("snippet_switch", "snippet", {"section": "main_after_start", "priority": "5", "code": '''# MON <-> DF: status twice a second from the engine's own counters (never a
 # radio read here: it would wait behind the timed commands), and the control
 # API on udp://@@HOST@@:@@PORT@@ ('mode df' | 'mode mon' | 'status').
@@ -241,8 +244,11 @@ def _api():
             reply = {"ok": False, "error": "%s: %s" % (type(e).__name__, e)}
         sk.sendto(json.dumps(reply, default=str).encode(), peer)
 
-threading.Thread(target=_api, daemon=True).start()
-'''.replace("@@HOST@@", HOST).replace("@@PORT@@", PORT).replace("@@MONF@@", repr([f for f, _ in MON]))},
+if @@API_ON@@:
+    threading.Thread(target=_api, daemon=True).start()
+else:
+    print("[switch] no control API: the mode changes only with the MODE selector")
+'''.replace("@@HOST@@", HOST).replace("@@PORT@@", PORT).replace("@@API_ON@@", "True" if a.api else "False").replace("@@MONF@@", repr([f for f, _ in MON]))},
     (8, 2000))
 
 yaml.safe_dump(g, open(a.out, "w"), default_flow_style=False, sort_keys=False, width=100)
