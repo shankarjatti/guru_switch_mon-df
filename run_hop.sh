@@ -12,6 +12,7 @@
 #   ./run_hop.sh --vga 60     louder transmitter
 #   ./run_hop.sh --fast       guru_fast.py: 10 ms radio-clock hopping instead of guru.py
 #   ./run_hop.sh --burst      guru_burst.py: 5 ms dwell / 7 ms switching, burst mode
+#   ./run_hop.sh --mon        guru_mon.py: MON mode, every channel its own LO and band
 #
 # Bands, gains, dwell and LO settings all live in guru.grc, not here.
 set -u
@@ -24,6 +25,7 @@ for arg in "$@"; do
         --restart) RESTART=1 ;;
         --fast) RX=guru_fast.py ;;
         --burst) RX=guru_burst.py ;;
+        --mon) RX=guru_mon.py ;;
         *) ARGS+=("$arg") ;;
     esac
 done
@@ -83,7 +85,7 @@ trap cleanup EXIT INT TERM
 if [ "$RESTART" = "1" ]; then
     echo "[run] --restart: stopping anything already running"
     stopped=0
-    for pat in "python3 -u guru\.py" "guru/guru\.py" "python3 -u guru_(fast|burst)\.py" "hackrf_tone_source\.py"; do
+    for pat in "python3 -u guru\.py" "guru/guru\.py" "python3 -u guru_(fast|burst|mon)\.py" "hackrf_tone_source\.py"; do
         if pgrep -f "$pat" >/dev/null 2>&1; then
             pkill -f "$pat" 2>/dev/null
             stopped=1
@@ -94,14 +96,14 @@ if [ "$RESTART" = "1" ]; then
         # Starting while the old process still holds the X310 fails with a
         # confusing "No devices found".
         for _ in $(seq 1 40); do
-            pgrep -f "python3 -u guru\.py|guru/guru\.py|python3 -u guru_(fast|burst)\.py|hackrf_tone_source\.py" \
+            pgrep -f "python3 -u guru\.py|guru/guru\.py|python3 -u guru_(fast|burst|mon)\.py|hackrf_tone_source\.py" \
                 >/dev/null 2>&1 || break
             sleep 0.25
         done
-        if pgrep -f "python3 -u guru\.py|guru/guru\.py|python3 -u guru_(fast|burst)\.py|hackrf_tone_source\.py" \
+        if pgrep -f "python3 -u guru\.py|guru/guru\.py|python3 -u guru_(fast|burst|mon)\.py|hackrf_tone_source\.py" \
             >/dev/null 2>&1; then
             echo "[run] something did not stop within 10 s:"
-            pgrep -af "python3 -u guru\.py|guru/guru\.py|python3 -u guru_(fast|burst)\.py|hackrf_tone_source\.py"
+            pgrep -af "python3 -u guru\.py|guru/guru\.py|python3 -u guru_(fast|burst|mon)\.py|hackrf_tone_source\.py"
             echo "      Not forcing it -- a killed receiver can leave the X310"
             echo "      needing a power cycle. Close it yourself and try again."
             exit 1
@@ -137,7 +139,7 @@ fi
 TXMODE=/tmp/hackrf_tone.mode
 TX_OFFSET=200e3
 TX_EXTRA=""
-if [ "$RX" = "guru_burst.py" ]; then
+if [ "$RX" = "guru_burst.py" ] || [ "$RX" = "guru_mon.py" ]; then
     # the transmitter is only a source: plain 10 kHz from its own clock, no
     # correction fed back from the receiver. Everything is measured on the RX.
     # 200 kHz: far from 0 Hz on every band even with the HackRF's own clock
@@ -172,7 +174,7 @@ else
         # badly at 5 GHz and up: one gain either clips 2.4 or buries the
         # others.
         RADIO_ARGS="--radio hackrf --vga 14 --rate 2e6 \
-                    --vga-map 2.4e9:14,5.2e9:47,5.8e9:47"
+                    --vga-map 900e6:14,2.4e9:14,5.2e9:47,5.8e9:47"
         echo "[run] HackRF One found -- using it as the calibration source"
         echo "[run] note: this radio's stream has been seen to stall under"
         echo "      repeated retuning and not recover, which reads as a band"

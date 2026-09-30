@@ -1,0 +1,250 @@
+/home/shankar/radar2/guru_mon/guru_mon.py:13: DeprecationWarning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+  from distutils.version import StrictVersion
+Warning: Ignoring XDG_SESSION_TYPE=wayland on Gnome. Use QT_QPA_PLATFORM=wayland to run on Wayland anyway.
+[INFO] [UHD] linux; GNU C++ version 11.4.0; Boost_107400; UHD_3.15.0.HEAD-0-gaea0e2de
+[INFO] [X300] X300 initialization sequence...
+[INFO] [X300] Maximum frame size: 1472 bytes.
+[INFO] [X300] Radio 1x clock: 200 MHz
+[INFO] [GPS] No GPSDO found
+[INFO] [0/DmaFIFO_0] Initializing block control (NOC ID: 0xF1F0D00000000000)
+[INFO] [0/DmaFIFO_0] BIST passed (Throughput: 1307 MB/s)
+[INFO] [0/DmaFIFO_0] BIST passed (Throughput: 1312 MB/s)
+[INFO] [0/Radio_0] Initializing block control (NOC ID: 0x12AD100000000001)
+[INFO] [0/Radio_1] Initializing block control (NOC ID: 0x12AD100000000001)
+[INFO] [0/DDC_0] Initializing block control (NOC ID: 0xDDC0000000000000)
+[INFO] [0/DDC_1] Initializing block control (NOC ID: 0xDDC0000000000000)
+[INFO] [0/DUC_0] Initializing block control (NOC ID: 0xD0C0000000000000)
+[INFO] [0/DUC_1] Initializing block control (NOC ID: 0xD0C0000000000000)
+[WARNING] [X300] Cannot update master clock rate! X300 Series does not allow changing the clock rate during runtime.
+[mon] ch0 A/RX1  0.9000 GHz  LO internal  LOCKED
+[mon] ch1 A/RX2  2.4000 GHz  LO internal  LOCKED
+[mon] ch2 B/RX1  5.2000 GHz  LO internal  LOCKED
+[mon] ch3 B/RX2  5.8000 GHz  LO internal  LOCKED
+O[mon] 15:11:22 ch0 LOCKED | 0.9000 GHz | samples 586404 (4.741 MS/s) | stream breaks 1 | no tone, strongest line +192.6 kHz 27.6 dB | ADC peak 0.001
+[mon] 15:11:22 ch1 LOCKED | 2.4000 GHz | samples 588952 (4.762 MS/s) | stream breaks 1 | TONE +192.6 kHz 79.3 dB | ADC peak 0.044
+[mon] 15:11:22 ch2 LOCKED | 5.2000 GHz | samples 590408 (4.774 MS/s) | stream breaks 1 | no tone, strongest line +227.8 kHz 13.6 dB | ADC peak 0.001
+[mon] 15:11:22 ch3 LOCKED | 5.8000 GHz | samples 600203 (4.853 MS/s) | stream breaks 1 | no tone, strongest line -285.6 kHz 13.8 dB | ADC peak 0.001
+[mon] 15:11:27 ch0 LOCKED | 0.9000 GHz | samples 11498396 (2.061 MS/s) | stream breaks 1 | no tone, strongest line +192.6 kHz 27.6 dB | ADC peak 0.001
+[mon] 15:11:27 ch1 LOCKED | 2.4000 GHz | samples 11500944 (2.061 MS/s) | stream breaks 1 | TONE +192.6 kHz 79.5 dB | ADC peak 0.044
+[mon] 15:11:27 ch2 LOCKED | 5.2000 GHz | samples 11502400 (2.061 MS/s) | stream breaks 1 | no tone, strongest line -157.5 kHz 12.2 dB | ADC peak 0.001
+[mon] 15:11:27 ch3 LOCKED | 5.8000 GHz | samples 11503856 (2.062 MS/s) | stream breaks 1 | no tone, strongest line +315.2 kHz 11.9 dB | ADC peak 0.001
+[mon] 15:11:32 ch0 LOCKED | 0.9000 GHz | samples 21550984 (2.032 MS/s) | stream breaks 1 | no tone, strongest line +192.6 kHz 28.0 dB | ADC peak 0.001
+[mon] 15:11:32 ch1 LOCKED | 2.4000 GHz | samples 21553532 (2.032 MS/s) | stream breaks 1 | TONE +192.6 kHz 79.4 dB | ADC peak 0.044
+[mon] 15:11:32 ch2 LOCKED | 5.2000 GHz | samples 21554988 (2.032 MS/s) | stream breaks 1 | no tone, strongest line -55.7 kHz 12.0 dB | ADC peak 0.001
+[mon] 15:11:32 ch3 LOCKED | 5.8000 GHz | samples 21556444 (2.032 MS/s) | stream breaks 1 | no tone, strongest line +187.5 kHz 12.0 dB | ADC peak 0.001
+[mon] 15:11:38 ch0 LOCKED | 0.9000 GHz | samples 32586372 (2.021 MS/s) | stream breaks 1 | no tone, strongest line +192.6 kHz 27.1 dB | ADC peak 0.001
+[mon] 15:11:38 ch1 LOCKED | 2.4000 GHz | samples 32588192 (2.021 MS/s) | stream breaks 1 | TONE +192.6 kHz 79.4 dB | ADC peak 0.044
+[mon] 15:11:38 ch2 LOCKED | 5.2000 GHz | samples 32589648 (2.021 MS/s) | stream breaks 1 | no tone, strongest line -104.7 kHz 11.5 dB | ADC peak 0.001
+[mon] 15:11:38 ch3 LOCKED | 5.8000 GHz | samples 32590740 (2.021 MS/s) | stream breaks 1 | no tone, strongest line -214.6 kHz 12.3 dB | ADC peak 0.001
+[mon] 15:11:43 ch0 LOCKED | 0.9000 GHz | samples 43440124 (2.016 MS/s) | stream breaks 1 | no tone, strongest line +192.6 kHz 27.6 dB | ADC peak 0.001
+[mon] 15:11:43 ch1 LOCKED | 2.4000 GHz | samples 43442672 (2.016 MS/s) | stream breaks 1 | TONE +192.6 kHz 79.5 dB | ADC peak 0.044
+[mon] 15:11:43 ch2 LOCKED | 5.2000 GHz | samples 43444856 (2.016 MS/s) | stream breaks 1 | no tone, strongest line -586.4 kHz 11.0 dB | ADC peak 0.001
+[mon] 15:11:43 ch3 LOCKED | 5.8000 GHz | samples 43446676 (2.016 MS/s) | stream breaks 1 | no tone, strongest line -290.3 kHz 12.3 dB | ADC peak 0.001
+[mon] 15:11:49 ch0 LOCKED | 0.9000 GHz | samples 54328092 (2.013 MS/s) | stream breaks 1 | TONE +197.3 kHz 48.8 dB | ADC peak 0.002
+[mon] 15:11:49 ch1 LOCKED | 2.4000 GHz | samples 54330640 (2.013 MS/s) | stream breaks 1 | no tone, strongest line +521.2 kHz 12.3 dB | ADC peak 0.002
+[mon] 15:11:49 ch2 LOCKED | 5.2000 GHz | samples 54332096 (2.013 MS/s) | stream breaks 1 | no tone, strongest line +241.5 kHz 12.9 dB | ADC peak 0.001
+[mon] 15:11:49 ch3 LOCKED | 5.8000 GHz | samples 54333188 (2.013 MS/s) | stream breaks 1 | no tone, strongest line +87.9 kHz 12.0 dB | ADC peak 0.001
+[mon] 15:11:54 ch0 LOCKED | 0.9000 GHz | samples 65170560 (2.010 MS/s) | stream breaks 1 | TONE +197.3 kHz 48.7 dB | ADC peak 0.002
+[mon] 15:11:54 ch1 LOCKED | 2.4000 GHz | samples 65172380 (2.011 MS/s) | stream breaks 1 | no tone, strongest line -73.5 kHz 11.5 dB | ADC peak 0.003
+[mon] 15:11:54 ch2 LOCKED | 5.2000 GHz | samples 65173836 (2.011 MS/s) | stream breaks 1 | no tone, strongest line -52.5 kHz 12.4 dB | ADC peak 0.001
+[mon] 15:11:54 ch3 LOCKED | 5.8000 GHz | samples 65175292 (2.011 MS/s) | stream breaks 1 | no tone, strongest line +106.2 kHz 12.8 dB | ADC peak 0.001
+[mon] 15:11:59 ch0 LOCKED | 0.9000 GHz | samples 75423348 (2.009 MS/s) | stream breaks 1 | TONE +197.3 kHz 48.8 dB | ADC peak 0.002
+[mon] 15:11:59 ch1 LOCKED | 2.4000 GHz | samples 75425168 (2.009 MS/s) | stream breaks 1 | no tone, strongest line -130.6 kHz 12.2 dB | ADC peak 0.002
+[mon] 15:11:59 ch2 LOCKED | 5.2000 GHz | samples 75426624 (2.009 MS/s) | stream breaks 1 | no tone, strongest line +544.2 kHz 11.4 dB | ADC peak 0.001
+[mon] 15:11:59 ch3 LOCKED | 5.8000 GHz | samples 75428080 (2.009 MS/s) | stream breaks 1 | no tone, strongest line +345.2 kHz 11.6 dB | ADC peak 0.001
+[mon] 15:12:04 ch0 LOCKED | 0.9000 GHz | samples 85428616 (2.008 MS/s) | stream breaks 1 | no tone, strongest line +192.6 kHz 21.6 dB | ADC peak 0.001
+[mon] 15:12:04 ch1 LOCKED | 2.4000 GHz | samples 85430436 (2.008 MS/s) | stream breaks 1 | TONE +192.6 kHz 79.0 dB | ADC peak 0.043
+[mon] 15:12:04 ch2 LOCKED | 5.2000 GHz | samples 85432256 (2.008 MS/s) | stream breaks 1 | no tone, strongest line +274.9 kHz 12.4 dB | ADC peak 0.001
+[mon] 15:12:04 ch3 LOCKED | 5.8000 GHz | samples 85434804 (2.008 MS/s) | stream breaks 1 | no tone, strongest line -32.7 kHz 12.2 dB | ADC peak 0.001
+[mon] 15:12:09 ch0 LOCKED | 0.9000 GHz | samples 96229588 (2.007 MS/s) | stream breaks 1 | no tone, strongest line +192.6 kHz 19.7 dB | ADC peak 0.001
+[mon] 15:12:09 ch1 LOCKED | 2.4000 GHz | samples 96231408 (2.007 MS/s) | stream breaks 1 | TONE +192.4 kHz 77.9 dB | ADC peak 0.043
+[mon] 15:12:09 ch2 LOCKED | 5.2000 GHz | samples 96232864 (2.007 MS/s) | stream breaks 1 | no tone, strongest line -113.0 kHz 12.9 dB | ADC peak 0.001
+[mon] 15:12:09 ch3 LOCKED | 5.8000 GHz | samples 96233592 (2.007 MS/s) | stream breaks 1 | no tone, strongest line +88.6 kHz 12.1 dB | ADC peak 0.001
+[mon] 15:12:15 ch0 LOCKED | 0.9000 GHz | samples 106498392 (2.006 MS/s) | stream breaks 1 | no tone, strongest line +192.4 kHz 18.9 dB | ADC peak 0.001
+[mon] 15:12:15 ch1 LOCKED | 2.4000 GHz | samples 106500576 (2.006 MS/s) | stream breaks 1 | TONE +192.4 kHz 78.8 dB | ADC peak 0.043
+[mon] 15:12:15 ch2 LOCKED | 5.2000 GHz | samples 106502396 (2.006 MS/s) | stream breaks 1 | no tone, strongest line -517.6 kHz 12.1 dB | ADC peak 0.001
+[mon] 15:12:15 ch3 LOCKED | 5.8000 GHz | samples 106504580 (2.007 MS/s) | stream breaks 1 | no tone, strongest line +221.2 kHz 11.6 dB | ADC peak 0.001
+[mon] 15:12:20 ch0 LOCKED | 0.9000 GHz | samples 117581100 (2.006 MS/s) | stream breaks 1 | no tone, strongest line -238.3 kHz 13.7 dB | ADC peak 0.001
+[mon] 15:12:20 ch1 LOCKED | 2.4000 GHz | samples 117583648 (2.006 MS/s) | stream breaks 1 | no tone, strongest line +79.6 kHz 12.2 dB | ADC peak 0.002
+[mon] 15:12:20 ch2 LOCKED | 5.2000 GHz | samples 117585832 (2.006 MS/s) | stream breaks 1 | TONE +183.6 kHz 81.0 dB | ADC peak 0.078
+[mon] 15:12:20 ch3 LOCKED | 5.8000 GHz | samples 117587652 (2.006 MS/s) | stream breaks 1 | no tone, strongest line +183.6 kHz 28.9 dB | ADC peak 0.001
+[mon] 15:12:26 ch0 LOCKED | 0.9000 GHz | samples 128457056 (2.005 MS/s) | stream breaks 1 | no tone, strongest line -140.1 kHz 12.5 dB | ADC peak 0.001
+[mon] 15:12:26 ch1 LOCKED | 2.4000 GHz | samples 128458876 (2.005 MS/s) | stream breaks 1 | no tone, strongest line +224.9 kHz 11.5 dB | ADC peak 0.002
+[mon] 15:12:26 ch2 LOCKED | 5.2000 GHz | samples 128460332 (2.005 MS/s) | stream breaks 1 | no tone, strongest line +181.6 kHz 25.4 dB | ADC peak 0.001
+[mon] 15:12:26 ch3 LOCKED | 5.8000 GHz | samples 128461424 (2.005 MS/s) | stream breaks 1 | TONE +181.6 kHz 80.1 dB | ADC peak 0.149
+[mon] 15:12:31 ch0 LOCKED | 0.9000 GHz | samples 138521656 (2.005 MS/s) | stream breaks 1 | no tone, strongest line -316.2 kHz 12.2 dB | ADC peak 0.001
+[mon] 15:12:31 ch1 LOCKED | 2.4000 GHz | samples 138523476 (2.005 MS/s) | stream breaks 1 | no tone, strongest line -57.6 kHz 12.0 dB | ADC peak 0.002
+[mon] 15:12:31 ch2 LOCKED | 5.2000 GHz | samples 138524932 (2.005 MS/s) | stream breaks 1 | no tone, strongest line +181.6 kHz 22.8 dB | ADC peak 0.001
+[mon] 15:12:31 ch3 LOCKED | 5.8000 GHz | samples 138526024 (2.005 MS/s) | stream breaks 1 | TONE +181.6 kHz 79.0 dB | ADC peak 0.149
+[mon] 15:12:36 ch0 LOCKED | 0.9000 GHz | samples 148572424 (2.005 MS/s) | stream breaks 1 | no tone, strongest line +210.9 kHz 12.5 dB | ADC peak 0.001
+[mon] 15:12:36 ch1 LOCKED | 2.4000 GHz | samples 148574972 (2.005 MS/s) | stream breaks 1 | no tone, strongest line +455.1 kHz 13.8 dB | ADC peak 0.002
+[mon] 15:12:36 ch2 LOCKED | 5.2000 GHz | samples 148577884 (2.005 MS/s) | stream breaks 1 | no tone, strongest line +181.4 kHz 24.9 dB | ADC peak 0.001
+[mon] 15:12:36 ch3 LOCKED | 5.8000 GHz | samples 148579340 (2.005 MS/s) | stream breaks 1 | TONE +181.4 kHz 79.9 dB | ADC peak 0.148
+[mon] 15:12:41 ch0 LOCKED | 0.9000 GHz | samples 158756780 (2.004 MS/s) | stream breaks 1 | no tone, strongest line +29.5 kHz 12.1 dB | ADC peak 0.001
+[mon] 15:12:41 ch1 LOCKED | 2.4000 GHz | samples 158758600 (2.004 MS/s) | stream breaks 1 | no tone, strongest line -403.1 kHz 12.9 dB | ADC peak 0.002
+[mon] 15:12:41 ch2 LOCKED | 5.2000 GHz | samples 158760056 (2.004 MS/s) | stream breaks 1 | no tone, strongest line +181.4 kHz 25.0 dB | ADC peak 0.001
+[mon] 15:12:41 ch3 LOCKED | 5.8000 GHz | samples 158761148 (2.004 MS/s) | stream breaks 1 | TONE +181.4 kHz 79.5 dB | ADC peak 0.148
+[mon] 15:12:46 ch0 LOCKED | 0.9000 GHz | samples 169473668 (2.004 MS/s) | stream breaks 1 | no tone, strongest line -35.2 kHz 12.2 dB | ADC peak 0.001
+[mon] 15:12:46 ch1 LOCKED | 2.4000 GHz | samples 169475488 (2.004 MS/s) | stream breaks 1 | no tone, strongest line -92.0 kHz 11.6 dB | ADC peak 0.002
+[mon] 15:12:46 ch2 LOCKED | 5.2000 GHz | samples 169476580 (2.004 MS/s) | stream breaks 1 | no tone, strongest line +181.2 kHz 25.2 dB | ADC peak 0.001
+[mon] 15:12:46 ch3 LOCKED | 5.8000 GHz | samples 169477672 (2.004 MS/s) | stream breaks 1 | TONE +181.2 kHz 80.1 dB | ADC peak 0.148
+[mon] 15:12:52 ch0 LOCKED | 0.9000 GHz | samples 180754028 (2.004 MS/s) | stream breaks 1 | TONE +197.0 kHz 48.4 dB | ADC peak 0.002
+[mon] 15:12:52 ch1 LOCKED | 2.4000 GHz | samples 180755848 (2.004 MS/s) | stream breaks 1 | no tone, strongest line +475.1 kHz 12.3 dB | ADC peak 0.002
+[mon] 15:12:52 ch2 LOCKED | 5.2000 GHz | samples 180757304 (2.004 MS/s) | stream breaks 1 | no tone, strongest line -567.6 kHz 11.7 dB | ADC peak 0.001
+[mon] 15:12:52 ch3 LOCKED | 5.8000 GHz | samples 180758760 (2.004 MS/s) | stream breaks 1 | no tone, strongest line -322.3 kHz 11.4 dB | ADC peak 0.001
+[mon] 15:12:57 ch0 LOCKED | 0.9000 GHz | samples 191465092 (2.004 MS/s) | stream breaks 1 | TONE +197.0 kHz 48.6 dB | ADC peak 0.002
+[mon] 15:12:57 ch1 LOCKED | 2.4000 GHz | samples 191467640 (2.004 MS/s) | stream breaks 1 | no tone, strongest line +126.2 kHz 13.0 dB | ADC peak 0.002
+[mon] 15:12:57 ch2 LOCKED | 5.2000 GHz | samples 191469096 (2.004 MS/s) | stream breaks 1 | no tone, strongest line +494.6 kHz 11.7 dB | ADC peak 0.001
+[mon] 15:12:57 ch3 LOCKED | 5.8000 GHz | samples 191470188 (2.004 MS/s) | stream breaks 1 | no tone, strongest line +322.5 kHz 11.7 dB | ADC peak 0.001
+[mon] 15:13:03 ch0 LOCKED | 0.9000 GHz | samples 202615140 (2.003 MS/s) | stream breaks 1 | TONE +197.0 kHz 48.7 dB | ADC peak 0.002
+[mon] 15:13:03 ch1 LOCKED | 2.4000 GHz | samples 202617324 (2.003 MS/s) | stream breaks 1 | no tone, strongest line +42.0 kHz 12.9 dB | ADC peak 0.002
+[mon] 15:13:03 ch2 LOCKED | 5.2000 GHz | samples 202618780 (2.003 MS/s) | stream breaks 1 | no tone, strongest line +373.8 kHz 12.1 dB | ADC peak 0.001
+[mon] 15:13:03 ch3 LOCKED | 5.8000 GHz | samples 202619872 (2.003 MS/s) | stream breaks 1 | no tone, strongest line +74.0 kHz 11.5 dB | ADC peak 0.001
+[mon] 15:13:08 ch0 LOCKED | 0.9000 GHz | samples 213377528 (2.003 MS/s) | stream breaks 1 | TONE +197.0 kHz 48.6 dB | ADC peak 0.002
+[mon] 15:13:08 ch1 LOCKED | 2.4000 GHz | samples 213378984 (2.003 MS/s) | stream breaks 1 | no tone, strongest line +23.4 kHz 13.0 dB | ADC peak 0.002
+[mon] 15:13:08 ch2 LOCKED | 5.2000 GHz | samples 213380804 (2.003 MS/s) | stream breaks 1 | no tone, strongest line +100.3 kHz 13.0 dB | ADC peak 0.001
+[mon] 15:13:08 ch3 LOCKED | 5.8000 GHz | samples 213382624 (2.003 MS/s) | stream breaks 1 | no tone, strongest line -357.2 kHz 12.1 dB | ADC peak 0.001
+[mon] 15:13:13 ch0 LOCKED | 0.9000 GHz | samples 223553512 (2.003 MS/s) | stream breaks 1 | TONE +197.0 kHz 48.4 dB | ADC peak 0.002
+[mon] 15:13:13 ch1 LOCKED | 2.4000 GHz | samples 223555696 (2.003 MS/s) | stream breaks 1 | no tone, strongest line -117.9 kHz 11.3 dB | ADC peak 0.002
+[mon] 15:13:13 ch2 LOCKED | 5.2000 GHz | samples 223557152 (2.003 MS/s) | stream breaks 1 | no tone, strongest line -544.4 kHz 11.6 dB | ADC peak 0.001
+[mon] 15:13:13 ch3 LOCKED | 5.8000 GHz | samples 223558244 (2.003 MS/s) | stream breaks 1 | no tone, strongest line -330.3 kHz 12.8 dB | ADC peak 0.001
+[mon] 15:13:19 ch0 LOCKED | 0.9000 GHz | samples 234413816 (2.003 MS/s) | stream breaks 1 | TONE +197.0 kHz 67.6 dB | ADC peak 0.009
+[mon] 15:13:19 ch1 LOCKED | 2.4000 GHz | samples 234416000 (2.003 MS/s) | stream breaks 1 | no tone, strongest line +153.8 kHz 12.1 dB | ADC peak 0.002
+[mon] 15:13:19 ch2 LOCKED | 5.2000 GHz | samples 234417456 (2.003 MS/s) | stream breaks 1 | no tone, strongest line -405.8 kHz 11.6 dB | ADC peak 0.001
+[mon] 15:13:19 ch3 LOCKED | 5.8000 GHz | samples 234418912 (2.003 MS/s) | stream breaks 1 | no tone, strongest line -216.3 kHz 12.5 dB | ADC peak 0.001
+[mon] 15:13:24 ch0 LOCKED | 0.9000 GHz | samples 245404432 (2.003 MS/s) | stream breaks 1 | TONE +197.0 kHz 67.2 dB | ADC peak 0.009
+[mon] 15:13:24 ch1 LOCKED | 2.4000 GHz | samples 245406252 (2.003 MS/s) | stream breaks 1 | no tone, strongest line +403.3 kHz 12.4 dB | ADC peak 0.002
+[mon] 15:13:24 ch2 LOCKED | 5.2000 GHz | samples 245407708 (2.003 MS/s) | stream breaks 1 | no tone, strongest line +394.8 kHz 11.9 dB | ADC peak 0.001
+[mon] 15:13:24 ch3 LOCKED | 5.8000 GHz | samples 245408800 (2.003 MS/s) | stream breaks 1 | no tone, strongest line -495.6 kHz 13.1 dB | ADC peak 0.001
+[mon] 15:13:29 ch0 LOCKED | 0.9000 GHz | samples 255495604 (2.003 MS/s) | stream breaks 1 | TONE +197.0 kHz 66.9 dB | ADC peak 0.009
+[mon] 15:13:29 ch1 LOCKED | 2.4000 GHz | samples 255497788 (2.003 MS/s) | stream breaks 1 | no tone, strongest line -319.1 kHz 12.2 dB | ADC peak 0.002
+[mon] 15:13:29 ch2 LOCKED | 5.2000 GHz | samples 255499244 (2.003 MS/s) | stream breaks 1 | no tone, strongest line +280.5 kHz 12.7 dB | ADC peak 0.001
+[mon] 15:13:29 ch3 LOCKED | 5.8000 GHz | samples 255501064 (2.003 MS/s) | stream breaks 1 | no tone, strongest line -441.4 kHz 11.3 dB | ADC peak 0.001
+[mon] 15:13:34 ch0 LOCKED | 0.9000 GHz | samples 265562388 (2.003 MS/s) | stream breaks 1 | no tone, strongest line +191.7 kHz 28.5 dB | ADC peak 0.001
+[mon] 15:13:34 ch1 LOCKED | 2.4000 GHz | samples 265564572 (2.003 MS/s) | stream breaks 1 | TONE +191.7 kHz 85.1 dB | ADC peak 0.207
+[mon] 15:13:34 ch2 LOCKED | 5.2000 GHz | samples 265566028 (2.003 MS/s) | stream breaks 1 | no tone, strongest line +210.9 kHz 12.4 dB | ADC peak 0.001
+[mon] 15:13:34 ch3 LOCKED | 5.8000 GHz | samples 265567120 (2.003 MS/s) | stream breaks 1 | no tone, strongest line -257.3 kHz 12.1 dB | ADC peak 0.001
+[mon] 15:13:40 ch0 LOCKED | 0.9000 GHz | samples 276463096 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +191.7 kHz 29.2 dB | ADC peak 0.001
+[mon] 15:13:40 ch1 LOCKED | 2.4000 GHz | samples 276464916 (2.002 MS/s) | stream breaks 1 | TONE +191.7 kHz 85.4 dB | ADC peak 0.207
+[mon] 15:13:40 ch2 LOCKED | 5.2000 GHz | samples 276466372 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +320.3 kHz 12.7 dB | ADC peak 0.001
+[mon] 15:13:40 ch3 LOCKED | 5.8000 GHz | samples 276467464 (2.002 MS/s) | stream breaks 1 | no tone, strongest line -236.6 kHz 12.2 dB | ADC peak 0.001
+[mon] 15:13:45 ch0 LOCKED | 0.9000 GHz | samples 286587756 (2.002 MS/s) | stream breaks 1 | TONE +197.0 kHz 66.5 dB | ADC peak 0.009
+[mon] 15:13:45 ch1 LOCKED | 2.4000 GHz | samples 286589940 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +36.9 kHz 12.8 dB | ADC peak 0.002
+[mon] 15:13:45 ch2 LOCKED | 5.2000 GHz | samples 286591396 (2.002 MS/s) | stream breaks 1 | no tone, strongest line -514.6 kHz 11.7 dB | ADC peak 0.001
+[mon] 15:13:45 ch3 LOCKED | 5.8000 GHz | samples 286592852 (2.002 MS/s) | stream breaks 1 | no tone, strongest line -491.0 kHz 12.1 dB | ADC peak 0.001
+[mon] 15:13:50 ch0 LOCKED | 0.9000 GHz | samples 297538332 (2.002 MS/s) | stream breaks 1 | TONE +197.0 kHz 66.6 dB | ADC peak 0.009
+[mon] 15:13:50 ch1 LOCKED | 2.4000 GHz | samples 297540152 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +131.8 kHz 12.0 dB | ADC peak 0.002
+[mon] 15:13:50 ch2 LOCKED | 5.2000 GHz | samples 297541608 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +77.6 kHz 11.5 dB | ADC peak 0.001
+[mon] 15:13:50 ch3 LOCKED | 5.8000 GHz | samples 297543064 (2.002 MS/s) | stream breaks 1 | no tone, strongest line -229.7 kHz 11.6 dB | ADC peak 0.001
+[mon] 15:13:55 ch0 LOCKED | 0.9000 GHz | samples 308211904 (2.002 MS/s) | stream breaks 1 | TONE +197.0 kHz 66.8 dB | ADC peak 0.009
+[mon] 15:13:55 ch1 LOCKED | 2.4000 GHz | samples 308215544 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +197.0 kHz 13.9 dB | ADC peak 0.002
+[mon] 15:13:55 ch2 LOCKED | 5.2000 GHz | samples 308216272 (2.002 MS/s) | stream breaks 1 | no tone, strongest line -254.6 kHz 13.7 dB | ADC peak 0.001
+[mon] 15:13:55 ch3 LOCKED | 5.8000 GHz | samples 308218820 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +329.8 kHz 11.7 dB | ADC peak 0.001
+[mon] 15:14:01 ch0 LOCKED | 0.9000 GHz | samples 318525116 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +191.7 kHz 29.1 dB | ADC peak 0.001
+[mon] 15:14:01 ch1 LOCKED | 2.4000 GHz | samples 318526936 (2.002 MS/s) | stream breaks 1 | TONE +191.7 kHz 83.5 dB | ADC peak 0.206
+[mon] 15:14:01 ch2 LOCKED | 5.2000 GHz | samples 318529120 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +39.6 kHz 12.7 dB | ADC peak 0.001
+[mon] 15:14:01 ch3 LOCKED | 5.8000 GHz | samples 318530940 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +197.8 kHz 11.8 dB | ADC peak 0.001
+[mon] 15:14:06 ch0 LOCKED | 0.9000 GHz | samples 329282408 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +191.7 kHz 29.5 dB | ADC peak 0.001
+[mon] 15:14:06 ch1 LOCKED | 2.4000 GHz | samples 329284228 (2.002 MS/s) | stream breaks 1 | TONE +191.7 kHz 83.4 dB | ADC peak 0.207
+[mon] 15:14:06 ch2 LOCKED | 5.2000 GHz | samples 329285684 (2.002 MS/s) | stream breaks 1 | no tone, strongest line -193.8 kHz 12.6 dB | ADC peak 0.001
+[mon] 15:14:06 ch3 LOCKED | 5.8000 GHz | samples 329287140 (2.002 MS/s) | stream breaks 1 | no tone, strongest line -20.5 kHz 11.8 dB | ADC peak 0.001
+[mon] 15:14:11 ch0 LOCKED | 0.9000 GHz | samples 340232256 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +63.2 kHz 12.0 dB | ADC peak 0.001
+[mon] 15:14:11 ch1 LOCKED | 2.4000 GHz | samples 340234440 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +160.4 kHz 11.6 dB | ADC peak 0.006
+[mon] 15:14:11 ch2 LOCKED | 5.2000 GHz | samples 340235896 (2.002 MS/s) | stream breaks 1 | TONE +182.1 kHz 81.0 dB | ADC peak 0.076
+[mon] 15:14:11 ch3 LOCKED | 5.8000 GHz | samples 340236988 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +182.1 kHz 25.0 dB | ADC peak 0.001
+[mon] 15:14:16 ch0 LOCKED | 0.9000 GHz | samples 350265552 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +46.6 kHz 12.1 dB | ADC peak 0.001
+[mon] 15:14:16 ch1 LOCKED | 2.4000 GHz | samples 350267372 (2.002 MS/s) | stream breaks 1 | no tone, strongest line -153.8 kHz 12.5 dB | ADC peak 0.005
+[mon] 15:14:16 ch2 LOCKED | 5.2000 GHz | samples 350268464 (2.002 MS/s) | stream breaks 1 | TONE +182.1 kHz 80.1 dB | ADC peak 0.076
+[mon] 15:14:16 ch3 LOCKED | 5.8000 GHz | samples 350269556 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +182.1 kHz 23.0 dB | ADC peak 0.001
+[mon] 15:14:22 ch0 LOCKED | 0.9000 GHz | samples 361232508 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +161.1 kHz 12.1 dB | ADC peak 0.001
+[mon] 15:14:22 ch1 LOCKED | 2.4000 GHz | samples 361234692 (2.002 MS/s) | stream breaks 1 | no tone, strongest line -93.0 kHz 12.3 dB | ADC peak 0.002
+[mon] 15:14:22 ch2 LOCKED | 5.2000 GHz | samples 361236148 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +42.5 kHz 11.3 dB | ADC peak 0.001
+[mon] 15:14:22 ch3 LOCKED | 5.8000 GHz | samples 361237240 (2.002 MS/s) | stream breaks 1 | TONE +180.2 kHz 77.1 dB | ADC peak 0.049
+[mon] 15:14:27 ch0 LOCKED | 0.9000 GHz | samples 371288736 (2.002 MS/s) | stream breaks 1 | no tone, strongest line -337.2 kHz 11.4 dB | ADC peak 0.001
+[mon] 15:14:27 ch1 LOCKED | 2.4000 GHz | samples 371290920 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +261.5 kHz 11.6 dB | ADC peak 0.002
+[mon] 15:14:27 ch2 LOCKED | 5.2000 GHz | samples 371292376 (2.002 MS/s) | stream breaks 1 | no tone, strongest line -549.8 kHz 13.6 dB | ADC peak 0.001
+[mon] 15:14:27 ch3 LOCKED | 5.8000 GHz | samples 371293468 (2.002 MS/s) | stream breaks 1 | TONE +180.2 kHz 77.3 dB | ADC peak 0.049
+[mon] 15:14:32 ch0 LOCKED | 0.9000 GHz | samples 381298736 (2.002 MS/s) | stream breaks 1 | no tone, strongest line -71.0 kHz 14.0 dB | ADC peak 0.001
+[mon] 15:14:32 ch1 LOCKED | 2.4000 GHz | samples 381300556 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +281.0 kHz 13.0 dB | ADC peak 0.002
+[mon] 15:14:32 ch2 LOCKED | 5.2000 GHz | samples 381302376 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +207.0 kHz 11.7 dB | ADC peak 0.001
+[mon] 15:14:32 ch3 LOCKED | 5.8000 GHz | samples 381303468 (2.002 MS/s) | stream breaks 1 | TONE +180.2 kHz 77.5 dB | ADC peak 0.049
+[mon] 15:14:37 ch0 LOCKED | 0.9000 GHz | samples 392293720 (2.002 MS/s) | stream breaks 1 | no tone, strongest line -339.4 kHz 12.1 dB | ADC peak 0.001
+[mon] 15:14:37 ch1 LOCKED | 2.4000 GHz | samples 392296268 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +297.1 kHz 11.7 dB | ADC peak 0.002
+[mon] 15:14:37 ch2 LOCKED | 5.2000 GHz | samples 392297724 (2.002 MS/s) | stream breaks 1 | no tone, strongest line -233.6 kHz 11.4 dB | ADC peak 0.001
+[mon] 15:14:37 ch3 LOCKED | 5.8000 GHz | samples 392298816 (2.002 MS/s) | stream breaks 1 | TONE +180.2 kHz 76.9 dB | ADC peak 0.049
+[mon] 15:14:43 ch0 LOCKED | 0.9000 GHz | samples 403272688 (2.002 MS/s) | stream breaks 1 | no tone, strongest line -170.7 kHz 12.9 dB | ADC peak 0.001
+[mon] 15:14:43 ch1 LOCKED | 2.4000 GHz | samples 403274508 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +285.9 kHz 13.8 dB | ADC peak 0.002
+[mon] 15:14:43 ch2 LOCKED | 5.2000 GHz | samples 403275600 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +205.6 kHz 13.3 dB | ADC peak 0.001
+[mon] 15:14:43 ch3 LOCKED | 5.8000 GHz | samples 403276692 (2.002 MS/s) | stream breaks 1 | TONE +179.9 kHz 77.2 dB | ADC peak 0.050
+[mon] 15:14:48 ch0 LOCKED | 0.9000 GHz | samples 414230908 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +376.7 kHz 12.3 dB | ADC peak 0.001
+[mon] 15:14:48 ch1 LOCKED | 2.4000 GHz | samples 414233092 (2.002 MS/s) | stream breaks 1 | no tone, strongest line -166.3 kHz 12.2 dB | ADC peak 0.002
+[mon] 15:14:48 ch2 LOCKED | 5.2000 GHz | samples 414234548 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +206.3 kHz 12.3 dB | ADC peak 0.001
+[mon] 15:14:48 ch3 LOCKED | 5.8000 GHz | samples 414235640 (2.002 MS/s) | stream breaks 1 | TONE +179.9 kHz 77.6 dB | ADC peak 0.049
+[mon] 15:14:54 ch0 LOCKED | 0.9000 GHz | samples 425172748 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +505.9 kHz 11.6 dB | ADC peak 0.001
+[mon] 15:14:54 ch1 LOCKED | 2.4000 GHz | samples 425174204 (2.002 MS/s) | stream breaks 1 | no tone, strongest line -266.6 kHz 11.5 dB | ADC peak 0.002
+[mon] 15:14:54 ch2 LOCKED | 5.2000 GHz | samples 425175660 (2.002 MS/s) | stream breaks 1 | no tone, strongest line -602.8 kHz 12.7 dB | ADC peak 0.001
+[mon] 15:14:54 ch3 LOCKED | 5.8000 GHz | samples 425176752 (2.002 MS/s) | stream breaks 1 | TONE +179.9 kHz 76.7 dB | ADC peak 0.049
+[mon] 15:14:59 ch0 LOCKED | 0.9000 GHz | samples 435182384 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +503.9 kHz 11.0 dB | ADC peak 0.001
+[mon] 15:14:59 ch1 LOCKED | 2.4000 GHz | samples 435184568 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +230.0 kHz 11.6 dB | ADC peak 0.002
+[mon] 15:14:59 ch2 LOCKED | 5.2000 GHz | samples 435186024 (2.002 MS/s) | stream breaks 1 | no tone, strongest line -592.5 kHz 11.5 dB | ADC peak 0.001
+[mon] 15:14:59 ch3 LOCKED | 5.8000 GHz | samples 435187116 (2.002 MS/s) | stream breaks 1 | TONE +179.7 kHz 76.8 dB | ADC peak 0.049
+[mon] 15:15:04 ch0 LOCKED | 0.9000 GHz | samples 446171180 (2.002 MS/s) | stream breaks 1 | no tone, strongest line -129.6 kHz 12.2 dB | ADC peak 0.001
+[mon] 15:15:04 ch1 LOCKED | 2.4000 GHz | samples 446172636 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +274.9 kHz 12.4 dB | ADC peak 0.002
+[mon] 15:15:04 ch2 LOCKED | 5.2000 GHz | samples 446173728 (2.002 MS/s) | stream breaks 1 | no tone, strongest line +188.7 kHz 12.6 dB | ADC peak 0.001
+[mon] 15:15:04 ch3 LOCKED | 5.8000 GHz | samples 446174820 (2.002 MS/s) | stream breaks 1 | TONE +179.7 kHz 77.4 dB | ADC peak 0.049
+[mon] 15:15:10 ch0 LOCKED | 0.9000 GHz | samples 457169804 (2.001 MS/s) | stream breaks 1 | TONE +196.8 kHz 67.0 dB | ADC peak 0.009
+[mon] 15:15:10 ch1 LOCKED | 2.4000 GHz | samples 457171624 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +196.8 kHz 16.0 dB | ADC peak 0.002
+[mon] 15:15:10 ch2 LOCKED | 5.2000 GHz | samples 457173080 (2.001 MS/s) | stream breaks 1 | no tone, strongest line -93.5 kHz 13.4 dB | ADC peak 0.001
+[mon] 15:15:10 ch3 LOCKED | 5.8000 GHz | samples 457174536 (2.002 MS/s) | stream breaks 1 | no tone, strongest line -296.1 kHz 12.7 dB | ADC peak 0.001
+[mon] 15:15:15 ch0 LOCKED | 0.9000 GHz | samples 467171068 (2.001 MS/s) | stream breaks 1 | TONE +196.8 kHz 67.1 dB | ADC peak 0.009
+[mon] 15:15:15 ch1 LOCKED | 2.4000 GHz | samples 467172888 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +196.8 kHz 14.4 dB | ADC peak 0.002
+[mon] 15:15:15 ch2 LOCKED | 5.2000 GHz | samples 467173980 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +258.1 kHz 11.8 dB | ADC peak 0.001
+[mon] 15:15:15 ch3 LOCKED | 5.8000 GHz | samples 467175072 (2.001 MS/s) | stream breaks 1 | no tone, strongest line -581.1 kHz 12.1 dB | ADC peak 0.001
+[mon] 15:15:20 ch0 LOCKED | 0.9000 GHz | samples 477336860 (2.001 MS/s) | stream breaks 1 | TONE +191.7 kHz 35.8 dB | ADC peak 0.001
+[mon] 15:15:20 ch1 LOCKED | 2.4000 GHz | samples 477338680 (2.001 MS/s) | stream breaks 1 | TONE +191.7 kHz 84.5 dB | ADC peak 0.205
+[mon] 15:15:20 ch2 LOCKED | 5.2000 GHz | samples 477340136 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +160.6 kHz 11.6 dB | ADC peak 0.001
+[mon] 15:15:20 ch3 LOCKED | 5.8000 GHz | samples 477341228 (2.001 MS/s) | stream breaks 1 | no tone, strongest line -177.5 kHz 12.1 dB | ADC peak 0.001
+[mon] 15:15:25 ch0 LOCKED | 0.9000 GHz | samples 487517940 (2.001 MS/s) | stream breaks 1 | TONE +191.4 kHz 36.1 dB | ADC peak 0.001
+[mon] 15:15:25 ch1 LOCKED | 2.4000 GHz | samples 487519760 (2.001 MS/s) | stream breaks 1 | TONE +191.4 kHz 84.4 dB | ADC peak 0.204
+[mon] 15:15:25 ch2 LOCKED | 5.2000 GHz | samples 487520852 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +458.7 kHz 12.1 dB | ADC peak 0.001
+[mon] 15:15:25 ch3 LOCKED | 5.8000 GHz | samples 487522308 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +81.8 kHz 12.8 dB | ADC peak 0.001
+[mon] 15:15:30 ch0 LOCKED | 0.9000 GHz | samples 497557060 (2.001 MS/s) | stream breaks 1 | no tone, strongest line -412.8 kHz 11.4 dB | ADC peak 0.001
+[mon] 15:15:30 ch1 LOCKED | 2.4000 GHz | samples 497558880 (2.001 MS/s) | stream breaks 1 | no tone, strongest line -208.5 kHz 13.3 dB | ADC peak 0.005
+[mon] 15:15:30 ch2 LOCKED | 5.2000 GHz | samples 497560336 (2.001 MS/s) | stream breaks 1 | TONE +181.6 kHz 81.1 dB | ADC peak 0.077
+[mon] 15:15:30 ch3 LOCKED | 5.8000 GHz | samples 497561428 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +181.6 kHz 25.9 dB | ADC peak 0.001
+[mon] 15:15:36 ch0 LOCKED | 0.9000 GHz | samples 508454492 (2.001 MS/s) | stream breaks 1 | no tone, strongest line -94.7 kHz 11.9 dB | ADC peak 0.001
+[mon] 15:15:36 ch1 LOCKED | 2.4000 GHz | samples 508456312 (2.001 MS/s) | stream breaks 1 | no tone, strongest line -94.2 kHz 12.3 dB | ADC peak 0.002
+[mon] 15:15:36 ch2 LOCKED | 5.2000 GHz | samples 508457768 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +179.7 kHz 11.9 dB | ADC peak 0.001
+[mon] 15:15:36 ch3 LOCKED | 5.8000 GHz | samples 508459224 (2.001 MS/s) | stream breaks 1 | TONE +179.4 kHz 76.1 dB | ADC peak 0.050
+[mon] 15:15:41 ch0 LOCKED | 0.9000 GHz | samples 519392692 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +96.7 kHz 13.6 dB | ADC peak 0.001
+[mon] 15:15:41 ch1 LOCKED | 2.4000 GHz | samples 519394876 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +86.4 kHz 13.6 dB | ADC peak 0.002
+[mon] 15:15:41 ch2 LOCKED | 5.2000 GHz | samples 519396332 (2.001 MS/s) | stream breaks 1 | no tone, strongest line -30.5 kHz 12.6 dB | ADC peak 0.001
+[mon] 15:15:41 ch3 LOCKED | 5.8000 GHz | samples 519397424 (2.001 MS/s) | stream breaks 1 | TONE +179.7 kHz 77.3 dB | ADC peak 0.049
+[mon] 15:15:47 ch0 LOCKED | 0.9000 GHz | samples 530545652 (2.001 MS/s) | stream breaks 1 | no tone, strongest line -56.4 kHz 12.4 dB | ADC peak 0.001
+[mon] 15:15:47 ch1 LOCKED | 2.4000 GHz | samples 530547472 (2.001 MS/s) | stream breaks 1 | no tone, strongest line -204.6 kHz 11.9 dB | ADC peak 0.002
+[mon] 15:15:47 ch2 LOCKED | 5.2000 GHz | samples 530548564 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +179.7 kHz 15.5 dB | ADC peak 0.001
+[mon] 15:15:47 ch3 LOCKED | 5.8000 GHz | samples 530550020 (2.001 MS/s) | stream breaks 1 | TONE +179.7 kHz 77.3 dB | ADC peak 0.050
+[mon] 15:15:52 ch0 LOCKED | 0.9000 GHz | samples 540624084 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +100.8 kHz 12.3 dB | ADC peak 0.001
+[mon] 15:15:52 ch1 LOCKED | 2.4000 GHz | samples 540625904 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +191.7 kHz 13.6 dB | ADC peak 0.002
+[mon] 15:15:52 ch2 LOCKED | 5.2000 GHz | samples 540627360 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +179.7 kHz 16.0 dB | ADC peak 0.001
+[mon] 15:15:52 ch3 LOCKED | 5.8000 GHz | samples 540628816 (2.001 MS/s) | stream breaks 1 | TONE +179.7 kHz 77.0 dB | ADC peak 0.049
+[mon] 15:15:57 ch0 LOCKED | 0.9000 GHz | samples 551557916 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +102.5 kHz 15.8 dB | ADC peak 0.001
+[mon] 15:15:57 ch1 LOCKED | 2.4000 GHz | samples 551559736 (2.001 MS/s) | stream breaks 1 | no tone, strongest line -122.6 kHz 11.5 dB | ADC peak 0.002
+[mon] 15:15:57 ch2 LOCKED | 5.2000 GHz | samples 551560828 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +179.4 kHz 12.9 dB | ADC peak 0.001
+[mon] 15:15:57 ch3 LOCKED | 5.8000 GHz | samples 551562284 (2.001 MS/s) | stream breaks 1 | TONE +179.7 kHz 76.0 dB | ADC peak 0.049
+[mon] 15:16:03 ch0 LOCKED | 0.9000 GHz | samples 562345056 (2.001 MS/s) | stream breaks 1 | no tone, strongest line -310.8 kHz 11.7 dB | ADC peak 0.001
+[mon] 15:16:03 ch1 LOCKED | 2.4000 GHz | samples 562347604 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +89.1 kHz 12.8 dB | ADC peak 0.002
+[mon] 15:16:03 ch2 LOCKED | 5.2000 GHz | samples 562349788 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +179.4 kHz 15.1 dB | ADC peak 0.001
+[mon] 15:16:03 ch3 LOCKED | 5.8000 GHz | samples 562350880 (2.001 MS/s) | stream breaks 1 | TONE +179.4 kHz 77.5 dB | ADC peak 0.049
+[mon] 15:16:08 ch0 LOCKED | 0.9000 GHz | samples 573298544 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +106.7 kHz 14.5 dB | ADC peak 0.001
+[mon] 15:16:08 ch1 LOCKED | 2.4000 GHz | samples 573300364 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +162.1 kHz 12.9 dB | ADC peak 0.002
+[mon] 15:16:08 ch2 LOCKED | 5.2000 GHz | samples 573301820 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +179.4 kHz 17.4 dB | ADC peak 0.001
+[mon] 15:16:08 ch3 LOCKED | 5.8000 GHz | samples 573303276 (2.001 MS/s) | stream breaks 1 | TONE +179.4 kHz 77.4 dB | ADC peak 0.049
+[mon] 15:16:13 ch0 LOCKED | 0.9000 GHz | samples 584220364 (2.001 MS/s) | stream breaks 1 | no tone, strongest line -356.2 kHz 13.1 dB | ADC peak 0.001
+[mon] 15:16:13 ch1 LOCKED | 2.4000 GHz | samples 584222184 (2.001 MS/s) | stream breaks 1 | no tone, strongest line -25.9 kHz 11.9 dB | ADC peak 0.002
+[mon] 15:16:13 ch2 LOCKED | 5.2000 GHz | samples 584223276 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +179.4 kHz 15.0 dB | ADC peak 0.001
+[mon] 15:16:13 ch3 LOCKED | 5.8000 GHz | samples 584224368 (2.001 MS/s) | stream breaks 1 | TONE +179.4 kHz 77.5 dB | ADC peak 0.049
+[mon] 15:16:19 ch0 LOCKED | 0.9000 GHz | samples 594352304 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +110.6 kHz 12.6 dB | ADC peak 0.001
+[mon] 15:16:19 ch1 LOCKED | 2.4000 GHz | samples 594354852 (2.001 MS/s) | stream breaks 1 | no tone, strongest line -38.6 kHz 13.2 dB | ADC peak 0.002
+[mon] 15:16:19 ch2 LOCKED | 5.2000 GHz | samples 594356308 (2.001 MS/s) | stream breaks 1 | no tone, strongest line +179.4 kHz 13.7 dB | ADC peak 0.001
+[mon] 15:16:19 ch3 LOCKED | 5.8000 GHz | samples 594357400 (2.001 MS/s) | stream breaks 1 | TONE +179.4 kHz 77.1 dB | ADC peak 0.049
