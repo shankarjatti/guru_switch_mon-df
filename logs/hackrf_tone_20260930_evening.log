@@ -1,0 +1,31 @@
+[INFO] Opening HackRF One #0 f77c60dc261977c3...
+==================================================================
+HackRF One CW calibration source
+==================================================================
+  centre       : 2.4000 GHz
+  tone         : centre + 200.0 kHz
+  sample rate  : 2.000 Msps
+  TX VGA       : 14 dB      RF amp: off
+  amplitude    : 0.70 of full scale (8-bit DAC)
+  radio        : hackrf
+  backend      : gr-soapy   (no libuhd in this process)
+  estimated at 2.400 GHz:
+    HackRF output      ~   -37.1 dBm
+    after 0 dB pad + 7 dB split ~   -44.1 dBm  <- each 2945 port
+    TwinRX full scale  :   -20.0 dBm
+    TwinRX damage      :   +10.0 dBm
+    !! at maximum gain a port would see ~+6.0 dBm.
+    !! no pad declared. A fixed attenuator is the only thing
+       protecting the TwinRX from a mistyped gain.
+  NOTE: this radio's reference is ~+/-20 ppm, so the tone can sit
+        up to ~116 kHz from the nominal offset at 5.8 GHz.
+        That is common mode across channels and does not affect phase.
+
+transmitting ...  Ctrl-C to stop
+
+  control socket: udp://127.0.0.1:5123   (commands: 'freq <hz>', 'vga <dB>', 'ppm <clock error>', 'get', 'ping', 'quit')
+    -> already on 2.4000 GHz, not retuned
+    -> already on 2.4000 GHz, not retuned
+    -> retuned to 5.2000 GHz  (vga 47, tone +200.0 kHz, generated +200.000 kHz for +0.000 ppm)
+    -> retuned to 5.8000 GHz  (vga 47, tone +200.0 kHz, generated +200.000 kHz for +0.000 ppm)
+    -> retuned to 2.4000 GHz  (vga 14, tone +200.0 kHz, generated +200.000 kHz for +0.000 ppm)

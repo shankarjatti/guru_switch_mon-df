@@ -1,0 +1,23 @@
+start: mode MON, switches 1, slots 13095 used 13088 late 7, timing lost None
+ 10 switches,   28 s | this: to MON locked, request -> dwell 29.9 ms | total bad 0 | slots 14893 used 14828 late 64 unlocked 0 | bursts missing 0 | lost None
+ 20 switches,   61 s | this: to MON locked, request -> dwell 30.3 ms | total bad 0 | slots 17083 used 17009 late 73 unlocked 0 | bursts missing 0 | lost None
+ 30 switches,  105 s | this: to MON locked, request -> dwell 30.0 ms | total bad 0 | slots 20078 used 19984 late 93 unlocked 0 | bursts missing 0 | lost None
+ 40 switches,  144 s | this: to MON locked, request -> dwell 28.3 ms | total bad 0 | slots 22611 used 22473 late 137 unlocked 0 | bursts missing 0 | lost None
+ 50 switches,  187 s | this: to MON locked, request -> dwell 23.2 ms | total bad 0 | slots 25461 used 25298 late 162 unlocked 0 | bursts missing 0 | lost None
+ 60 switches,  230 s | this: to MON locked, request -> dwell 26.3 ms | total bad 0 | slots 28207 used 27961 late 245 unlocked 0 | bursts missing 0 | lost None
+ 70 switches,  275 s | this: to MON locked, request -> dwell 25.0 ms | total bad 0 | slots 31276 used 30987 late 288 unlocked 0 | bursts missing 0 | lost None
+ 80 switches,  311 s | this: to MON locked, request -> dwell 30.5 ms | total bad 0 | slots 33630 used 33327 late 302 unlocked 0 | bursts missing 0 | lost None
+ 90 switches,  343 s | this: to MON locked, request -> dwell 33.5 ms | total bad 0 | slots 35808 used 35505 late 302 unlocked 0 | bursts missing 0 | lost None
+100 switches,  381 s | this: to MON locked, request -> dwell 27.7 ms | total bad 0 | slots 38351 used 37905 late 445 unlocked 0 | bursts missing 0 | lost None
+110 switches,  413 s | this: to MON NOT locked / not used, request -> dwell 25.3 ms | total bad 1 | slots 40311 used 39826 late 484 unlocked 0 | bursts missing 0 | lost None
+120 switches,  444 s | this: to MON locked, request -> dwell 26.2 ms | total bad 1 | slots 42353 used 41836 late 516 unlocked 0 | bursts missing 0 | lost None
+130 switches,  486 s | this: to MON locked, request -> dwell 27.1 ms | total bad 1 | slots 45394 used 44856 late 537 unlocked 0 | bursts missing 0 | lost None
+140 switches,  523 s | this: to MON locked, request -> dwell 26.4 ms | total bad 1 | slots 47867 used 47311 late 555 unlocked 0 | bursts missing 0 | lost None
+150 switches,  566 s | this: to MON locked, request -> dwell 27.7 ms | total bad 1 | slots 50722 used 50166 late 555 unlocked 0 | bursts missing 0 | lost None
+
+END after 566 s: switches 151 (not used 1) | slots 50722 used 50166 late 555 unlocked 0 skipped 1 | bursts ok 50720 missing 0 | timing lost None
+to DF : 75 switches, request -> first dwell mean 46.6 ms, min 36.4, worst 56.3 | not locked/used 0
+to MON: 75 switches, request -> first dwell mean 27.8 ms, min 22.1, worst 33.5 | not locked/used 1
+LO routing change: mean 1.0 ms, worst 4.0 ms
+DF 2.4000 GHz phase (guru's meter, 113 readings over the run): first +138.95 -66.63 +89.03 deg; change over the run: worst 0.09 0.28 0.15 deg, std 0.03 0.08 0.06 deg
+saved /home/shankar/radar2/guru_switch/results/switch_validate_20260930_173117.json

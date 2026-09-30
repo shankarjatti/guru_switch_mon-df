@@ -1,0 +1,61 @@
+== 18:13:15 min 1 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 4 (last DF) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:13:13 2.4000 GHz  windows 5087  with tone 4783  worst SNR -32.4 dB | tone +192626.1 Hz 10000 samples | ch1   +0.06 (max dev 0.05)  ch2   +0.29 (max dev 0.04)  ch3   +0.27 (max dev 0.05)
+== 18:14:15 min 2 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 4 (last DF) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:14:13 2.4000 GHz  windows 6730  with tone 6426  worst SNR -32.4 dB | tone +192563.1 Hz 10000 samples | ch1   +0.05 (max dev 0.07)  ch2   +0.28 (max dev 0.05)  ch3   +0.26 (max dev 0.05)
+== 18:15:15 min 3 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 4 (last DF) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:15:13 2.4000 GHz  windows 8343  with tone 8039  worst SNR -32.4 dB | tone +192671.9 Hz 10000 samples | ch1   +0.08 (max dev 0.07)  ch2   +0.32 (max dev 0.05)  ch3   +0.32 (max dev 0.05)
+== 18:16:15 min 4 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 6 (last DF) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:16:13 2.4000 GHz  windows 9833  with tone 9529  worst SNR -32.4 dB | tone +192715.7 Hz 10000 samples | ch1   +0.06 (max dev 0.06)  ch2   +0.32 (max dev 0.04)  ch3   +0.34 (max dev 0.05)
+== 18:17:15 min 5 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 6 (last DF) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:17:13 2.4000 GHz  windows 11448  with tone 11144  worst SNR -32.4 dB | tone +192720.5 Hz 10000 samples | ch1   +0.07 (max dev 0.06)  ch2   +0.34 (max dev 0.05)  ch3   +0.34 (max dev 0.05)
+== 18:18:15 min 6 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 6 (last DF) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:18:13 2.4000 GHz  windows 12962  with tone 12658  worst SNR -32.4 dB | tone +192770.0 Hz 10000 samples | ch1   +0.08 (max dev 0.07)  ch2   +0.29 (max dev 0.05)  ch3   +0.29 (max dev 0.04)
+== 18:19:15 min 7 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 6 (last DF) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:19:13 2.4000 GHz  windows 14319  with tone 14015  worst SNR -32.4 dB | tone +192656.9 Hz 10000 samples | ch1   +0.10 (max dev 0.07)  ch2   +0.29 (max dev 0.05)  ch3   +0.26 (max dev 0.04)
+== 18:20:15 min 8 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 6 (last DF) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:20:13 2.4000 GHz  windows 15857  with tone 15553  worst SNR -32.4 dB | tone +192692.6 Hz 10000 samples | ch1   +0.10 (max dev 0.07)  ch2   +0.30 (max dev 0.04)  ch3   +0.29 (max dev 0.04)
+== 18:21:15 min 9 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 6 (last DF) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:21:13 2.4000 GHz  windows 17483  with tone 17179  worst SNR -32.4 dB | tone +192641.3 Hz 10000 samples | ch1   +0.11 (max dev 0.07)  ch2   +0.29 (max dev 0.05)  ch3   +0.29 (max dev 0.05)
+== 18:22:15 min 10 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 6 (last DF) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:22:13 2.4000 GHz  windows 19090  with tone 18786  worst SNR -32.4 dB | tone +192644.2 Hz 10000 samples | ch1   +0.11 (max dev 0.06)  ch2   +0.29 (max dev 0.04)  ch3   +0.27 (max dev 0.04)
+== 18:23:15 min 11 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 6 (last DF) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:23:13 2.4000 GHz  windows 20707  with tone 20403  worst SNR -32.4 dB | tone +192659.3 Hz 10000 samples | ch1   +0.12 (max dev 0.07)  ch2   +0.31 (max dev 0.03)  ch3   +0.29 (max dev 0.04)
+== 18:24:15 min 12 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 6 (last DF) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:24:13 2.4000 GHz  windows 22343  with tone 22039  worst SNR -32.4 dB | tone +192737.5 Hz 10000 samples | ch1   +0.12 (max dev 0.07)  ch2   +0.33 (max dev 0.05)  ch3   +0.32 (max dev 0.04)
+== 18:25:15 min 13 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 6 (last DF) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:25:13 2.4000 GHz  windows 23969  with tone 23665  worst SNR -32.4 dB | tone +192770.4 Hz 10000 samples | ch1   +0.12 (max dev 0.06)  ch2   +0.39 (max dev 0.05)  ch3   +0.38 (max dev 0.04)
+== 18:26:15 min 14 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 6 (last DF) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:26:13 2.4000 GHz  windows 25596  with tone 25292  worst SNR -32.4 dB | tone +192802.5 Hz 10000 samples | ch1   +0.12 (max dev 0.05)  ch2   +0.44 (max dev 0.04)  ch3   +0.43 (max dev 0.05)
+== 18:27:15 min 15 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 6 (last DF) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:27:13 2.4000 GHz  windows 27225  with tone 26921  worst SNR -32.4 dB | tone +192822.0 Hz 10000 samples | ch1   +0.12 (max dev 0.08)  ch2   +0.44 (max dev 0.05)  ch3   +0.42 (max dev 0.05)
+== 18:28:15 min 16 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 6 (last DF) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:28:13 2.4000 GHz  windows 28843  with tone 28539  worst SNR -32.4 dB | tone +192807.2 Hz 10000 samples | ch1   +0.12 (max dev 0.06)  ch2   +0.46 (max dev 0.04)  ch3   +0.44 (max dev 0.04)
+== 18:29:15 min 17 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 6 (last DF) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:29:13 2.4000 GHz  windows 30159  with tone 29855  worst SNR -32.4 dB | tone +192861.3 Hz 10000 samples | ch1   +0.12 (max dev 0.06)  ch2   +0.46 (max dev 0.04)  ch3   +0.44 (max dev 0.05)
+== 18:30:15 min 18 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 6 (last DF) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:30:13 2.4000 GHz  windows 31468  with tone 31164  worst SNR -32.4 dB | tone +192841.2 Hz 10000 samples | ch1   +0.13 (max dev 0.06)  ch2   +0.49 (max dev 0.05)  ch3   +0.47 (max dev 0.05)
+== 18:31:15 min 19 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 6 (last DF) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:31:13 2.4000 GHz  windows 33034  with tone 32730  worst SNR -32.4 dB | tone +192981.2 Hz 10000 samples | ch1   +0.13 (max dev 0.08)  ch2   +0.52 (max dev 0.05)  ch3   +0.52 (max dev 0.05)
+== 18:32:15 min 20 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 7 (last MON) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:32:13 2.4000 GHz  windows 34379  with tone 34075  worst SNR -32.4 dB | tone +193061.5 Hz 10000 samples | ch1   +0.13 (max dev 0.05)  ch2   +0.50 (max dev 0.05)  ch3   +0.49 (max dev 0.05)
+== 18:33:15 min 21 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 7 (last MON) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:33:14 2.4000 GHz  windows 34379  with tone 34075  worst SNR -32.4 dB | tone +193061.5 Hz 10000 samples | ch1   +0.13 (max dev 0.05)  ch2   +0.50 (max dev 0.05)  ch3   +0.49 (max dev 0.05)
+== 18:34:15 min 22 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 7 (last MON) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:34:15 2.4000 GHz  windows 34379  with tone 34075  worst SNR -32.4 dB | tone +193061.5 Hz 10000 samples | ch1   +0.13 (max dev 0.05)  ch2   +0.50 (max dev 0.05)  ch3   +0.49 (max dev 0.05)
+== 18:35:15 min 23 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 7 (last MON) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:35:10 2.4000 GHz  windows 34379  with tone 34075  worst SNR -32.4 dB | tone +193061.5 Hz 10000 samples | ch1   +0.13 (max dev 0.05)  ch2   +0.50 (max dev 0.05)  ch3   +0.49 (max dev 0.05)
+== 18:36:15 min 24 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 7 (last MON) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:36:11 2.4000 GHz  windows 34379  with tone 34075  worst SNR -32.4 dB | tone +193061.5 Hz 10000 samples | ch1   +0.13 (max dev 0.05)  ch2   +0.50 (max dev 0.05)  ch3   +0.49 (max dev 0.05)
+== 18:37:15 min 25 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 7 (last MON) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:37:12 2.4000 GHz  windows 34379  with tone 34075  worst SNR -32.4 dB | tone +193061.5 Hz 10000 samples | ch1   +0.13 (max dev 0.05)  ch2   +0.50 (max dev 0.05)  ch3   +0.49 (max dev 0.05)
+== 18:38:15 min 26 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 7 (last MON) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:38:13 2.4000 GHz  windows 34379  with tone 34075  worst SNR -32.4 dB | tone +193061.5 Hz 10000 samples | ch1   +0.13 (max dev 0.05)  ch2   +0.50 (max dev 0.05)  ch3   +0.49 (max dev 0.05)
+== 18:39:15 min 27 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 7 (last MON) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:39:13 2.4000 GHz  windows 34379  with tone 34075  worst SNR -32.4 dB | tone +193061.5 Hz 10000 samples | ch1   +0.13 (max dev 0.05)  ch2   +0.50 (max dev 0.05)  ch3   +0.49 (max dev 0.05)
+== 18:40:16 min 28 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 7 (last MON) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:40:14 2.4000 GHz  windows 34379  with tone 34075  worst SNR -32.4 dB | tone +193061.5 Hz 10000 samples | ch1   +0.13 (max dev 0.05)  ch2   +0.50 (max dev 0.05)  ch3   +0.49 (max dev 0.05)
+== 18:41:16 min 29 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 7 (last MON) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:41:15 2.4000 GHz  windows 34379  with tone 34075  worst SNR -32.4 dB | tone +193061.5 Hz 10000 samples | ch1   +0.13 (max dev 0.05)  ch2   +0.50 (max dev 0.05)  ch3   +0.49 (max dev 0.05)
+== 18:42:16 min 30 | guru_switch running yes | HackRF running yes | TIMING LOST 0 | tracebacks 0 | mode requests 7 (last MON) | HackRF TIMEOUTs +0, watchdog lines 0, fresh restarts 0
+   DF 2.4: [meter] 18:42:11 2.4000 GHz  windows 34379  with tone 34075  worst SNR -32.4 dB | tone +193061.5 Hz 10000 samples | ch1   +0.13 (max dev 0.05)  ch2   +0.50 (max dev 0.05)  ch3   +0.49 (max dev 0.05)
+WATCH END 18:42:16 after 30 min

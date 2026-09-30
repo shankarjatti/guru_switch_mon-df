@@ -1,15 +1,36 @@
 # guru_switch — USRP-2945 DF + MON in one program, switched on the radio clock
 
-Work copy made 2026-09-30 from the frozen `~/radar2/guru_DF_v1` (DF) and `~/radar2/guru_MON_v1` (MON).
-Those two stay untouched. Nothing here is installed into `~/gnuradio-3.8`: the new engine
-(`oot/engine/libtwinrx_switch.so`), the source block (`switch_source.py`) and its GRC definition
-(`grc/switch_source.block.yml`) live in this folder; the DF blocks after the source are the installed,
-verified ones (same as guru_DF_v1).
+A 4-channel receiver on an NI **USRP-2945** (Ettus X310 + 2 × TwinRX) with two modes, switched by hand at a slot
+boundary on the radio's own clock:
+
+* **DF** — all 4 channels on ONE shared LO (phase-coherent), hopping 2.4 → 5.2 → 5.8 GHz, 7 ms switching + 5 ms dwell,
+  burst mode, 2 MS/s (10,000 samples per dwell), calibrated phases (for direction finding by the DOA stage)
+* **MON** — every channel on its OWN LO and band (900 MHz / 2.4 / 5.2 / 5.8 GHz), ONE continuous stream
+
+Returning from MON to DF keeps the calibrated phase (worst 0.33° after 150 trips, the same as a plain DF retune).
+A switch takes ~20–33 ms from the request to the first sample of the new mode.
 
 ```bash
-cd ~/radar2/guru_switch && ./run_hop.sh --switch          # GUI; then CALIBRATE (in DF)
-python3 switch_validate.py --switches 150                 # validation through the API (GUI running)
+cd ~/radar2/guru_switch && ./run_hop.sh --switch          # GUI; CALIBRATE (in DF); MODE selector
 ```
+
+## Documentation
+| document | contents |
+|---|---|
+| [docs/switching/THEORY.md](docs/switching/THEORY.md) | TwinRX LOs, why a shared LO gives coherence, the LO divider state and the timed tune, independent LOs, the radio clock and its command queue, burst vs continuous streaming, phase measurement on a tone, CALIBRATE, why a C++ engine |
+| [docs/switching/ENGINE_AND_BLOCKS.md](docs/switching/ENGINE_AND_BLOCKS.md) | block diagram, engine slots and timelines, the switch sequence, verdicts / counters / timing lost, C API, every custom block (switch_source, DF blocks, MON path) |
+| [docs/switching/DEVELOPMENT_AND_TESTS.md](docs/switching/DEVELOPMENT_AND_TESTS.md) | step by step how it was built, every problem found and fixed, every measurement, user decisions, open items |
+| [docs/switching/RUN_AND_HARDWARE.md](docs/switching/RUN_AND_HARDWARE.md) | hardware, cabling, software, run, tests, troubleshooting |
+| [docs/WORK_LOG.md](docs/WORK_LOG.md) | the live work log of the whole project, stage by stage |
+| [docs/DEVELOPMENT_LOG.md](docs/DEVELOPMENT_LOG.md), [docs/lab_notes/](docs/lab_notes/) | the DF work before this (guru_fast / guru_burst) |
+| [results/](results/) | raw results (JSON / NPZ) of every test named in the docs |
+
+## Where this comes from
+Made on 2026-09-30 from the frozen **guru_DF_v1** (DF, shared LO) and **guru_MON_v1** (MON, independent LOs).
+Nothing here is installed into GNU Radio: the new engine (`oot/engine/libtwinrx_switch.so`, source
+`twinrx_engine.cpp`), the source block (`switch_source.py`) and its GRC definition (`grc/switch_source.block.yml`)
+are used from this folder; the DF blocks after the source are the installed, verified `doa` ones
+(sources in `oot/`, snapshot in `installed_snapshot/`, `./RESTORE.sh --check`).
 
 ## Modes
 | | DF | MON |

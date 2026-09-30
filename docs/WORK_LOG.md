@@ -21,13 +21,113 @@ decisions taken, and what comes next. Only measured facts; anything not verified
 | Run | `./run_hop.sh --fast`, then CALIBRATE; every 5–10 min for < 1° |
 | Radio | X310 `31082D8` at 192.168.10.2; HackRF tone on 2.4 GHz (UDP 127.0.0.1:5123) |
 | Open items | thermal drift (~8°/16 min); rtprio not enabled (limit 0); CPU governor = `powersave` (not yet tested as a cause of late slots); field calibration without HackRF; overflow recovery untested; RTOS choice |
-| Saved state | `~/radar2/guru0930` (frozen 2026-09-30, lab tag `guru0930`) — base for the next step |
+| Saved state | DF: `~/radar2/guru_DF_v1`, MON: `~/radar2/guru_MON_v1` (both frozen 2026-09-30); earlier `~/radar2/guru0930` (frozen 2026-09-30, lab tag `guru0930`) — base for the next step |
 | Setup now (2026-09-30) | back to CABLE (HackRF → splitter → 4 ch); installed blocks = guru57; over-the-air work paused in `~/radar2/guru_ota` |
 | Next step | user: `cd ~/radar2/guru && ./run_hop.sh --burst` + CALIBRATE; long run (> 11 min) to prove the 2 MS/s fix; rtprio needs log out/in |
 
 ---
 
 ## 2026-09-28
+
+### 2026-09-30 18:12–18:42 — 30-min run of guru_switch: PASSED (no failure)
+* User: "keep monitoring, we'll run it for 30 min; if it fails we'll check root cause". Watched every minute.
+* CALIBRATE OK 18:10:15 (worst single window 0.06°). User switched MON/DF by hand 7 times (last: MON at ~18:31).
+* 30 min: guru_switch running all the time, TIMING LOST 0, tracebacks 0; HackRF: 0 new TIMEOUTs, 0 watchdog
+  restarts (after the fresh-process fix + fresh start).
+* DF 2.4 GHz (18:13–18:32, in DF): tone +192.6..193.1 kHz, 10,000 samples per dwell every time, phases after CAL
+  ch1 +0.05..+0.13°, ch2 +0.28..+0.52°, ch3 +0.26..+0.52° (slow drift ~0.2° over 20 min, max dev ≤ 0.08°).
+  From 18:32 the program is in MON, so the DF meter holds its last value (expected).
+* First run of the 2 MS/s DF chain past 11 min without TIMING LOST since the 09-29/09-30 failures (6 and 11 min);
+  that earlier one coincided with me building a tarball — load matters, not proven fixed.
+
+### 2026-09-30 18:08 — "not getting correct signal": HackRF stalled again (not the receiver)
+* guru_switch log: every meter "no tone"; receiver healthy (locked, 0 missing, no TIMING LOST). HackRF log: 7046
+  TIMEOUTs, watchdog restarting every ~1 s, each restart stalling again. HackRF USB device number 006 → 009 → 013
+  over the day = it dropped off USB and came back at least 3 times (cable / port / power).
+* Fix: 3 stalls within 60 s → the transmitter re-execs itself as a fresh process on the band last asked for
+  (lab commit; copied to guru_switch, guru_mon, guru10ms). Fresh transmitter: 0 TIMEOUTs; guru_switch 2.4 GHz
+  tone back (+192.8 kHz, 10,000 samples, phases +0.05/+0.14/+0.13°). 5.2/5.8 need CALIBRATE.
+* Recommended to the user: HackRF on another USB port / shorter cable / powered hub.
+
+### 2026-09-30 18:20 — user ran guru_switch: "ITS WORKING SUPER"
+* User started `cd ~/radar2/guru_switch && ./run_hop.sh --switch` with the run instructions (CALIBRATE in DF,
+  MODE selector manual only, MON tab, LAB TONE selector) and confirmed it works.
+* Not yet frozen as a safe copy (guru_switch is the work copy, last commit a2a0140 + message fix).
+
+### 2026-09-30 17:00–18:10 — switching steps 3–5: GUI, API, validation; user: MON continuous, manual mode only
+* `guru_switch.grc/.py` (`make_guru_switch.py`): guru_burst's DF flowgraph unchanged on outputs 0-3 + MON tab
+  (per LO spectrum / time / status) on 4-7 + MODE selector above the tabs. `./run_hop.sh --switch`.
+* First GUI start: TIMING LOST at once — the Python MON meter (all 4 MON streams through Python) + 8 displays
+  on top of the DF chain. Fix: MON path C++ only (probe snapshots of 8192 samples, displays thinned to whole
+  4096-sample blocks, MON count from the engine). Then no TIMING LOST.
+* Bugs found and fixed: MON band-stats key "MON" (string) broke the DF lock line; a repeated request (GUI
+  selector following an API request) moved the request time.
+* Validation (`switch_validate.py`, GUI + API, 151 switches over 566 s, then burst-mode MON):
+  150/151 switches locked + used (1 not used, marked), bursts 50,720 ok / 0 missing, no TIMING LOST; DF 2.4 GHz
+  phase over the whole run (guru's own meter): worst change 0.09 / 0.28 / 0.15°; request → first dwell:
+  to DF mean 46.6 ms (worst 56.3), to MON 27.8 ms (worst 33.5); routing 1.0 ms mean (worst 4.0);
+  555 / 50,722 slots late (1.1 %, marked, never used) = the PC's latency (see 16:20 entry).
+* User: "MON work should be in continuous mode now ... don't follow burst mode there" → MON = ONE continuous
+  stream (timed START_CONTINUOUS at the first MON sample; STOP at the switch back, the stream ends where it
+  ends, end-of-burst gives the exact last sample); engine keeps 20 ms MON records with a lock read. DF stays burst.
+* User: "don't set auto changing mode between MON and DF, that should be manually controlled" → the program never
+  switched by itself (the automatic switching seen was my validation script through the API); API now OFF by
+  default, mode only via the MODE selector.
+* Continuous MON headless (`switch_engine_check.py`, a TEST that switches): 10 cycles: 0 missing bursts, DF phase
+  after each return ≤ 0.27°, DF dwells 10,000; 1000 MON records locked; MON→DF now 20–29 ms, DF→MON 23–33 ms.
+  First continuous run had bursts missing 10 (= number of switches), NOT reproduced in 3 runs since — open.
+* GUI started for the user in DF (CALIBRATE first: the X310 was power-cycled).
+
+### 2026-09-30 16:20–16:45 — switching steps 2 (engine) done, headless-verified on the radio
+* `guru_switch/oot/engine/twinrx_engine.cpp` → `libtwinrx_switch.so` (separate lib; installed engine untouched):
+  MON = one more band, own freq per channel, own internal LOs; mode request taken at the next planned slot;
+  consecutive MON slots not retuned → MON bursts join with no gap. `switch_source.py` (local block, 8 outputs:
+  0-3 DF with the old tags, 4-7 MON with mon_on / mon_bad / mon_off).
+* Measured facts found on the way (route_burst_test.py):
+  - timed LO routing takes effect at T (ch0 tone gone +0.12 ms after T, never before), phase back ≤ 0.16°;
+  - BUT in the running engine a TIMED routing call blocks the host until T (each call reads the TwinRX back and
+    the read waits behind the timed write) → tune after it went out late (all 10 switch slots late, send 30–45 ms).
+    Fix: after the old mode's last dwell has ENDED, route UNTIMED (0.6–2.9 ms), then the timed tune at
+    end + switch_gap (10 ms);
+  - 200 burst commands at once overflow the radio's command queue (only 32 ran); the engine queues one ahead.
+* Headless check (`switch_engine_check.py`, 5 cycles DF 2 s / MON 2 s, tone on 2.4 GHz):
+  1558/1558 slots used, 0 late/unlocked/skipped, bursts 1557 ok / 0 missing, 10/10 switches locked;
+  DF phase after each return from MON ≤ 0.26° (single-dwell std 0.06/0.11/0.09°); every DF dwell 10,000 samples,
+  every MON dwell 40,000 (20 ms); MON: only ch1 (2.4 GHz) sees the tone (84.8 dB), ch0 34 dB board-mate leak,
+  ch2/ch3 noise; request → first dwell of the new mode: DF→MON 24–33 ms, MON→DF 39–48 ms.
+* One earlier run had 165 late DF slots with the same code (band change 4 ms instead of 1.1): a kernel worker at
+  62–67 % CPU (D state), rustdesk, CPU governor `powersave`. DF-only and the next run: 0 late. PC latency, not the
+  design — the performance governor needs the user (system setting).
+* Next: control API + GUI (steps 3–4), then validation (step 5).
+
+### 2026-09-30 16:05–16:17 — switching step 1 (`guru_switch/switch_check.py`): DF phase SURVIVES a trip through MON
+* `~/radar2/guru_switch` = working copy of guru_DF_v1 + guru_MON_v1 (`59d2ed4`); frozen copies untouched.
+* First trial tuned UNTIMED → phases after any retune jumped by exact multiples of 90° (also in the DF-only
+  baseline) = the TwinRX LO divider state. Test-script error; fixed by using the engine's tune exactly
+  (gains at T, ch c at T + c·0.4 ms, second pass at T + 3 ms, DDC policy NONE; lock read after the second pass).
+* Full run (`results/switch_check_20260930_161434.json`): per DF band 50 MON trips (DF → MON with ch0..3 on
+  0.9/2.4/5.2/5.8 GHz, each own LO, 0.2 s → DF) interleaved with 50 DF-only retune baselines:
+  - phase change after a MON trip, worst of ch1/ch2/ch3: 2.4 GHz 0.33°, 5.2 GHz 0.20°, 5.8 GHz 0.22°
+    (baseline retune: 0.26°, 0.14°, 0.12°); extra caused by the switch ≈ 0.03–0.11° (mean), std ≤ 0.07°.
+  - MON set up correctly (all internal, all locked) 150/150; lock timeouts 0.
+  - LO routing change ~2 ms (host, worst 4.7 ms); lock confirmed 4–8 ms after the timed tune (radio clock;
+    includes the 3 ms second pass and sensor reads). Tune lead 30 ms was a choice, not a limit.
+* Caveats: `lo_locked` on external channels (ch0/ch1 in DF) reports their own synth, so it proves nothing
+  there — the phase + SNR are the proof. Between program starts the reference phase of ch2 came up 180° apart
+  (+27.7° vs −152.8° at 2.4 GHz) → the start state is ambiguous: calibrate at every start (already the rule);
+  within one run it is stable. MON-mode reception during the trips was not checked (only routing + locks).
+* Conclusion: switching needs NO recalibration on return to DF (with the engine's tune). Next: step 2 (engine).
+
+### 2026-09-30 15:45 — both works saved separately: `guru_DF_v1` and `guru_MON_v1`
+* User: "keep both work separate and safe ... with other name ... after that we'll come to combining with switching".
+* `~/radar2/guru_DF_v1` (git `b579304`, 449 files, `RESTORE.sh --verify/--check` OK, lab tag `guru_DF_v1` = `d9c5f78`,
+  `guru_DF_v1.tar.gz` 245 MB): guru0930 + HackRF re-exec fix + 3-packet X310 ping. Needs CALIBRATE (X310 power-cycled).
+* `~/radar2/guru_MON_v1` (git `6e975ff`, 15 files, `guru_MON_v1.tar.gz` 186 kB): MON only, standalone (stock gr-uhd,
+  embedded meter, no installed doa blocks); block templates in `templates/`; regenerates the same flowgraph.
+* ch0 port check (MON mode, same freq/gain): ch0 A/RX1 13–16 dB low on all 4 bands, others within ~3 dB → RF path
+  of ch0, not LO sharing. Open: swap ch0/ch1 cables.
+* User asked about "apk" for switching — unclear (API vs Android app); answered both. Next: MON↔DF switching plan
+  (step 1 = switch_check.py measurement), only after the user's go.
 
 ### 2026-09-30 15:12 — MON step 1 (guru_mon): 4 LOs, own band each — WORKS on the cable
 * Built in `~/radar2/guru_mon` (clone of guru0930; `d98421c`, `ad333a8`): `make_guru_mon.py` → `guru_mon.grc/.py`,
