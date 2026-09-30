@@ -125,6 +125,8 @@ struct Engine {
     // write, so the host blocked until S and the tune after it went out late)
     double switch_gap = 0.010;
     std::atomic<double> last_route_ms{0}, max_route_ms{0};
+    // MON: each channel's own lo_locked as last read by the scheduler (-1 not yet)
+    std::atomic<int> mon_lock[NCH] = {{-1}, {-1}, {-1}, {-1}};
 
     uhd::usrp::multi_usrp::sptr u;
     uhd::rx_streamer::sptr rx;
@@ -686,11 +688,16 @@ struct Engine {
                 } else if (cur.tuned) {
                     // MON after a switch: every channel's OWN synthesiser
                     ok = true;
-                    for (size_t ch = 0; ch < NCH; ++ch)
-                        ok = u->get_rx_sensor("lo_locked", ch).to_bool() && ok;
+                    for (size_t ch = 0; ch < NCH; ++ch) {
+                        const bool l = u->get_rx_sensor("lo_locked", ch).to_bool();
+                        mon_lock[ch] = l ? 1 : 0;
+                        ok = l && ok;
+                    }
                 } else {
                     // MON continuing: one channel per slot, in turn
-                    ok = u->get_rx_sensor("lo_locked", static_cast<size_t>(k % NCH)).to_bool();
+                    const size_t ch = static_cast<size_t>(k % NCH);
+                    ok = u->get_rx_sensor("lo_locked", ch).to_bool();
+                    mon_lock[ch] = ok ? 1 : 0;
                 }
                 cur_lock_done = (host_now() + off - cur.S) * 1e3;
                 if (!ok) { ++n_unlocked; why = 3; }
@@ -787,8 +794,13 @@ void eng_set_switch_gap(void* h, double secs) {
 int eng_set_mode(void* h, int mode) {
     auto* e = static_cast<Engine*>(h);
     if (mode == 1 && !e->has_mon) return -1;
-    e->last_req_dev = host_now() + e->dev_offset.load();
-    e->want_mode = mode ? 1 : 0;
+    const int m = mode ? 1 : 0;
+    // the same request again (e.g. the GUI selector following an API request)
+    // is no new request: it must not move the request time
+    if (e->want_mode.load() != m) {
+        e->last_req_dev = host_now() + e->dev_offset.load();
+        e->want_mode = m;
+    }
     return e->want_mode.load();
 }
 
@@ -805,6 +817,7 @@ void eng_mode_info(void* h, double* o) {
     o[9] = static_cast<double>(e->mon_dwell_samples.load());
     o[10] = static_cast<double>(e->df_dwell_samples.load());
     o[11] = e->last_route_ms.load();
+    for (int c = 0; c < NCH; ++c) o[12 + c] = e->mon_lock[c].load();
 }
 
 double eng_start(void* h, int hop) {

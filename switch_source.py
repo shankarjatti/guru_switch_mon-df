@@ -114,7 +114,7 @@ class switch_source(gr.sync_block):
         self._wait_since = None
         self._rows = (ctypes.c_double * (ROW * 256))()
         self._stat = (ctypes.c_double * 16)()
-        self._mi = (ctypes.c_double * 12)()
+        self._mi = (ctypes.c_double * 16)()
         self.preroll = float(preroll)
         self.start_dev = None
         self._h = None
@@ -198,7 +198,9 @@ class switch_source(gr.sync_block):
             if s["valid"] == -1:
                 continue
             key = "locked" if s["valid"] == 1 else WHY.get(s["why"], "invalid")
-            bkey = "MON" if s["mode"] == 1 else s["freq"]
+            # MON slots under -1.0: a number (the DF screen compares the keys with its
+            # band frequencies) that is no DF band
+            bkey = -1.0 if s["mode"] == 1 else s["freq"]
             b = self._band_stats.setdefault(bkey, {"slots": 0, "locked": 0, "unlocked": 0,
                                                    "late": 0, "skipped": 0, "no burst": 0})
             if not s.get("counted"):
@@ -357,6 +359,8 @@ class switch_source(gr.sync_block):
                 "last_switch_to_dwell_ms": (sw_dwell - sw_S) * 1e3 if sw_S else None,
                 "mon_dwell_samples": int(o[9]), "df_dwell_samples": int(o[10]),
                 "last_route_ms": o[11],
+                # each channel's own lock as the engine last read it in MON (None: not read yet)
+                "mon_lock": [None if o[12 + c] < 0 else bool(o[12 + c]) for c in range(NCH)],
                 "mon_slots_verified": self._mon_verified, "mon_slots_not_used": self._mon_bad}
 
     # --------------------------------------------------------------- status
