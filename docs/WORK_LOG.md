@@ -10,10 +10,28 @@ decisions taken, and what comes next. Only measured facts; anything not verified
 
 ---
 
-## CURRENT STATE (keep this block up to date)
+## CURRENT STATE (keep this block up to date) — last update 2026-10-01
 
 | | |
 |---|---|
+| Working system | **guru_switch** (`~/radar2/guru_switch`, `./run_hop.sh --switch`): DF (shared LO, 2.4 → 5.2 → 5.8 GHz, 7 ms switching + 5 ms dwell, burst, 2 MS/s) + MON (own LO per channel: ch0 900 MHz, ch1 2.4, ch2 5.2, ch3 5.8 GHz, ONE continuous stream) in one program; mode changed ONLY by hand with the MODE selector (control API off by default) |
+| Proven | DF phase after returning from MON ≤ 0.33° (same as a plain retune); switch ~20–33 ms request → first dwell; 30-min run 2026-09-30 18:12–18:42: 0 TIMING LOST, 0 errors, HackRF 0 stalls |
+| GitHub | **this work + this log**: https://github.com/shankarjatti/guru_switch_mon-df (PUBLIC, main) · old (do not change): https://github.com/shankarjatti/guru10ms |
+| Frozen safe copies | DF `~/radar2/guru_DF_v1` · MON `~/radar2/guru_MON_v1` · earlier `guru0930`, `guru57`, `guru10ms` (each: git, SHA256SUMS, `.tar.gz`; DF ones `RESTORE.sh`). guru_switch itself is NOT frozen locally yet (GitHub has it) |
+| Work copies | `~/radar2/guru_switch` (switching), `~/radar2/guru_mon` (MON), `~/radar2/guru` (DF lab), `~/radar2/guru_ota` (over-the-air, paused) |
+| Run | `cd ~/radar2/guru_switch && ./run_hop.sh --switch` → CALIBRATE in DF at every start → MODE selector; close the window to stop (never kill) |
+| Radio / source | X310 `31082D8` at 192.168.10.2 (1 Gb/s link, enp3s0); HackRF 200 kHz tone, 2 MS/s, VGA 14 (0.9/2.4 GHz) / 47 (5.2/5.8), UDP 127.0.0.1:5123, restarts itself as a fresh process after stalls |
+| Docs of the switch work | `guru_switch/docs/switching/`: THEORY, ENGINE_AND_BLOCKS, DEVELOPMENT_AND_TESTS, RUN_AND_HARDWARE |
+| User rules | everything real, no fakes/fallbacks; RX does all calculations, TX only a source; plan first, build after the go; MON continuous; mode manual only; keep this log updated every stage (sessions get compacted) |
+| Open items | ~1–2 % DF slots late when the PC is busy (CPU governor `powersave`, kernel worker load); 10 missing bursts seen once (first continuous-MON run, not reproduced); ch0 (A/RX1) 13–16 dB low (cable/port); HackRF drops off USB (another port/cable); MON bands fixed at start; CPU headroom of the DF Python chain; over-the-air jitter (guru_ota) |
+| Next (user's plan) | step by step, only on the user's go: more MON bands with retuning, DOA requests from edge modules → priority scheduler → DF on the band → back to MON |
+
+**After a compacted session:** read this block, then the newest entries below; the switch work's details are in
+`~/radar2/guru_switch/docs/switching/`. This log lives ONLY in `~/radar2/guru_switch/docs/WORK_LOG.md`
+(GitHub guru_switch_mon-df). **Never change the old repos** (guru10ms on GitHub and locally, guru57, guru0930,
+guru_DF_v1, guru_MON_v1) — user, 2026-10-01.
+
+---|---|
 | Working system | guru_burst (lab `~/radar2/guru`): 2.4 → 5.2 → 5.8 GHz, 7 ms switch + 5 ms dwell, 36 ms cycle, burst mode, 2 MS/s, 200 kHz HackRF tone (pure source). guru_fast 10/10 ms still available |
 | Code on the lab PC | `~/radar2/guru10ms/` (this repo, pushed) and `~/radar2/guru/` (same code; lab git repo `~/radar2`, tag `guru10ms` = `d135177`) |
 | GitHub | https://github.com/shankarjatti/guru10ms (public, branch `main`) |
@@ -28,6 +46,13 @@ decisions taken, and what comes next. Only measured facts; anything not verified
 ---
 
 ## 2026-09-28
+
+### 2026-10-01 — user: "keep updating in .md file because of compact session"
+* CURRENT STATE block rewritten for the switch work.
+* User: "don't change anything in our old repos" → this log is kept ONLY here (guru_switch_mon-df) from now on.
+  One commit with this CURRENT STATE update had already been pushed to guru10ms (before the message arrived) —
+  left as it is; nothing else changed there.
+* `phase_table_live_deg.txt` changed: written by the user's CALIBRATE of 2026-09-30 18:10 (real table).
 
 ### 2026-09-30 evening — MON/DF switch work published: https://github.com/shankarjatti/guru_switch_mon-df (PUBLIC)
 * User gave the repo (created public) and asked for everything: MON + DF switch information, files, custom blocks,
