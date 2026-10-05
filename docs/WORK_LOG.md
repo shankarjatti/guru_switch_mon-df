@@ -10,7 +10,7 @@ decisions taken, and what comes next. Only measured facts; anything not verified
 
 ---
 
-## CURRENT STATE (keep this block up to date) — last update 2026-10-01
+## CURRENT STATE (keep this block up to date) — last update 2026-10-05
 
 | | |
 |---|---|
@@ -24,6 +24,7 @@ decisions taken, and what comes next. Only measured facts; anything not verified
 | Docs of the switch work | `guru_switch/docs/switching/`: THEORY, ENGINE_AND_BLOCKS, DEVELOPMENT_AND_TESTS, RUN_AND_HARDWARE |
 | User rules | everything real, no fakes/fallbacks; RX does all calculations, TX only a source; plan first, build after the go; MON continuous; mode manual only; keep this log updated every stage (sessions get compacted) |
 | Open items | ~1–2 % DF slots late when the PC is busy (CPU governor `powersave`, kernel worker load); 10 missing bursts seen once (first continuous-MON run, not reproduced); ch0 (A/RX1) 13–16 dB low (cable/port); HackRF drops off USB (another port/cable); MON bands fixed at start; CPU headroom of the DF Python chain; over-the-air jitter (guru_ota) |
+| Monitoring plan (2026-10-05, architecture only) | per-channel scan frames: CH1 14.26 s · CH2 9.16 s · CH3 5.12 s · CH4 0.3 s; look = (T_pkt + T_rep) × 2.5 + 10 ms (CH3 150 ms, CH4 10 ms dwell); MON = 4 Pub-Sub links, DF = 1 Pub-Sub from AOA — see the 2026-10-05 entry |
 | Next (user's plan) | step by step, only on the user's go: more MON bands with retuning, DOA requests from edge modules → priority scheduler → DF on the band → back to MON |
 
 **After a compacted session:** read this block, then the newest entries below; the switch work's details are in
@@ -44,6 +45,71 @@ guru_DF_v1, guru_MON_v1) — user, 2026-10-01.
 | Next step | user: `cd ~/radar2/guru && ./run_hop.sh --burst` + CALIBRATE; long run (> 11 min) to prove the 2 MS/s fix; rtprio needs log out/in |
 
 ---
+
+## 2026-10-05
+
+### 2026-10-05 — REQUIREMENT: emergency mode skips DF approval (spec only, nothing built)
+* User: *"in emergency mode no need to wait for DF approval"*.
+* What it changes: today the mode changes **only by hand** with the MODE selector and the
+  control API is off by default. This is the first case where a DF request would move
+  MON → DF with no operator action, i.e. the control API path has to be live under an
+  emergency condition.
+* Not built. Questions that change the architecture, waiting on the user:
+  1. What raises "emergency"? A flag on the edge module's DOA request, a separate operator
+     arm switch, or a classification by the priority scheduler?
+  2. Where does it preempt? Abort the MON look in progress, or at the next slot boundary?
+     (the engine switches at a slot boundary today; mid-look abort is new work)
+  3. How does it go back to MON? Fixed DF dwell, operator release, or when the emergency
+     clears?
+  4. Two emergency requests at once — what decides?
+  5. **Calibration.** DF runs CALIBRATE at every start today. An instant emergency DF has no
+     time for it, so it has to use a stored per-band calibration. Offsets re-randomise on
+     every power cycle and drift with RF frequency, so the stored set has an age limit —
+     what is acceptable, and what should happen when it is stale?
+* Related known limits to carry into the design: TwinRX will not retune into 5.0–5.14 GHz
+  (UHD picks a high-side LO1 that never locks); ~1–2 % DF slots late when the PC is busy.
+
+
+### 2026-10-01 … 10-05 — MONITORING PLAN (architecture only: no code, no measurements)
+* User: "no we not going to building any code project now, I need to give architecture" · "no file creation,
+  just analyse … make plan and update block diagram" · "we'll come only for MONITORING". Inputs: the user's design
+  sheet (Frequency List tab = bands per module; its dwell column NOT used) and timing slides; per-channel
+  plans and block diagrams were made in chat. **Everything below is from standards / the sheet, not measured.**
+* Rules decided by the user:
+  * every look = **(T_pkt + T_rep) × 2.5 + 10 ms switch** (T_pkt = one packet/pulse on air, T_rep = gap to the
+    next one from the same transmitter); **switch 10 ms everywhere**; bands from the sheet only.
+  * CH3 radar: **150 ms dwell per look** (user override); CH4: **10 ms dwell per band** (user override).
+  * one look = one LO tune; 80 MHz wide looks assumed (needs ≥ 100 MS/s per channel = dual 10 GbE; today's
+    1 Gb/s gives ~4 MHz looks).
+* **CH1 — ch0 A/RX1 — Drone + Replay/DoS — frame 14,256 ms**
+  * Conventional × 10, 1,065 ms per cycle: Wi-Fi 2412–2472 · 5180–5240 · 5745–5825 (beacon 102.4 ms × 2.5 =
+    256 ms each) + LoRa 865–928 (SF7, 51 B packet 103 ms × 2.5 = 257 ms) = 10,650 ms.
+  * DroneID listen 10 ms + 2 s = 2,010 ms.
+  * Unconventional × 2, 798 ms per cycle: 433.05–434.79 · 1080–1280 · 5645–5945 (256 ms each) = 1,596 ms.
+    865–928, 2399.5–2483.5, 5150–5250 left out (ISM, already covered by the conventional cycle).
+* **CH2 — ch1 A/RX2 — Terrestrial + Air/Maritime — frame 9,156 ms**
+  * Terrestrial × 8, 1,042 ms per cycle (dwell ms): D-STAR 145.0 (20 + 0 → 50) · TETRA 420.0 (14.17 + 42.5 → 142)
+    · DMR 446.00625 (27.5 + 32.5 → 150) · P25 450.0 (180 + 0 → 450) · NXDN 451.0 (80 + 0 → 200) = 8,336 ms.
+  * Air & maritime × 1: AIS 161.975 (400, same as ADS-B — user) · ADS-B 1090 (0.12 + 160 → 400) = 820 ms.
+  * Gaps are for ONE radio (handheld: DMR 32.5 ms, TETRA 42.5 ms), not slot-to-slot (2.5 / 0.25 ms).
+* **CH3 — ch2 B/RX1 — Radar — frame 5,120 ms**: 32 looks × (150 + 10 ms): L 1200–1400 (3) · S 2700–3100 (5) ·
+  S 3000–3500 (7) · C 5140–5900 (10; 5000–5140 cannot be tuned) · C 5400–5900 (7, inside the C row above).
+  Without the duplicate row 4.0 s; one look per row 0.8 s (user to choose). Earlier PRI rule (2.5 × slowest PRI:
+  L 10, S 8.3, C 25 ms) replaced by the 150 ms.
+* **CH4 — ch3 B/RX2 — cellular downlink only — frame 300 ms**: 15 looks × (10 + 10 ms): 10 sheet bands
+  (3 × 2G, B28, B5, B8, B3/n3, B1/n1, B40 × 2 looks, n78 × 5 looks). n78 sync repeats every 20 ms → seen ~half
+  the time at 10 ms. One look per band: 200 ms.
+* **Data paths** (block diagram):
+  * MON (parallel): scheduler → **4 Pub-Sub links**, one per channel (IQ + FFT + tags: channel, LO freq,
+    look/frame id, radio time) → its edge module → its UI.
+  * Control Pub-Sub: detections + DOA requests → scheduler.
+  * DF (sequential): **PS 1–4 OFF**; shared LO, DF bursts → AOA → **one DF Pub-Sub** (IQ + FFT + az/el + tags)
+    → the related module → its UI; then back to MON, PS 1–4 on. MON ↔ DF switch stays manual.
+* Open: CH3 150 ms per look or per row; CH4 merge 2G into B8/B3; where edge modules run (80 MHz raw IQ is
+  ~800 MB/s per link → same PC or FFT only); GNSS has no channel; separate DF antenna array vs same 4 antennas;
+  ground radars outside the sheet (VHF/UHF, wind profilers, 1030 MHz) not added; CH3 + CH4 share board B
+  (~55 dB board-mate leak); host link 1 Gb/s vs dual 10 GbE.
+* Next: only on the user's go (measure MON retune time per step and max MS/s per channel first).
 
 ## 2026-09-28
 
