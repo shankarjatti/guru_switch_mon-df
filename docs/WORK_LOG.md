@@ -10,10 +10,14 @@ decisions taken, and what comes next. Only measured facts; anything not verified
 
 ---
 
-## CURRENT STATE (keep this block up to date) — last update 2026-10-05
+## CURRENT STATE (keep this block up to date) — last update 2026-10-22
 
 | | |
 |---|---|
+| **Monitoring (built 2026-10-08…16, local only)** | `~/radar2/guru_mon_scan` (scanner, scan_plan, pub-sub, UI) + `~/radar2/edge_ch2` (watchdog, UI bridge, CH2 router) + `~/radar2/terrestrial38`, `gr-dsd`, `gr-tetra` (GR 3.8 decoders). 4 channels scan their frames in parallel, own LO each, ZeroMQ PUB 5201–5204, 5-panel UI, activity CSV. Frozen: `guru_mon_scan_v1` / `_v2` (+ `.tar.gz`, `.sha256`), `terrestrial_port_v1.tar.gz`. NOT in the GitHub repo. Details: the 2026-10-08…16 entry and `guru_mon_scan/BUILD_LOG.md` |
+| **Run monitoring** | `sudo nmcli connection up usrp` (NIC must be 192.168.10.1/24) → X310 on, 4 antennas → `cd ~/radar2/edge_ch2 && python3 -u run_monitor.py --gain 25 --ch2-gain 10 --samp-rate 1e6 --squelch -45` → UI http://127.0.0.1:8099/securecom_ui.html → stop with ONE Ctrl-C. Checked 2026-10-22 (files, toolchain, modules, ports; hardware not run) |
+| **Monitoring gaps found 2026-10-22** | (1) each look ≈ 1 MHz at the band centre, not 80 MHz; (2) detector reads only the last 1–2 ms of a dwell; (3) CH3 "ACTIVE" is energy only; (4) `scan_plan.py` adds the 10 ms switch twice for CH3 (160), CH4 (20), DroneID (2010); (5) host `sleep` timing, host-time tags, no LO-lock read in `mon_server.py`; (6) no proof yet of one correct terrestrial decode. See the 2026-10-22 entry |
+| **DF side of the design (`~/radar2/monitoring_sim.html`)** | NOT built: request path, priority scheduler (drone ×5 / others ×2), manual approve, emergency, DF Pub-Sub + AOA. Only the MON↔DF switch itself is proven (guru_switch). Field calibration with real antennas still undecided |
 | Working system | **guru_switch** (`~/radar2/guru_switch`, `./run_hop.sh --switch`): DF (shared LO, 2.4 → 5.2 → 5.8 GHz, 7 ms switching + 5 ms dwell, burst, 2 MS/s) + MON (own LO per channel: ch0 900 MHz, ch1 2.4, ch2 5.2, ch3 5.8 GHz, ONE continuous stream) in one program; mode changed ONLY by hand with the MODE selector (control API off by default) |
 | Proven | DF phase after returning from MON ≤ 0.33° (same as a plain retune); switch ~20–33 ms request → first dwell; 30-min run 2026-09-30 18:12–18:42: 0 TIMING LOST, 0 errors, HackRF 0 stalls |
 | GitHub | **this work + this log**: https://github.com/shankarjatti/guru_switch_mon-df (PUBLIC, main) · old (do not change): https://github.com/shankarjatti/guru10ms |
@@ -45,6 +49,75 @@ guru_DF_v1, guru_MON_v1) — user, 2026-10-01.
 | Next step | user: `cd ~/radar2/guru && ./run_hop.sh --burst` + CALIBRATE; long run (> 11 min) to prove the 2 MS/s fix; rtprio needs log out/in |
 
 ---
+
+## 2026-10-22
+
+### 2026-10-22 — user: "check that monitoring work … based on the monitoring and DF html file … what is done, what is to do" · "check how to run" · "keep updating on .md file always"
+* **Read-only check, nothing was run.** The X310 was not reachable: NIC `enp3s0` was on "Wired connection 1"
+  (192.168.0.180), not the saved `usrp` profile (192.168.10.1/24). Compared `~/radar2/monitoring_sim.html`
+  (design) with `guru_mon_scan`, `edge_ch2`, `BUILD_LOG.md`, the activity CSVs and the memory notes.
+* **Done and run on the X310 (per BUILD_LOG / edge_ch2 README, not re-run today):** 4 channels scan in parallel
+  (CH1 47 looks, CH2 42, CH3 5, CH4 9), MON retune + lock worst 6.7 ms (switch kept at 10 ms), ZeroMQ PUB 5201–5204
+  (header: ch, band, freq, look, frame, host_time, n), 5-panel UI on real data, activity CSV (17 logs 14–16 Oct;
+  longest run 16:53 → 17:46 on 16 Oct), watchdog `run_monitor.py` (CH2 gain 10, 1 MS/s), CH2 router + 4-protocol
+  decoder chain live, `--pin`, `--look-bw`.
+* **Gaps found (from reading the code and the logs; hardware not re-measured):**
+  1. One look = `--samp-rate` wide (1 MS/s in the watchdog) at the band centre → ≈ 1 MHz of bands that are
+     25–760 MHz wide. The design's 80 MHz look needs ≥ 100 MS/s per channel (dual 10 GbE).
+  2. `mon_server.py` reads a 2000-sample moving average ONCE at the end of the dwell → only the last 1–2 ms of the
+     dwell is judged; bursts earlier in the dwell are missed (needs peak / max over the dwell).
+  3. CH3 "ACTIVE" = wideband energy, 10–12 dB over floor on every radar band; a 2 ms average hides µs pulses and
+     cannot separate radar from Wi-Fi. No radar detection yet.
+  4. `scan_plan.py`: CH3 dwell 160, CH4 dwell 20, DroneID 2010 are the sim's look totals that already contain the
+     10 ms switch; the code adds `SWITCH_MS` again → CH3 850 ms (plan 800), CH4 270 ms (plan 180), CH1 14,266 ms
+     (plan 14,256). To confirm with the user, then fix.
+  5. Timing is host `time.sleep` in 4 threads (real switch probably ≈ tune time + 10 ms; not measured — use
+     `MON_DBG_TIMING=1`); tags carry host time, not radio time; blocks around a retune can mix two bands;
+     `mon_server.py` (the running path) does not read the LO lock — only the older `mon_scan.py` GUI does.
+  6. Pub-Sub carries IQ + header only; the FFT is made in the UI bridge (design says IQ + FFT).
+  7. Terrestrial decode: thousands of `.wav` recordings (dmr / nxdn / p25) exist, all protocols firing in the same
+     second at times → they include false triggers; no recorded proof of one correct decode (talkgroup / ID).
+  8. Sim: the CH1 and CH2 timelines leave out the 10 ms switch (13.8 s / 8.7 s vs labels 14.26 s / 9.16 s).
+     DroneID listen sits on 2.442 GHz as a placeholder; DMR is on 446.100 (the radio's real frequency).
+* **DF side of the sim: not built.** No request path, priority scheduler (drone ×5 / others ×2), manual approve,
+  emergency, DF Pub-Sub or AOA in `guru_mon_scan`; the UI has no DF controls. The MON↔DF switch itself is proven in
+  guru_switch, but its MON mode has 4 fixed bands (cannot run 47-look frames) and `mon_server` is untimed Python →
+  two code bases to merge. Open: field calibration with real antennas; one array for DF and monitoring or two;
+  the 5 emergency questions of the 2026-10-05 entry.
+* **How to run (checked: all files exist, GR 3.8 + UHD 3.15 python modules import, system python has numpy / zmq /
+  websockets, `paplay` for audio, all ports 5201–5204 / 7001–7004 / 8099 / 8788 / 8780 / 8787 free):**
+  `sudo nmcli connection up usrp` → `ping 192.168.10.2` → X310 on, 4 antennas on A/RX1, A/RX2, B/RX1, B/RX2 →
+  `cd ~/radar2/edge_ch2 && python3 -u run_monitor.py --gain 25 --ch2-gain 10 --samp-rate 1e6 --squelch -45`
+  (look for `[watchdog] all up`, ≈ 30 s) → http://127.0.0.1:8099/securecom_ui.html (the `guru_mon_scan/README`
+  path `:8099/guru_mon_scan/…` is wrong for the watchdog, which serves from `guru_mon_scan`) → stop with ONE Ctrl-C
+  (never kill the scanner one by one: can leave the X310 stuck). Do not press "Start decoder" (the watchdog starts
+  it). Logs: `/tmp/mon_server.log` (`[hb] alive` every 5 s), `guru_mon_scan/results/activity_*.csv`.
+* **Suggested order (waiting for the user's go):** fix the double-counted switch time → detector = peak over the
+  dwell + LO lock + radio-time tags in `mon_server` → measure the real look timing and a long run → prove one
+  correct DMR decode → then DF (request path + scheduler with manual approve, then the engine merge).
+* **Rule from the user today: "keep updating on .md file always"** → every stage and every answer that changes the
+  state goes into this log (and CURRENT STATE) in the same turn.
+
+### 2026-10-08 … 10-16 — MONITORING BUILT (backfilled on 2026-10-22 from `guru_mon_scan/BUILD_LOG.md`, `README_MON_SCAN.md`, `edge_ch2/README.md`; numbers are those sessions' measurements, not re-run today)
+* Setup change 2026-10-08: no HackRF — 4 real antennas on the 4 TwinRX ports, DMR hand-radios as the live source
+  (CH2 band 446.100 MHz); NetworkManager profile `usrp` (enp3s0 = 192.168.10.1/24, never-default) fixes the NIC address.
+* `guru_mon_scan` made from guru_switch (originals untouched). Plan A (monitoring) before B (DF).
+  A1 retune measured (`mon_scan_retune.py`): CH1 6.2 / CH2 6.2 / CH3 6.7 / CH4 5.8 ms worst, LO relocks every retune.
+  A2/A3/A6: `mon_scan.py` GUI, 4 channels in parallel, per-channel band table + FFT + time graph + ACTIVE/quiet.
+  A4/A5: `mon_pub.py` (stream tag + ZeroMQ PUB 5201–5204), `mon_server.py` (headless), `mon_sub_example.py`;
+  verified offline by loopback (12,964 messages, correct headers). Look splitting (`--look-bw 80e6`), activity CSV,
+  `--pin "CH=BAND"`. Monitoring verified on hardware 2026-10-12; frozen `guru_mon_scan_v1` (12 Oct), `_v2` (+pin, 12 Oct).
+* Terrestrial module (user's repo, B210 + GR 3.10 + UHD 4) ported 2026-10-12 to GR 3.8 C++ OOTs: `gr-dsd`
+  (DMR / P25 / NXDN / D-STAR) and `gr-tetra`; saved as `terrestrial_port_v1.tar.gz`.
+* 2026-10-14 (X310): all channels scanned and published, CH3 ACTIVE on C 5650 / S 3250; CH2 console embedded and live.
+  `edge_ch2`: CH2 header + router (5202 → TCP 7001–7004 by protocol), UI bridge `mon_ws_bridge.py` (ws 8780), 5-panel
+  `securecom_ui.html`. B210 unusable on USB 2.0 (LIBUSB_TRANSFER_OVERFLOW) → the X310 is the target.
+* 2026-10-16: root cause of false cross-detections ("DMR detecting at 450") and ruined decode = CH2 ADC overload
+  (close keyed hand-radio at gain 25 read −0.9 dBFS) → `--ch2-gain 10` (keyed radio ≈ −16 dBFS); sample rate 1 MS/s
+  (2 MS/s × 4 pushed `mon_server` to 180 % CPU, load ≈ 10, stalls); `mon_ws_bridge` FFT capped; watchdog
+  `run_monitor.py` restarts a stalled component (mon_server only after the X310 re-enumerates). CH2 Mode 1 (scan all)
+  / Mode 2 (auto-detect, lock the strongest, release after 2 silent dwells).
+* Open then: DMR decode (frequency match / clipping) — see the 2026-10-22 gaps.
 
 ## 2026-10-05
 
